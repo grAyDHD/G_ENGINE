@@ -1,0 +1,71 @@
+GPTrack/
+│
+├── 07_lib/                 
+│   ├── asm/                # Assembly source files
+│   │   ├── gfx.s           # Optimized graphics routines
+│   │   ├── physics.s       # Optimized physics calculations
+│   │   ├── input.s         # Optimized input handling
+│   │   ├── audio.s         # Optimized sound processing
+│   │   ├── dma.s           # Direct Memory Access routines
+│   │   └── util.s          # Low-level utility functions
+│   │
+│   ├── C/                  # C source files
+│   │   ├── gfx/            # Graphics functions
+│   │   │   ├── sprites.c   # Sprite handling
+│   │   │   ├── tiles.c     # Tile-based rendering
+│   │   │   ├── backgrounds.c # Background rendering
+│   │   │   └── text.c      # Text rendering
+│   │   │
+│   │   ├── input/          # Input handling functions
+│   │   │   ├── buttons.c   # Button input handling
+│   │   │   ├── touch.c     # Touch screen input handling (if needed)
+│   │   │   └── input_manager.c # General input manager
+│   │   │
+│   │   ├── physics/        # Physics functions
+│   │   │   ├── movement.c  # Basic movement and kinematics
+│   │   │   ├── collision.c # Collision detection and response
+│   │   │   ├── gravity.c   # Gravity and related effects
+│   │   │   └── particles.c # Particle system for effects
+│   │   │
+│   │   ├── audio/          # Audio functions
+│   │   │   ├── sound.c     # Sound effects
+│   │   │   ├── music.c     # Background music handling
+│   │   │   └── mixer.c     # Audio mixing and channel management
+│   │   │
+│   │   ├── system/         # System-level functions
+│   │   │   ├── dma.c       # Direct Memory Access
+│   │   │   ├── interrupts.c # Interrupt handling
+│   │   │   └── timers.c    # Timer functions
+│   │   │
+│   │   ├── engine/         # Core engine logic
+│   │   │   ├── game_loop.c # Main game loop
+│   │   │   ├── state.c     # Game state management
+│   │   │   └── events.c    # Event handling
+│   │   │
+│   │   └── util/           # Utility functions
+│   │       ├── math.c      # Math functions (e.g., trigonometry, random numbers)
+│   │       ├── memory.c    # Memory management
+│   │       └── logging.c   # Debugging and logging utilities
+│   │
+│   ├── include/            # Header files (public API for the library)
+│   │   ├── gfx/            # Headers for graphics modules
+│   │   ├── input/          # Headers for input modules
+│   │   ├── physics/        # Headers for physics modules
+│   │   ├── audio/          # Headers for audio modules
+│   │   ├── system/         # Headers for system-level functions
+│   │   ├── engine/         # Headers for core engine logic
+│   │   └── util/           # Headers for utility functions
+│   │
+├── tests/                  # Test programs and ROMs
+│   ├── test_gfx/           # Tests for graphics functionality
+│   ├── test_input/         # Tests for input handling
+│   ├── test_physics/       # Tests for physics
+│   ├── test_audio/         # Tests for audio functionality
+│   └── test_engine/        # Tests for core engine features
+│
+├── docs/                   # Documentation
+│   ├── API.md              # Documentation for the library API
+│   └── Tutorial.md         # Step-by-step tutorial for new users
+│
+├── Makefile                # Main Makefile for building the library and tests
+└── README.md               # Project overview and setup instructions
