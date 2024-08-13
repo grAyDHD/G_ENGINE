@@ -381,25 +381,25 @@ Linker script and memory map
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000      0x30b
+.debug_info     0x00000000      0x313
  *(.debug_info)
- .debug_info    0x00000000      0x30b main.o
+ .debug_info    0x00000000      0x313 main.o
 
-.debug_abbrev   0x00000000      0x1fb
+.debug_abbrev   0x00000000      0x1fa
  *(.debug_abbrev)
- .debug_abbrev  0x00000000      0x1fb main.o
+ .debug_abbrev  0x00000000      0x1fa main.o
 
-.debug_line     0x00000000      0x3a3
+.debug_line     0x00000000      0x3a5
  *(.debug_line)
- .debug_line    0x00000000      0x3a3 main.o
+ .debug_line    0x00000000      0x3a5 main.o
 
 .debug_frame    0x00000000       0x88
  *(.debug_frame)
  .debug_frame   0x00000000       0x88 main.o
 
-.debug_str      0x00000000      0x166
+.debug_str      0x00000000      0x168
  *(.debug_str)
- .debug_str     0x00000000      0x166 main.o
+ .debug_str     0x00000000      0x168 main.o
 
 .debug_loc
  *(.debug_loc)
@@ -468,7 +468,7 @@ LOAD /opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/14.1.0/../../../../ar
 END GROUP
 LOAD /opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/14.1.0/thumb/crtend.o
 LOAD /opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/14.1.0/thumb/crtn.o
-OUTPUT(/home/grayson/Code/GBA/GPTrack/09_phys/09_phys.elf elf32-littlearm)
+OUTPUT(/home/grayson/Code/GBA/G_Engine/09_phys/09_phys.elf elf32-littlearm)
 LOAD linker stubs
 
 .debug_loclists

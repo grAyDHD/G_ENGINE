@@ -1,0 +1,78 @@
+[
+  {
+    "arguments": [
+      "/opt/devkitpro/devkitARM/bin/arm-none-eabi-gcc",
+      "-mthumb",
+      "-mthumb-interwork",
+      "-O2",
+      "-Wall",
+      "-fno-strict-aliasing",
+      "-IC/include",
+      "-IC",
+      "-c",
+      "-o",
+      "build/audio/audio.o",
+      "C/audio/audio.c"
+    ],
+    "directory": "/home/grayson/Code/GBA/G_Engine/07_lib",
+    "file": "/home/grayson/Code/GBA/G_Engine/07_lib/C/audio/audio.c",
+    "output": "/home/grayson/Code/GBA/G_Engine/07_lib/build/audio/audio.o"
+  },
+  {
+    "arguments": [
+      "/opt/devkitpro/devkitARM/bin/arm-none-eabi-gcc",
+      "-mthumb",
+      "-mthumb-interwork",
+      "-O2",
+      "-Wall",
+      "-fno-strict-aliasing",
+      "-IC/include",
+      "-IC",
+      "-c",
+      "-o",
+      "build/gfx/draw.o",
+      "C/gfx/draw.c"
+    ],
+    "directory": "/home/grayson/Code/GBA/G_Engine/07_lib",
+    "file": "/home/grayson/Code/GBA/G_Engine/07_lib/C/gfx/draw.c",
+    "output": "/home/grayson/Code/GBA/G_Engine/07_lib/build/gfx/draw.o"
+  },
+  {
+    "arguments": [
+      "/opt/devkitpro/devkitARM/bin/arm-none-eabi-gcc",
+      "-mthumb",
+      "-mthumb-interwork",
+      "-O2",
+      "-Wall",
+      "-fno-strict-aliasing",
+      "-IC/include",
+      "-IC",
+      "-c",
+      "-o",
+      "build/gfx/gfx.o",
+      "C/gfx/gfx.c"
+    ],
+    "directory": "/home/grayson/Code/GBA/G_Engine/07_lib",
+    "file": "/home/grayson/Code/GBA/G_Engine/07_lib/C/gfx/gfx.c",
+    "output": "/home/grayson/Code/GBA/G_Engine/07_lib/build/gfx/gfx.o"
+  },
+  {
+    "arguments": [
+      "/opt/devkitpro/devkitARM/bin/arm-none-eabi-gcc",
+      "-mthumb",
+      "-mthumb-interwork",
+      "-O2",
+      "-Wall",
+      "-fno-strict-aliasing",
+      "-IC/include",
+      "-IC",
+      "-c",
+      "-o",
+      "build/input/input.o",
+      "C/input/input.c"
+    ],
+    "directory": "/home/grayson/Code/GBA/G_Engine/07_lib",
+    "file": "/home/grayson/Code/GBA/G_Engine/07_lib/C/input/input.c",
+    "output": "/home/grayson/Code/GBA/G_Engine/07_lib/build/input/input.o"
+  }
+]

@@ -376,17 +376,17 @@ Linker script and memory map
  *(.debug_abbrev)
  .debug_abbrev  0x00000000       0x8b main.o
 
-.debug_line     0x00000000       0xd0
+.debug_line     0x00000000       0xd2
  *(.debug_line)
- .debug_line    0x00000000       0xd0 main.o
+ .debug_line    0x00000000       0xd2 main.o
 
 .debug_frame    0x00000000       0x28
  *(.debug_frame)
  .debug_frame   0x00000000       0x28 main.o
 
-.debug_str      0x00000000       0xef
+.debug_str      0x00000000       0xf1
  *(.debug_str)
- .debug_str     0x00000000       0xef main.o
+ .debug_str     0x00000000       0xf1 main.o
 
 .debug_loc
  *(.debug_loc)
@@ -453,7 +453,7 @@ LOAD /opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/14.1.0/../../../../ar
 END GROUP
 LOAD /opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/14.1.0/thumb/crtend.o
 LOAD /opt/devkitpro/devkitARM/bin/../lib/gcc/arm-none-eabi/14.1.0/thumb/crtn.o
-OUTPUT(/home/grayson/Code/GBA/GPTrack/01_pxlDsp/01_pxlDsp.elf elf32-littlearm)
+OUTPUT(/home/grayson/Code/GBA/G_Engine/01_pxlDsp/01_pxlDsp.elf elf32-littlearm)
 LOAD linker stubs
 
 .debug_rnglists
