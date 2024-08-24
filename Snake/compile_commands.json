@@ -1,0 +1,22 @@
+[
+  {
+    "arguments": [
+      "/opt/devkitpro/devkitARM/bin/arm-none-eabi-gcc",
+      "-g",
+      "-Wall",
+      "-O2",
+      "-mcpu=arm7tdmi",
+      "-mtune=arm7tdmi",
+      "-mthumb",
+      "-I/home/grayson/Code/GBA/G_Engine/Snake/build/../../07_lib/C/include",
+      "-I/home/grayson/Code/GBA/G_Engine/Snake/build/../../07_lib/build",
+      "-c",
+      "-o",
+      "Snake.o",
+      "/home/grayson/Code/GBA/G_Engine/Snake/C/Snake.c"
+    ],
+    "directory": "/home/grayson/Code/GBA/G_Engine/Snake/build",
+    "file": "/home/grayson/Code/GBA/G_Engine/Snake/C/Snake.c",
+    "output": "/home/grayson/Code/GBA/G_Engine/Snake/build/Snake.o"
+  }
+]

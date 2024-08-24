@@ -3,76 +3,31 @@
 // bounmce whn hitting walls
 // three platforms- one bouncy, one giving jump boost, one cant jump from
 //
+#include "dmg.h"
 #include "draw.h"
 #include "gfx.h"
 #include "input.h"
-#define GRAVITY 1    // Gravity constant
-#define SW 240       // Screen width
-#define SH 160       // Screen height
-#define BALL_SIZE 4  // Size of the ball
-#define MOVE_SPEED 2 // Speed of movement when pressing left/right
-#define SHOOT_VEL 5  // Initial velocity when shooting with bumpers
-#define JUMP_VELOCITY -10
-
-struct Object {
-  int x;
-  int y;
-  int vx;
-  int vy;
-  int ax;
-  int ay;
-  int onGround;
-};
+#include "phys.h"
 
 int gravityDirection = 1;
-
-void applyGravity(struct Object *obj) { obj->ay = GRAVITY * gravityDirection; }
-
-void updateMovement(struct Object *obj) {
-  obj->vx += obj->ax;
-  obj->vy += obj->ay;
-  obj->x += obj->vx;
-  obj->y += obj->vy;
-}
-
-void handleCollisions(struct Object *obj) {
-  if (gravityDirection == 1) {
-    if (obj->y >= SH - BALL_SIZE) {
-      obj->y = SH - BALL_SIZE;
-      obj->vy = -(obj->vy / 2);
-      obj->onGround = 1;
-    } else if (obj->y <= 0) {
-      obj->vy = 0;
-      obj->onGround = 0;
-    } else {
-      obj->onGround = 0;
-    }
-  }
-
-  else if (gravityDirection == -1) {
-    if (obj->y <= 0) {
-      obj->y = 0;
-      obj->vy = -(obj->vy / 2);
-      obj->onGround = 1;
-    } else if (obj->y >= SH - BALL_SIZE) {
-      obj->y = SH - BALL_SIZE;
-      obj->vy = 0;
-      obj->onGround = 0;
-    } else {
-      obj->onGround = 0;
-    }
-  }
-
-  if (obj->x < 0) {
-    obj->x = 0;
-    obj->vx = 0;
-  }
-  if (obj->x >= SW - BALL_SIZE) {
-    obj->x = SW - BALL_SIZE;
-    obj->vx = 0;
-  }
-}
-
+// features to finish demo:
+// three platforms to jump on,
+// bitmap background
+// game play loop: 'A' is jump, and should trigger "jump" sound effect.
+// should only emit sound once while held, check if on ground when pressed, and
+// jump slightly higher if held longer. when gravity is reversed, ball 'lands'
+// on ceiling, and jumping works essentially the same but in reverse direction
+// also, jump sound should have adjusted parameters  to reverse the sweep sound
+// when gravity reversed. bumper buttons are used to launch the ball at a 45
+// degree angle against gravity.  There should be momentum introduced to provide
+// bouncing off of walls/platforms. A launch can be performed in the air, only
+// if ground has been made contact with since the last use of the launch.
+// gravity should have an accellerating effect, and the ball should bounce 0-3
+// times depending on collision speed with the ground. can land one of three
+// platforms, each emitting a unique collision sound.  launching into side of
+// platform is effective to bounce the opposite direction left and right buttons
+// move ball left and right at all times. holding 'B' reverses gravity until it
+// is released.
 void checkInput(struct Object *ball) {
 
   if ((KEYS & A) == 0) {
@@ -113,9 +68,13 @@ void checkInput(struct Object *ball) {
 
 int main() {
   DSPC = MODE3 | BG2;
+  initSoundSystem();
+  defaultCH1Sound();
+  TIMED();
 
   struct Object ball = {120, 80, 0, 0, 0, 0};
   Coordinate prevCrnr = {ball.x, ball.y}; // Track the previous position
+
   while (1) {
     drawRect(prevCrnr, BALL_SIZE, BALL_SIZE, 0x0000, VRAM);
     checkInput(&ball);

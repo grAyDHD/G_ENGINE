@@ -3,7 +3,6 @@
     "arguments": [
       "/opt/devkitpro/devkitARM/bin/arm-none-eabi-gcc",
       "-mthumb",
-      "-mthumb-interwork",
       "-O2",
       "-Wall",
       "-fno-strict-aliasing",
@@ -22,7 +21,6 @@
     "arguments": [
       "/opt/devkitpro/devkitARM/bin/arm-none-eabi-gcc",
       "-mthumb",
-      "-mthumb-interwork",
       "-O2",
       "-Wall",
       "-fno-strict-aliasing",
@@ -41,7 +39,6 @@
     "arguments": [
       "/opt/devkitpro/devkitARM/bin/arm-none-eabi-gcc",
       "-mthumb",
-      "-mthumb-interwork",
       "-O2",
       "-Wall",
       "-fno-strict-aliasing",
@@ -60,7 +57,6 @@
     "arguments": [
       "/opt/devkitpro/devkitARM/bin/arm-none-eabi-gcc",
       "-mthumb",
-      "-mthumb-interwork",
       "-O2",
       "-Wall",
       "-fno-strict-aliasing",

@@ -1,0 +1,22 @@
+[
+  {
+    "arguments": [
+      "/opt/devkitpro/devkitARM/bin/arm-none-eabi-gcc",
+      "-g",
+      "-Wall",
+      "-O2",
+      "-mcpu=arm7tdmi",
+      "-mtune=arm7tdmi",
+      "-mthumb",
+      "-I/home/grayson/Code/GBA/G_Engine/11_dmg1/build/../../07_lib/C/include",
+      "-I/home/grayson/Code/GBA/G_Engine/11_dmg1/build/../../07_lib/build",
+      "-c",
+      "-o",
+      "11_dmg1.o",
+      "/home/grayson/Code/GBA/G_Engine/11_dmg1/C/11_dmg1.c"
+    ],
+    "directory": "/home/grayson/Code/GBA/G_Engine/11_dmg1/build",
+    "file": "/home/grayson/Code/GBA/G_Engine/11_dmg1/C/11_dmg1.c",
+    "output": "/home/grayson/Code/GBA/G_Engine/11_dmg1/build/11_dmg1.o"
+  }
+]

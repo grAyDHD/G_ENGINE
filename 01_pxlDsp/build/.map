@@ -376,9 +376,9 @@ Linker script and memory map
  *(.debug_abbrev)
  .debug_abbrev  0x00000000       0x8b main.o
 
-.debug_line     0x00000000       0xd2
+.debug_line     0x00000000       0xa2
  *(.debug_line)
- .debug_line    0x00000000       0xd2 main.o
+ .debug_line    0x00000000       0xa2 main.o
 
 .debug_frame    0x00000000       0x28
  *(.debug_frame)

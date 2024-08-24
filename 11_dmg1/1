@@ -1,0 +1,53 @@
+#include <input.h>
+#include <typedefs.h>
+
+#define DMG_SOUND_SYSTEM *(volatile u16 *)0x04000084
+#define ENABLE_SOUND() (DMG_SOUND_SYSTEM |= 0x0080)
+#define DISABLE_SOUND() (DMG_SOUND_SYSTEM &= 0xFF7F);
+#define DMG_STEREO_OUTPUT *(volatile u16 *)0x04000080
+
+#define DMG_1 *(volatile u16 *)0x04000060
+#define SWEEP *(volatile u16 *)0x04000060
+#define ENV *(volatile u16 *)0x04000062
+#define FREQ *(volatile u16 *)0x04000064
+#define PLAY() (FREQ = (FREQ & 0x07FF) | 0x8000) // Reset sound with PLAY bit
+
+#define SWEEP_RANGE(range) (DMG_1 = (DMG_1 & ~0x07) | ((8 - (range)) & 0x07))
+#define SWEEP_TIME(time)                                                       \
+  (DMG_1 = (DMG_1 & ~(0x07 << 4)) | (((8 - (time)) & 0x07) << 4))
+#define SWEEP_DIRECTION(direction)                                             \
+  (DMG_1 = (DMG_1 & ~(0x08)) | (direction << 3))
+u16 keyCache;
+u16 prevKeyCache;
+void initSoundSystem();
+void setChannel1();
+
+int main() {
+  ENABLE_SOUND();
+  DMG_STEREO_OUTPUT = 0xFF77; // Enable all channels, full volume, both speakers
+  SWEEP = 0x00AA;             // Sweep settings: fast/short, small shift
+  // SWEEP_RANGE(6);     // 0 1 2 3 4 5 6 7
+  // SWEEP_TIME(6);      // 0 7 6 5 4 3 2 1
+  // SWEEP_DIRECTION(1); // direction up
+  ENV = 0x1FBF;  // Max length, 50% duty cycle, fast step, increment,
+  FREQ = 0x806D; // Set frequency, and set to timed mode (bit 14 = 1)
+                 // 0100
+
+  while (1) {
+    for (volatile int i = 0; i < 1000000; i++) {
+    }
+    PLAY();
+
+    //    UPDATE_KEYS(); // Update key states
+
+    // prevKeyCache = keyCache; // Store the current state as the previous state
+  }
+
+  return 0;
+}
+
+void initSoundSystem() {
+  ENABLE_SOUND();
+  DMG_STEREO_OUTPUT = 0xFF77;
+  // define
+}

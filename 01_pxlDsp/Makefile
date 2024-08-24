@@ -22,7 +22,7 @@ CFLAGS := -g -Wall -O2\
 	-mcpu=arm7tdmi -mtune=arm7tdmi\
 	$(ARCH)
 
-CFLAGS += $(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir))
+CFLAGS += $(foreach dir,$(INCLUDES),-I$(dir))
 CXXFLAGS := $(CFLAGS) -fno-rtti -fno-exceptions
 ASFLAGS := -g $(ARCH)
 LDFLAGS := -g $(ARCH) -Wl,-Map,$(notdir $*.map) -specs=gba.specs
