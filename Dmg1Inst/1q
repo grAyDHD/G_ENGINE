@@ -3,10 +3,12 @@
 #include <input.h>
 #include <typedefs.h>
 
-#define PRESS_ONCE(k) ((prevKeyCache & k) && !(keyCache & k))
+#define PLAY_NOTE()
+
+#define UPDATE_KEY_CACHE() (prevKeyCache = keyCache);
 
 u16 keyCache;
-u16 prevKeyCache = 0;
+u16 prevKeyCache;
 
 u16 NOTES[4] = {0xC410, 0x0484, 0x04E5, 0x0563};
 
@@ -15,28 +17,21 @@ enum ToneState { NORMAL, STACCATO, LEGATO };
 enum SoundState { IDLE, PLAY_NOTE };
 
 int main() {
-  ENABLE_SOUND();
-  DMG_STEREO_OUTPUT = 0xFF77;
-  ENV = 0xC083;
-
+  // ENABLE_SOUND();
   DSPC = MODE3 | BG2;
+  // DMG_STEREO_OUTPUT = 0xFF77;
+
+  // ENV = 0xC083;
+
+  // enum TetraState currentMode = ZERO;
+  //  enum SoundState currentSoundState = IDLE;
 
   while (1) {
-    UPDATE_KEYS();
-    if (PRESS_ONCE(LS)) {
-
-      FREQ = NOTES[3];
-    } else if (PRESS_ONCE(RS)) {
-      FREQ = NOTES[2];
-
-    } else if (PRESS_ONCE(A)) {
-
-      FREQ = NOTES[1];
-    } else if (PRESS_ONCE(B)) {
-      FREQ = NOTES[0];
-    }
-    prevKeyCache = keyCache;
-    waitVBLANK();
+    //    UPDATE_KEYS();
+    //    if (INPUT(B)) {
+    //      FREQ = NOTES[0];
+    //    }
+    //  }
   }
   return 0;
 }
@@ -99,6 +94,3 @@ if (INPUT(LS)) {
     break;
   }
 */
-
-// enum TetraState currentMode = ZERO;
-//  enum SoundState currentSoundState = IDLE;
