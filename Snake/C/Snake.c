@@ -18,6 +18,8 @@ void initializeScreen(unsigned short *vmem) {
 
 int main() {
   initializeScreen(VRAM);
+  Coordinate snakeHead = {60, 60};
 
+  drawRect(snakeHead, 8, 8, COLOR(12, 20, 2), VRAM);
   return 0;
 }
