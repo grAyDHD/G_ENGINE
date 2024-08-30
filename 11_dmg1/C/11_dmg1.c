@@ -2,8 +2,6 @@
 #include <gfx.h>
 #include <input.h>
 #include <typedefs.h>
-// how the fuck are sounds even playing what the fuck?
-#define UPDATE_KEY_CACHE() (prevKeyCache = keyCache);
 
 u16 keyCache;
 u16 prevKeyCache;
@@ -30,8 +28,11 @@ int main() {
     case IDLE:
       if (INPUT(A) && !(prevKeyCache & A)) { // A was just pressed
         FREQ = 0xCF88;
+        //      PLAY();
         currentState = PLAY_ONCE;
       } else if (INPUT(B)) { // B was pressed
+                             // CONTINUOUS();
+                             // PLAY();
         FREQ = 0x8088;
         currentState = CONTINUOUS;
       }
@@ -42,12 +43,7 @@ int main() {
         currentState = IDLE;
       }
       break;
-      // ahhhhh I think I know the issue, I need to write actual macros for
-      // setting FREQ/playing a note, as right now, the bits to initiate note
-      // play back I believe are encoded in the value I am setting for FREQ.  I
-      // remember now a few weeks ago writing this, I wasn't getting expected
-      // behavior when setting the frequency THEN setting play, but rather
-      // triggering them simultaneously.
+
     case CONTINUOUS:
       if (!(INPUT(B))) { // B was released
         // TIMED();
@@ -64,7 +60,7 @@ int main() {
       break;
     }
 
-    UPDATE_KEY_CACHE(); // Store the current state as the previous state
+    prevKeyCache = keyCache; // Store the current state as the previous state
   }
 
   return 0;
