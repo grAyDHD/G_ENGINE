@@ -1,0 +1,35 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: soundtest - Win32 Debug--------------------
+</h3>
+
+
+Microsoft (R) Program Maintenance Utility   Version 6.00.8168.0
+Copyright (C) Microsoft Corp 1988-1998. All rights reserved.
+
+ gcc  -I c:\devkitadv\nylib -I c:\devkitadv\include -I c:\devkitadv\arm-agb-elf\include -I c:\devkitadv\lib\gcc-lib\arm-agb-elf\3.0.2\include -I c:\devkitadv\code\soundtest3\voice1 -mthumb-interwork -c -g  -Wall c:\devkitadv\code\soundtest3\voice1\main.c 
+------------------------------------------
+C-Sources Compiled
+------------------------------------------
+ ld -L c:\DevKitAdv\lib\gcc-lib\arm-agb-elf\3.0.2\interwork -L c:\devkitadv\arm-agb-elf\lib\interwork -T lnkscript -o rom.elf crt0.o   crtbegin.o  crtend.o   main.o   font.o   fontdata.o  logo.o -lc
+/cygdrive/c/devkitadv/bin/ld: Warning: fontdata.o does not support interworking, whereas rom.elf does
+/cygdrive/c/devkitadv/bin/ld: Warning: logo.o does not support interworking, whereas rom.elf does
+------------------------------------------
+Linking Done
+------------------------------------------
+ objcopy -v -O binary rom.elf soundtest1.gba
+copy from rom.elf(elf32-littlearm) to soundtest1.gba(binary)
+------------------------------------------
+Done
+------------------------------------------
+
+
+
+<h3>Results</h3>
+soundtest1.bin - 0 error(s), 2 warning(s)
+</pre>
+</body>
+</html>

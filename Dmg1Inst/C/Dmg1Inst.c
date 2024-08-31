@@ -42,25 +42,57 @@ int main() {
   return 0;
 }
 
+// hold select for directions to change tone, hold start to to change note
+// duration, hold both to set sweep/volume presets
 enum ChordState updateChordState(enum ChordState chordState) {
-  if (PRESS_ONCE(U)) {
+  if (INPUT(ST)) {
+
+    if (INPUT(U)) {
+      ENV = (ENV & 0xFF3F) | (0x00 << 6);
+    } else if (INPUT(D)) {
+      ENV = (ENV & 0xFF3F) | (0x01 << 6);
+    } else if (INPUT(L)) {
+      ENV = (ENV & 0xFF3F) | (0x02 << 6);
+    } else if (INPUT(R)) {
+      ENV = (ENV & 0xFF3F) | (0x03 << 6);
+    }
+
+  } else if (INPUT(SL)) {
+    if (INPUT(U)) {
+      ENV = (ENV & 0xFFC0) | 0x03;
+      FREQ |= 0x8000;
+    } else if (INPUT(D)) {
+      ENV = (ENV & 0xFFC0) | (0x03C);
+      FREQ |= 0x8000;
+    } else if (INPUT(L)) {
+      ENV = (ENV & 0xFFC0) | (0x3B);
+      FREQ |= 0x8000;
+    } else if (INPUT(R)) {
+      ENV = (ENV & 0xFFC0) | (0x3F);
+      FREQ |= 0x8000;
+    }
+
+  } else if (PRESS_ONCE(U)) {
     if (chordState == THREE) {
       chordState = ZERO;
     } else {
       chordState = THREE;
     }
+
   } else if (PRESS_ONCE(D)) {
     if (chordState == ONE) {
       chordState = ZERO;
     } else {
       chordState = ONE;
     }
+
   } else if (PRESS_ONCE(L)) {
     if (chordState == TWO) {
       chordState = ZERO;
     } else {
       chordState = TWO;
     }
+
   } else if (PRESS_ONCE(R)) {
     if (chordState == FOUR) {
       chordState = ZERO;
@@ -68,6 +100,7 @@ enum ChordState updateChordState(enum ChordState chordState) {
       chordState = FOUR;
     }
   }
+
   return chordState;
 }
 
