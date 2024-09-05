@@ -1,0 +1,14 @@
+#include <gfx.h>
+#include <input.h>
+#include <typedefs.h>
+
+u16 keyCache;
+u16 prevKeyCache = 0;
+// 0xC
+u16 NOTES[5][4] = {{0x416, 0x4B5, 0x563, 0x5CE},
+                   {0x2C7, 0x3DA, 0x484, 0x511},
+                   {0x4B5, 0x563, 0x5CE, 0x642},
+                   {0x511, 0x589, 0x60B, 0X65B},
+                   {0x5ED, 0x642, 0x689, 0x6C4}};
+
+int main() { return 0; }

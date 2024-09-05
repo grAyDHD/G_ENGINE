@@ -7,15 +7,6 @@
 #define INPUT(k) (!(keyCache & (k)))
 #define UPDATE_KEYS() (keyCache = KEYS)
 
-// KEYS register inits to:
-//  1111 1111 1111 1111
-// this is the keyCache
-// k is bit of input.
-// keycache & k is true/1
-// gba registers pressed key with 0 bit set,
-// !(1) = 0, or pressed.
-// that is why input macro uses ! operator
-//
 #define A (1 << 0)
 #define B (1 << 1)
 #define SL (1 << 2)

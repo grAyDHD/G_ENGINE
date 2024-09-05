@@ -19,24 +19,6 @@
 
 //---Scale mode 5 screen---//
 
-#define REG_BG2PA *(volatile u16 *)0x4000020 // Horizontal scaling factor
-#define REG_BG2PB *(volatile u16 *)0x4000022 // Horizontal shearing factor
-#define REG_BG2PC *(volatile u16 *)0x4000024 // Vertical shearing factor
-#define REG_BG2PD *(volatile u16 *)0x4000026 // Vertical scaling factor
-
-#define REG_BG2X *(volatile s32 *)0x4000028 // Horizontal offset (using s32)
-#define REG_BG2Y *(volatile s32 *)0x400002C // Vertical offset (using s32)
-
-#define REG_TM2D *(volatile u16 *)0x4000108
-
-#define IN_IWRAM __attribute__((section(".iwram")))
-#define IN_EWRAM __attribute__((section(".ewram")))
-
-// bit 0, vblank status, 0 not in vblank, 1 = in VBlank
-// bit 3, VBlank interrupt enable
-// poll DSPSTAT once set
-// loop until vblank status bit is set
-
 #define DSPSTAT (*(volatile unsigned short *)0x04000004)
 #define VCOUNT                                                                 \
   (*(volatile unsigned short                                                   \
