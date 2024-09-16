@@ -1,11 +1,11 @@
 ifeq ($(strip $(DEVKITARM)),)
 $(error "Please set DEVKITARM in your environment. export DEVKITARM=<path to>devkitARM")
 endif
+
 include $(DEVKITARM)/gba_rules
 
 G_ENGINE_DIR := ../../07_lib
 G_ENGINE := $(G_ENGINE_DIR)/build/g_engine.a
-
 
 TARGET := $(notdir $(CURDIR))
 BUILD := build
@@ -16,11 +16,10 @@ DATA :=
 MUSIC := 
 GRAPHICS := graphics
 
-
 ARCH := -mthumb -mthumb-interwork
 CFLAGS := -g -Wall -O2\
 	-mcpu=arm7tdmi -mtune=arm7tdmi\
-	$(ARCH)
+	$(ARCH) -save-temps   # Add this to save assembly files
 
 CFLAGS += $(foreach dir,$(INCLUDES),-I$(dir))
 CXXFLAGS := $(CFLAGS) -fno-rtti -fno-exceptions
@@ -34,11 +33,9 @@ OBJCOPY := arm-none-eabi-objcopy
 LIBS := $(G_ENGINE)
 LIBDIRS := $(G_ENGINE_DIR)/build
 
-
 ifneq ($(BUILD),$(notdir $(CURDIR)))
 
 export OUTPUT := $(CURDIR)/$(TARGET)
-
 
 export VPATH := $(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
 		$(foreach dir,$(DATA),$(CURDIR)/$(dir)) \
@@ -77,14 +74,14 @@ export LIBPATHS := -L$(G_ENGINE_DIR)/build
 
 .PHONY: $(BUILD) clean all
 
-
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
 clean:
 	@echo clean ...
-	@rm -fr $(BUILD) $(TARGET).elf $(TARGET).gba $(G_ENGINE)
+	@rm -fr $(BUILD) $(TARGET).elf $(TARGET).gba $(TARGET).i $(TARGET).s $(G_ENGINE)
+
 else
 
 all: $(OUTPUT).gba

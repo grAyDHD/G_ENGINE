@@ -1,13 +1,15 @@
 #include "engine.h"
+#include "gfx.h"
+#include "typedefs.h"
 
 int main() {
-    DSPC = MODE3 | BG2;
+  DSPC = MODE3 | BG2;
 
-    unsigned short green = 0x03E0;
+  u16 color = COLOR(2, 2, 20);
+  for (int y = 0; y < 160; y++) {
     for (int x = 0; x < 240; x++) {
-        for (int y = 0; y < 160; y++) {
-            plotPixel(x, y, green, VRAM);
-        }
+      plotPixel(x, y, color, VRAM);
     }
-    return 0;
+  }
+  return 0;
 }

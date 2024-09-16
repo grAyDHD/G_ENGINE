@@ -1,1 +1,0 @@
-SECTIONS {.rodata : {*(.data)}}
