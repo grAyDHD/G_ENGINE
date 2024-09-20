@@ -2,6 +2,8 @@
 #define INPUT_H
 
 #include "typedefs.h"
+extern u16 keyCache;
+extern u16 prevKeyCache;
 
 #define KEYS (*(volatile u16 *)0x4000130)
 #define INPUT(k) (!(keyCache & (k)))
@@ -17,8 +19,5 @@
 #define D (1 << 7)
 #define RS (1 << 8)
 #define LS (1 << 9)
-
-extern u16 keyCache;
-extern u16 prevKeyCache;
 
 #endif

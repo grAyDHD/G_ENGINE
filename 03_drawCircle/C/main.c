@@ -1,5 +1,22 @@
-#include "engine.h"
+// #include "engine.h"
+#define u16 unsigned short
+#define u32 unsigned long
 
+#define COLOR(r, g, b) (((r) & 0x1F) << 10 | ((g) & 0x1F) << 5 | ((b) & 0x1F))
+
+#define SW 240
+#define SH 160
+
+//---Display control---//
+#define DSPC *(u32 *)0x4000000
+//---Video buffer---
+#define VRAM (u16 *)0x6000000
+
+//---Modes---//
+#define MODE3 (u16)0x400
+#define BG2 (u16)0x003
+
+void plotPixel(int x, int y, u16 clr) { ((u16 *)VRAM)[y * SW + x] = clr; }
 void drawCircle(int x, int y, int radius, unsigned short color,
                 unsigned short *vmem) {
   int r = radius;
@@ -11,14 +28,27 @@ void drawCircle(int x, int y, int radius, unsigned short color,
     for (volatile int z = 0; z < 100000; z++)
       ;
     // Draw the eight octants
-    plotPixel(x + r, y + s, color, VRAM); // Octant 1
-    plotPixel(x + s, y + r, color, VRAM); // Octant 2
-    plotPixel(x - s, y + r, color, VRAM); // Octant 3
-    plotPixel(x - r, y + s, color, VRAM); // Octant 4
-    plotPixel(x - r, y - s, color, VRAM); // Octant 5
-    plotPixel(x - s, y - r, color, VRAM); // Octant 6
-    plotPixel(x + s, y - r, color, VRAM); // Octant 7
-    plotPixel(x + r, y - s, color, VRAM); // Octant 8
+    plotPixel(x + r, y + s, color); // Octant 1
+    plotPixel(x + s, y + r, color); // Octant 2
+    plotPixel(x - s, y + r, color); // Octant 3
+    plotPixel(x - r, y + s, color); // Octant 4
+    plotPixel(x - r, y - s, color); // Octant 5
+    plotPixel(x - s, y - r, color); // Octant 6
+    plotPixel(x + s, y - r, color); // Octant 7
+    plotPixel(x + r, y - s, color); // Octant 8
+#define COLOR(r, g, b) (((r) & 0x1F) << 10 | ((g) & 0x1F) << 5 | ((b) & 0x1F))
+
+#define SW 240
+#define SH 160
+
+//---Display control---//
+#define DSPC *(u32 *)0x4000000
+//---Video buffer---
+#define VRAM (u16 *)0x6000000
+
+//---Modes---//
+#define MODE3 (u16)0x400
+#define BG2 (u16)0x003
 
     s++;
     if (decisionOver2 <= 0) {
