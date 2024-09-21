@@ -5,7 +5,6 @@
 #include <input.h>
 
 #define COLOR(r, g, b) (((r) & 0x1F) << 10 | ((g) & 0x1F) << 5 | ((b) & 0x1F))
-
 #define GW 30 // GRID WIDTH = SW/8
 #define GH 20 // GRID HEIGHT = SH/8
 
@@ -29,33 +28,34 @@ void clearSnake(Snake *snake) {
   int black = COLOR(0, 0, 0);
   drawRect(snake->head->xy, 8, 8, black, VRAM);
 };
+
 void handleInput(Snake *snake) {
   switch (snake->direction) {
   case (UP):
     if (INPUT(L)) {
       snake->direction = LEFT;
-    } else {
+    } else if (INPUT(R)) {
       snake->direction = RIGHT;
     }
     break;
   case (DOWN):
     if (INPUT(L)) {
       snake->direction = LEFT;
-    } else {
+    } else if (INPUT(R)) {
       snake->direction = RIGHT;
     }
     break;
   case (LEFT):
     if (INPUT(U)) {
       snake->direction = UP;
-    } else {
+    } else if (INPUT(D)) {
       snake->direction = DOWN;
     }
     break;
   case (RIGHT):
     if (INPUT(U)) {
       snake->direction = UP;
-    } else {
+    } else if (INPUT(D)) {
       snake->direction = DOWN;
     }
     break;
@@ -81,7 +81,7 @@ void updateSnakePosition(Snake *snake) {
 
 void drawSnake(Snake *snake) {
   int green = COLOR(0, 20, 7);
-  drawRect(snake->head->xy, 10, 10, green, VRAM);
+  drawRect(snake->head->xy, 8, 8, green, VRAM);
 };
 
 void initializeScreen(unsigned short *vmem) {
@@ -107,9 +107,9 @@ int main() {
     clearSnake(&player);
     updateSnakePosition(&player);
     drawSnake(&player);
-    handleInput(&player);
 
-    for (volatile int t = 0; t < 100000; t++) {
+    for (volatile int t = 0; t < 50000; t++) {
+      handleInput(&player);
     };
 
     UPDATE_KEYS();

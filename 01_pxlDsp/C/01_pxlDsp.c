@@ -1,0 +1,9 @@
+#include "draw.h"
+#include "gfx.h"
+
+int main() {
+  DSPC = (MODE3 | BG2);
+  u16 clr = COLOR(13, 19, 28);
+  plotPixel(12, 24, clr);
+  return 0;
+}

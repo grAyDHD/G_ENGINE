@@ -3,9 +3,9 @@
 
 #include "typedefs.h"
 
-#define DMG_SOUND_SYSTEM *(volatile u16 *)0x04000084
-#define ENABLE_SOUND() (DMG_SOUND_SYSTEM |= 0x0080)
-#define DISABLE_SOUND() (DMG_SOUND_SYSTEM &= 0xFF7F);
+#define SOUND_SYSTEM *(volatile u16 *)0x04000084
+#define ENABLE_SOUND() (SOUND_SYSTEM |= 0x0080)
+#define DISABLE_SOUND() (SOUND_SYSTEM &= 0xFF7F);
 #define DMG_STEREO_OUTPUT *(volatile u16 *)0x04000080
 
 #define DMG_1 *(volatile u16 *)0x04000060
@@ -18,6 +18,9 @@
   (DMG_1 = (DMG_1 & ~(0x07 << 4)) | (((8 - (time)) & 0x07) << 4))
 #define SWEEP_DIRECTION(direction)                                             \
   (DMG_1 = (DMG_1 & ~(0x08)) | (direction << 3))
+
+#define ENV_LENGTH // reset sound bit after set
+#define ENV_DIRECTION
 
 #define TIMED() (FREQ |= 0x4000)
 #define CONTINUOUS() (FREQ &= ~0x4000)

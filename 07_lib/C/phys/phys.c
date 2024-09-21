@@ -1,3 +1,4 @@
+#include <gfx.h>
 #include <phys.h>
 
 int gravityDirection = 1;
@@ -10,7 +11,7 @@ void updateMovement(struct Object *obj) {
   obj->y += obj->vy;
 }
 
-void handleCollisions(struct Object *obj) {
+void handleCollisions(struct Object *obj, int BALL_SIZE) {
   if (gravityDirection == 1) {
     if (obj->y >= SH - BALL_SIZE) {
       obj->y = SH - BALL_SIZE;

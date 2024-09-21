@@ -26,13 +26,20 @@ void changeSquareSize(Square *square) {
                        : "r1", "memory");
 };
 */
-extern void changeSquareSize(Square *square);
+
+extern void increaseSquareSize(Square *square);
+extern void decreaseSquareSize(Square *square);
+//
 int main() {
   DSPC = MODE3 | BG2;
   Square square = {10, colors[0], {120, 80}};
   while (1) {
     if (INPUT(B)) {
-      changeSquareSize(&square);
+      drawRect(square.coordinate, square.size, square.size, 0x0000, VRAM);
+      decreaseSquareSize(&square);
+    } else if (INPUT(A)) {
+      drawRect(square.coordinate, square.size, square.size, 0x0000, VRAM);
+      increaseSquareSize(&square);
     }
     drawRect(square.coordinate, square.size, square.size, square.color, VRAM);
     UPDATE_KEYS();

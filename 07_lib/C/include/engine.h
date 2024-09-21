@@ -5,12 +5,11 @@
 #include "typedefs.h"
 
 // Include all other headers
-#include "gfx.h"
 #include "draw.h"
-#include "audio.h"
+#include "gfx.h"
 // Add more headers as you create more modules
- #include "input.h"
-//#include "physics.h"
-// #include "system.h"
+#include "input.h"
+// #include "physics.h"
+//  #include "system.h"
 
 #endif // ENGINE_H
