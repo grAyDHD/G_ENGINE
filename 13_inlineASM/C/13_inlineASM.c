@@ -2,6 +2,7 @@
 #include <gfx.h>
 #include <input.h>
 #include <typedefs.h>
+
 u16 keyCache = 0;
 typedef struct {
   int size;              // 4 byte
@@ -15,6 +16,7 @@ int colorCount = sizeof(colors) / sizeof(colors[0]);
 int currentColorIndex = 0;
 
 // ASSEMBLY FUNCTION
+/*
 void changeSquareSize(Square *square) {
   __asm__ __volatile__("ldr r1, [%0]\n"
                        "add r1, r1, #1\n"
@@ -23,8 +25,8 @@ void changeSquareSize(Square *square) {
                        : "r"(square)
                        : "r1", "memory");
 };
-
-// extern void changeSquareSize(Square *square);
+*/
+extern void changeSquareSize(Square *square);
 int main() {
   DSPC = MODE3 | BG2;
   Square square = {10, colors[0], {120, 80}};
@@ -35,6 +37,5 @@ int main() {
     drawRect(square.coordinate, square.size, square.size, square.color, VRAM);
     UPDATE_KEYS();
   }
-
   return 0;
 }

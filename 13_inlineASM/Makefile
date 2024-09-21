@@ -1,117 +1,115 @@
+# Environment setup
 ifeq ($(strip $(DEVKITARM)),)
 $(error "Please set DEVKITARM in your environment. export DEVKITARM=<path to>devkitARM")
 endif
 include $(DEVKITARM)/gba_rules
 
+# Directory and file paths
 G_ENGINE_DIR := ../../07_lib
 G_ENGINE := $(G_ENGINE_DIR)/build/g_engine.a
 
-
+# Build targets and source directories
 TARGET := $(notdir $(CURDIR))
 BUILD := build
-SOURCES := C
+SOURCES := C asm
 
+# Include and asset directories
 INCLUDES := $(G_ENGINE_DIR)/C/include $(G_ENGINE_DIR)/build 
 DATA := 
 MUSIC := 
-GRAPHICS := graphics
+GRAPHICS :=
 
-
+# Compiler and linker flags
 ARCH := -mthumb -mthumb-interwork
 CFLAGS := -g -Wall -O2\
 	-mcpu=arm7tdmi -mtune=arm7tdmi\
 	$(ARCH)
-
 CFLAGS += $(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir))
 CXXFLAGS := $(CFLAGS) -fno-rtti -fno-exceptions
 ASFLAGS := -g $(ARCH)
-LDFLAGS := -g $(ARCH) -Wl,-Map,$(notdir $*.map) -specs=gba.specs
+LDFLAGS := -g $(ARCH) -Wl,-Map,$(BUILD)/$(TARGET).map -specs=gba.specs
 
+# Toolchain definitions
 CC := arm-none-eabi-gcc
 LD := arm-none-eabi-gcc
 OBJCOPY := arm-none-eabi-objcopy
 
+# Libraries and paths
 LIBS := $(G_ENGINE)
 LIBDIRS := $(G_ENGINE_DIR)/build
 
+# Source files
+CFILES := $(wildcard C/*.c)
+SFILES := $(wildcard asm/*.s)
+PNGFILES := $(wildcard $(GRAPHICS)/*.png)
+BINFILES := $(wildcard $(DATA)/*.*)
 
-ifneq ($(BUILD),$(notdir $(CURDIR)))
+# Object files
+OFILES_C := $(patsubst C/%.c,$(BUILD)/%.o,$(CFILES))
+OFILES_S := $(patsubst asm/%.s,$(BUILD)/%.o,$(SFILES))
+OFILES_GRAPHICS := $(patsubst %.png,$(BUILD)/%.png.o,$(PNGFILES))
+OFILES_BIN := $(patsubst $(DATA)/%,$(BUILD)/%.bin.o,$(BINFILES))
 
-export OUTPUT := $(CURDIR)/$(TARGET)
+# All object files
+OFILES := $(OFILES_C) $(OFILES_S) $(OFILES_GRAPHICS) $(OFILES_BIN)
 
+# Build and dependency directories
+VPATH := C asm $(DATA) $(GRAPHICS)
+DEPSDIR := $(CURDIR)/$(BUILD)
 
-export VPATH := $(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
-		$(foreach dir,$(DATA),$(CURDIR)/$(dir)) \
-		$(foreach dir,$(GRAPHICS),$(CURDIR)/$(dir))
-export DEPSDIR := $(CURDIR)/$(BUILD)
-
-CFILES := $(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
-CPPFILES := $(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
-SFILES := $(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
-PNGFILES := $(foreach dir,$(GRAPHICS),$(notdir $(wildcard $(dir)/*.png)))
-BINFILES := $(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
-
-ifneq ($(strip $(MUSIC)),)
-	export AUDIOFILES := $(foreach dir,$(notdir $(wildcard $(MUSIC)/*.*)),$(CURDIR)/$(MUSIC)/$(dir))
-	BINFILES += soundbank.bin
-endif
-
-ifeq ($(strip $(CPPFILES)),)
-	export LD := $(CC)
-else
-	export LD := $(CXX)
-endif
-
-export OFILES_BIN := $(addsuffix .o,$(BINFILES))
-export OFILES_SOURCES := $(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s:.o)
-export OFILES_GRAPHICS := $(PNGFILES:.png:.o)
-export OFILES := $(OFILES_BIN) $(OFILES_SOURCES) $(OFILES_GRAPHICS)
-
-export HFILES := $(addsuffix .h,$(subst .,_,$(BINFILES))) $(PNGFILES:.png:.h)
-
-export INCLUDE := $(foreach dir,$(INCLUDES),-iquote $(CURDIR)/$(dir)) \
+# Include paths for headers and libraries
+INCLUDE := $(foreach dir,$(INCLUDES),-iquote $(CURDIR)/$(dir)) \
 			$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
 			-I$(CURDIR)/$(BUILD)
+LIBPATHS := -L$(G_ENGINE_DIR)/build
 
-export LIBPATHS := -L$(G_ENGINE_DIR)/build
-
+# Build targets
 .PHONY: $(BUILD) clean all
 
-
+# Create build directory
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@
-	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
-clean:
-	@echo clean ...
-	@rm -fr $(BUILD) $(TARGET).elf $(TARGET).gba $(G_ENGINE)
-else
+# Main build target
+all: $(BUILD)/$(TARGET).gba
 
-all: $(OUTPUT).gba
+# Link .elf and .gba files
+$(BUILD)/$(TARGET).gba: $(BUILD)/$(TARGET).elf
+	$(OBJCOPY) -v -O binary $< $@
 
-$(OUTPUT).gba: $(OUTPUT).elf
-
-$(OUTPUT).elf: $(OFILES) $(G_ENGINE)
+$(BUILD)/$(TARGET).elf: $(OFILES) $(G_ENGINE)
 	$(LD) $(LDFLAGS) -o $@ $^ $(LIBPATHS) $(LIBS)
 
-$(OFILES_SOURCES): $(HFILES)
+# Compile C source files to object files
+$(BUILD)/%.o: C/%.c | $(BUILD)
+	$(CC) $(CFLAGS) -c $< -o $@
 
-$(G_ENGINE):
-	$(MAKE) -C $(G_ENGINE_DIR) build/g_engine.a
+# Assemble .s files to object files
+$(BUILD)/%.o: asm/%.s | $(BUILD)
+	$(CC) $(ASFLAGS) -c $< -o $@
 
+# Compile other assets (e.g., PNG to object)
+$(BUILD)/%.png.o: %.png | $(BUILD)
+	@echo "Processing $<"
+	grit $< -fts -o $@
 
-soundbank.bin soundbank.h: $(AUDIOFILES)
-	@mmutil $^ -osoundbank.bin -hsoundbank.h
+# Compile binary data to object files
+$(BUILD)/%.bin.o: $(DATA)/% | $(BUILD)
+	@echo "Processing $<"
+	bin2o $< $@
 
-%.bin.o %_bin.h: %.bin
-	@echo $(notdir $<)
-	@$(bin2o)
+# Clean up build artifacts
+clean:
+	@echo "Cleaning..."
+	@rm -rf $(BUILD) $(TARGET).elf $(TARGET).gba $(G_ENGINE)
 
-%.s %.h: %.png %.grit
-	@echo "grit $(notdir $<)"
-	@grit $< -fts -o$*
-
+# Dependency handling
 .SECONDARY:
-
 -include $(DEPSDIR)/*.d
-endif
+
+# Log some details for debugging
+$(info CFILES are $(CFILES))
+$(info SFILES are $(SFILES))
+$(info OFILES are $(OFILES))
+$(info VPATH is: $(VPATH))
+
