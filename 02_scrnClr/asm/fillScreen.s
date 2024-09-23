@@ -6,7 +6,7 @@
 
 fillScreen:
   @ r0 contains color value
-  push {r4-r11, lr}
+  push {r4-r11}
   ldr r1, =0x6000000 @vram base address
   mov r2, #1920 @number of total writes to fill screen
   @ store color value in 9 more registers
