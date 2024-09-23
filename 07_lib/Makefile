@@ -1,3 +1,8 @@
+ifeq ($(strip $(DEVKITARM)),)
+$(error "Please set DEVKITARM in your environment. export DEVKITARM=<path to>devkitARM")
+endif
+include $(DEVKITARM)/gba_rules
+
 C_SRC_DIR := C
 ASM_SRC_DIR := asm
 BUILD_DIR := build
