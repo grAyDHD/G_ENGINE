@@ -1,8 +1,4 @@
-#include "typedefs.h"
-#include <audio.h>
-#include <draw.h>
-#include <gfx.h>
-#include <input.h>
+#include "engine.h"
 
 #define COLOR(r, g, b) (((r) & 0x1F) << 10 | ((g) & 0x1F) << 5 | ((b) & 0x1F))
 #define GW 30 // GRID WIDTH = SW/8
@@ -26,7 +22,7 @@ typedef struct {
 } Snake;
 void clearSnake(Snake *snake) {
   int black = COLOR(0, 0, 0);
-  drawRect(snake->head->xy, 8, 8, black, VRAM);
+  drawRect(snake->head->xy, 8, 8, black);
 };
 
 void handleInput(Snake *snake) {
@@ -81,17 +77,8 @@ void updateSnakePosition(Snake *snake) {
 
 void drawSnake(Snake *snake) {
   int green = COLOR(0, 20, 7);
-  drawRect(snake->head->xy, 8, 8, green, VRAM);
+  drawRect(snake->head->xy, 8, 8, green);
 };
-
-void initializeScreen(unsigned short *vmem) {
-  unsigned short black = COLOR(1, 5, 3);
-  for (int x = 0; x < SW; x++) {
-    for (int y = 0; y < SH; y++) {
-      plotPixel(x, y, black, vmem);
-    }
-  }
-}
 
 int main() {
   DSPC = MODE3 | BG2;
