@@ -1,15 +1,14 @@
 #include "engine.h"
-// extern void fillScreen(u32 clr);
+
+extern void fillScreen(u32 clr);
 
 int main() {
   DSPC = MODE3 | BG2;
 
-  u16 color = COLOR(2, 2, 20);
+  u16 color = COLOR(0, 2, 20);
+  u32 dblClr = (color) | (color << 16);
 
-  for (int y = 0; y < 160; y++) {
-    for (int x = 0; x < 240; x++) {
-      plotPixel(x, y, color);
-    }
-  }
+  fillScreen(dblClr);
+
   return 0;
 }
