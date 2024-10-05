@@ -4,12 +4,13 @@
 // Include standard typedefs, macros, and global defines
 #include "typedefs.h"
 
-// Include all other headers
+#include "dmg.h"
 #include "draw.h"
 #include "gfx.h"
+#include "in.h"
+#include "phys.h"
+
 // Add more headers as you create more modules
-#include "input.h"
-// #include "physics.h"
 //  #include "system.h"
 
 #endif // ENGINE_H
