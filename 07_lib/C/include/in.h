@@ -50,8 +50,8 @@ typedef enum eKeyIndex {
 #define ST 0x0008
 #define R 0x0010
 #define L 0x0020
-#define U 0x0040
-#define D 0x0080
+#define UP 0x0040
+#define DN 0x0080
 #define RT 0x0100
 #define LT 0x0200
 
