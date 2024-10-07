@@ -1,10 +1,30 @@
-#include "dmg.h"
 #include "in.h"
-#include "typedefs.h"
 #include <engine.h>
 
 enum OctaveState { TWO = 0, THREE, FOUR, FIVE, SIX, SEVEN };
-u16 NOTES[12][7] = {
+enum Position { FIRST, SECOND, THIRD, FOURTH };
+enum RootNote { CC = 0, Db, DD, Eb, E, F, Gb, G, Ab, AA, Bb, BB };
+enum Mode {
+  IONIAN = 0,
+  DORIAN,
+  PHRYGIAN,
+  LYDIAN,
+  MIXOLYDIAN,
+  AEOLIAN,
+  LOCRIAN
+};
+
+const u8 MODE_INTERVALS[7][8] = {
+    {0, 2, 4, 5, 7, 9, 11, 12}, // Ionian
+    {0, 2, 3, 5, 7, 9, 10, 12}, // Dorian
+    {0, 1, 3, 5, 7, 8, 10, 12}, // Phrygian
+    {0, 2, 4, 6, 7, 9, 11, 12}, // Lydian
+    {0, 2, 4, 5, 7, 9, 10, 12}, // Mixolydian
+    {0, 2, 3, 5, 7, 8, 10, 12}, // Aeolian
+    {0, 1, 3, 5, 6, 8, 10, 12}  // Locrian
+};
+
+const u16 NOTES[12][7] = {
     {0x2C, 0x416, 0x60B, 0x706, 0x782, 0x7C1, 0X7E0},  // c2-c5    0
     {0x9D, 0x44E, 0x627, 0x714, 0x789, 0x7C4, 0x7E2},  // c#2-c#5  1
     {0x107, 0x483, 0x642, 0x721, 0x790, 0x7C8, 0x7E4}, // d2-d5    2
@@ -20,11 +40,69 @@ u16 NOTES[12][7] = {
 };
 
 u16 note = 0;
+
 enum OctaveState currentOctave = TWO;
+enum Position currentPosition = FIRST;
+enum RootNote currentRoot = Ab;
+enum Mode currentMode = AEOLIAN;
 
 void playNote(u16 noteFreq) {
   ENV_1 = 0xF0BF;
   FREQ_1 = noteFreq | 0x8000;
+}
+
+void playScaleDegree(int scaleDegree) {
+  int interval = MODE_INTERVALS[currentMode][scaleDegree - 1];
+  int noteOffset = currentRoot + interval;
+  int octaveOffset = noteOffset / 12;
+  int noteIndex = noteOffset % 12;
+  int octave = currentOctave + octaveOffset;
+
+  if (octave > SEVEN)
+    octave = SEVEN;
+
+  playNote(NOTES[noteIndex][octave]);
+}
+
+void updatePosition() {
+  if (key_is_up(LT) && key_is_up(RT)) {
+    currentPosition = FIRST;
+  } else if (key_is_down(LT) && key_is_up(RT)) {
+    currentPosition = SECOND;
+  } else if (key_is_up(LT) && key_is_down(RT)) {
+    currentPosition = THIRD;
+  } else if (key_is_down(LT) && key_is_down(RT)) {
+    currentPosition = FOURTH;
+  }
+}
+
+void changeOctave() {
+  if (key_hit(UP) && currentOctave < SEVEN) {
+    currentOctave++;
+  } else if (key_hit(DN) && currentOctave > TWO) {
+    currentOctave--;
+  }
+}
+
+void changeRoot() {
+  if (key_is_down(ST) && key_is_up(SL) && key_hit(LT)) {
+    currentRoot = (currentRoot + 5) % 12; // Equivalent to -7 mod 12
+  } else if (key_is_down(ST) && key_is_up(SL) && key_hit(RT)) {
+    currentRoot = (currentRoot + 7) % 12; // Move up a fifth
+  }
+  if (key_is_down(SL) && key_is_down(ST) && key_hit(LT)) {
+    currentRoot = (currentRoot + 11) % 12;
+  } else if (key_is_down(SL) && key_is_down(ST) && key_hit(RT)) {
+    currentRoot = (currentRoot + 1) % 12;
+  }
+}
+
+void changeMode() {
+  if (key_is_down(SL) && key_is_up(ST) && key_hit(LT)) {
+    currentMode = (currentMode + 6) % 7; // Previous mode
+  } else if (key_is_down(SL) && key_is_up(ST) && key_hit(RT)) {
+    currentMode = (currentMode + 1) % 7; // Next mode
+  }
 }
 
 int main() {
@@ -37,159 +115,41 @@ int main() {
     VBLANK();
     key_poll();
 
-    if (key_hit(U) && currentOctave < SEVEN) {
-      currentOctave++;
-    } else if (key_hit(D) && currentOctave > TWO) {
-      currentOctave--;
-    }
-
+    changeOctave();
+    changeRoot();
+    changeMode();
     if (key_is_up(B) && key_is_up(A) && ENV_1 > 0)
       ENV_1 = 0;
 
-    if (key_is_up(LT) && key_is_up(RT)) {
+    if (key_is_up(ST) && key_is_up(SL))
+      updatePosition();
+
+    if (currentPosition == FIRST) {
       if (key_is_down(B) && ENV_1 == 0) {
-        playNote(NOTES[8][currentOctave]);
+        playScaleDegree(1);
       } else if (key_is_down(A) && ENV_1 == 0) {
-        playNote(NOTES[10][currentOctave]);
+        playScaleDegree(2);
       }
-    } else if (key_is_down(LT) && key_is_up(RT)) {
+    } else if (currentPosition == SECOND) {
       if (key_is_down(B) && ENV_1 == 0) {
-        playNote(NOTES[11][currentOctave]);
+        playScaleDegree(3);
       } else if (key_is_down(A) && ENV_1 == 0) {
-        playNote(NOTES[1][currentOctave + 1]);
+        playScaleDegree(4);
       }
-    } else if (key_is_up(LT) && key_is_down(RT)) {
+    } else if (currentPosition == THIRD) {
       if (key_is_down(B) && ENV_1 == 0) {
-        playNote(NOTES[3][currentOctave + 1]);
+        playScaleDegree(5);
       } else if (key_is_down(A) && ENV_1 == 0) {
-        playNote(NOTES[4][currentOctave + 1]);
+        playScaleDegree(6);
       }
-    } else if (key_is_down(LT) && key_is_down(RT)) {
+    } else if (currentPosition == FOURTH) {
       if (key_is_down(B) && ENV_1 == 0) {
-        playNote(NOTES[6][currentOctave + 1]);
+        playScaleDegree(7);
       } else if (key_is_down(A) && ENV_1 == 0) {
-        playNote(NOTES[8][currentOctave + 1]);
+        playScaleDegree(8);
       }
     }
   }
 
   return 0;
 }
-
-/*
-    // Stop the note if neither A nor B is pressed
-    if (key_is_up(KI_A) && key_is_up(KI_B) && ENV_1 > 0) {
-      ENV_1 = 0;
-    } else {
-
-
-      if (!INPUT(LT) && !INPUT(RT)) {
-        if (INPUT(ST)) {
-          noteFreq = NOTES[11][3];
-        }
-        if (INPUT(B))
-          noteFreq = NOTES[8][0]; // G#2
-        else if (INPUT(A))
-          noteFreq = NOTES[10][0]; // A#2
-      } else if (INPUT(LT) && !INPUT(RT)) {
-        if (INPUT(B))
-          noteFreq = NOTES[11][0]; // B2
-        else if (INPUT(A))
-          noteFreq = NOTES[1][1]; // C#3
-      } else if (!INPUT(LT) && INPUT(RT)) {
-        if (INPUT(B))
-          noteFreq = NOTES[3][1]; // D#3
-        else if (INPUT(A))
-          noteFreq = NOTES[4][1]; // E3
-      } else if (INPUT(LT) && INPUT(RT)) {
-        if (INPUT(B))
-          noteFreq = NOTES[6][1]; // F#3
-        else if (INPUT(A))
-          noteFreq = NOTES[8][1]; // G#3
-      }
- *
- *
- *
- *
- *
- *
- *
-enum ChordState { ZERO, ONE, TWO, THREE, FOUR };
-
-u16 NOTES[5][4] = {{0x0416, 0x04B5, 0x0563, 0x05CE}, cm7
-                   {0x02C7, 0x03DA, 0x0484, 0x0511}, G7
-                   {0x04B5, 0x0563, 0x05CE, 0x0642}, ebM7
-                   {0x0511, 0x0589, 0x060B, 0X065B}, fm7
-                   {0x05ED, 0x0642, 0x0689, 0x06C4}}; bdim7
-
-#define LENGTH_VERY_SHORT 0x3F
-#define LENGTH_SHORT 0x2A
-#define LENGTH_LONG 0x15
-#define LENGTH_VERY_LONG 0x00
-u16 currentNoteLength = LENGTH_VERY_SHORT;
-*/
-
-/*
-  while (1) {
-    UPDATE_KEYS();
-    if (INPUT(ST) || INPUT(SL)) {
-      if (INPUT(ST)) {
-        // Handle wave duty changes
-        if (PRESS_ONCE(U)) {
-          ENV = (ENV & 0xFF3F) | (0x00 << 6);
-        } else if (PRESS_ONCE(D)) {
-          ENV = (ENV & 0xFF3F) | (0x01 << 6);
-        } else if (PRESS_ONCE(L)) {
-          ENV = (ENV & 0xFF3F) | (0x02 << 6);
-        } else if (PRESS_ONCE(R)) {
-          ENV = (ENV & 0xFF3F) | (0x03 << 6);
-        }
-      } else if (INPUT(SL)) {
-        // Handle sound length changes
-        if (PRESS_ONCE(U)) {
-          currentNoteLength = LENGTH_VERY_SHORT;
-          ENV = (ENV & 0xFFC0) | currentNoteLength;
-          FREQ = 0x4000; // sets bit 15 to zero, timed mode
-        } else if (PRESS_ONCE(D)) {
-          currentNoteLength = LENGTH_VERY_LONG;
-          ENV = (ENV & 0xFFC0) | currentNoteLength;
-          FREQ = 0x4000; // sets bit 15 to zero, timed mode
-        } else if (PRESS_ONCE(L)) {
-          currentNoteLength = LENGTH_SHORT;
-          ENV = (ENV & 0xFFC0) | currentNoteLength;
-          FREQ = 0x4000; // sets bit 15 to zero, timed mode
-        } else if (PRESS_ONCE(R)) {
-          currentNoteLength = LENGTH_LONG;
-          ENV = (ENV & 0xFFC0) | currentNoteLength;
-          FREQ = 0x4000; // sets bit 15 to zero, timed mode
-        }
-      }
-    } else if (PRESS_ONCE(U)) {
-      chordState = (chordState == THREE) ? ZERO : THREE;
-    } else if (PRESS_ONCE(D)) {
-      chordState = (chordState == ONE) ? ZERO : ONE;
-    } else if (PRESS_ONCE(L)) {
-      chordState = (chordState == TWO) ? ZERO : TWO;
-    } else if (PRESS_ONCE(R)) {
-      chordState = (chordState == FOUR) ? ZERO : FOUR;
-    }
-
-    // play note on button press
-    if (PRESS_ONCE(LS)) {
-      note = NOTES[chordState][3];
-      FREQ = note | 0xC000;
-    } else if (PRESS_ONCE(RS)) {
-      note = NOTES[chordState][2];
-      FREQ = note | 0xC000;
-    } else if (PRESS_ONCE(A)) {
-      note = NOTES[chordState][1];
-      FREQ = note | 0xC000;
-    } else if (PRESS_ONCE(B)) {
-      note = NOTES[chordState][0];
-      FREQ = note | 0xC000;
-    }
-
-    prevKeyCache = keyCache;
-    waitVBLANK();
-  }
-*/
