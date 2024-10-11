@@ -10,12 +10,14 @@
 
 #include "../build/MockSnek.h"
 #include "gfx.h"
-extern void memCopy32(void *dst, const void *src, u32 wdn);
+// extern void memCopy32(void *dst, const void *src, u32 wdn);
+extern void m3_Background(const void *src);
 
 int main() {
   DSPC = MODE3 | BG2;
-  memCopy32(VRAM, MockSnekBitmap, MockSnekBitmapLen / sizeof(u32));
+  //  memCopy32(VRAM, MockSnekBitmap, MockSnekBitmapLen / sizeof(u32));
 
+  m3_Background(MockSnekBitmap);
   while (1) {
     VBLANK();
   }
