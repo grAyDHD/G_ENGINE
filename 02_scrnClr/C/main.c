@@ -6,7 +6,7 @@ extern void fillScreen(u32 clr);
 int main() {
   DSPC = MODE3 | BG2;
 
-  u32 color = COLOR(0, 2, 20);
+  u32 color = RGB(0, 2, 20);
 
   int r = 0, g = 2, b = 20;
   int dr = 1, dg = 1, db = 1;
@@ -17,10 +17,10 @@ int main() {
     r = (r + dr) % 32;
     g = (g + dg) % 32;
     b = (b + db) % 32;
-    color = COLOR(r, g, b);
+    color = RGB(r, g, b);
     //    color = (color | color << 16);
     color = dblClr(color);
-    waitVBLANK();
+    VBLANK();
     fillScreen(color);
   }
 
