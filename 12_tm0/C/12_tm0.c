@@ -9,9 +9,9 @@
 
 #define PLAYNOW 0x8000 // 1000 0000 0000 0000
 
-typedef void (*fnptr)(void);
+// typedef void (*fnptr)(void);
 
-#define ISR_VECTOR *(fnptr *)(0x03007FFC)     // interrupt vector &
+// #define ISR_VECTOR *(fnptr *)(0x03007FFC)     // interrupt vector &
 #define REG_IME (*(volatile u16 *)0x04000208) // master enable, set bit 0 to 1
 #define REG_IE (*(volatile u16 *)0x04000200)  // enable specific interrupts
 #define REG_IF (*(volatile u16 *)0x04000202)  // check/acknowledge interrupts
@@ -23,7 +23,7 @@ int currentNote = 0;
 void ISR() {
 
   if (REG_IF & IRQTM0) { // Check if Timer 0 interrupt occurred
-    FREQ = (notes[currentNote] | PLAYNOW);
+    FREQ_1 = (notes[currentNote] | PLAYNOW);
     currentNote++;
     if (currentNote > 1) {
       currentNote = 0;
@@ -48,7 +48,7 @@ void ISR() {
 // list delete will delete on and correct the list for empty space
 //
 void foo() {
-  ISR_VECTOR = ISR;
+  //  ISR_VECTOR = ISR;
   // enable/start timer
   // REG_IE |= enable matching bit
   REG_IME = 1; // enable interrupts
@@ -56,9 +56,9 @@ void foo() {
 int main() {
   ENABLE_SOUND();
   DMG_STEREO_OUTPUT = 0xFF77;
-  ENV = 0xF393;
+  ENV_1 = 0xF393;
 
-  ISR_VECTOR = ISR;
+  //  ISR_VECTOR = ISR;
   REG_IME = 0x1;  // enable global interrupts;
   REG_IE |= 0x08; // enable tm0 interrupt
 
