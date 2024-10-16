@@ -1,44 +1,54 @@
 .arm
 .global SpriteFrame
 .type SpriteFrame, %function
-@ SpriteFrame(int x, int y, int frame, const void *image)
 
+@ SpriteFrame(int x, int y, int frame, const void *image, int frameCount)
 @ r0 = x
 @ r1 = y
 @ r2 = frame
 @ r3 = image (pointer to sprite sheet)
 
 SpriteFrame:
-  push {r4-r11}
+  push {r4-r11}  @8x4 = 32 bytes, lr on stack so 36 bytes + 4 for alignment
   
-  @ Step 1: calculate VRAM base address
-  ldr r8, =0x6000000
-  @ldr r9, =240 @y base offset value
-  @mul r10, r1, r9 @y*offset in r10
-  @add r8, r0, r10, lsl #1 @add x+y offset and double result for 2 byte pixels
+@ Step 1: calculate VRAM xy offset address
+  mov r5, #240                           @ y base offset value
+  mul r6, r1, r5                         @ y * 240
+  add r0, r0, r6                         @ x+y*240
+  add r0, r0, r0                         @ double
+  ldr r1, =0x6000000
+  add r1, r1, r0
 
-  @VRAM offset in r8
-   
-  @ Step 2: Calculate frame offset in image
-  mov r4, #32  @16 pixels = 32 bytes per row
-  @frame 0, = 0.  frame 1 = 32, frame 2 =  64, etc.
-  mul r5, r2, r4 @ multiply frame by pixels in bytes, frame 0 = no offset, start of image.
-  add r3, r3, r5 @ jump to frame offset, r3 = image +frame offset
+                  @ r0 = x (no longer needed)
+                  @ r1 = vram xy address 
+                  @ r2 = frame 
+                  @ r3 = image
+ 
+@ Step 2: Calculate frame offset
+  mov r4, #32                            @ 16 pixels = 32 bytes per row of a frame
+  mul r5, r2, r4                         @ multiply frame number by frame width
+  add r0, r3, r5                         @ add frame offset to image base address
 
-  @ Step 3: Loop through each row of the sprite (16 rows)
-  mov r6, #16 @set row counter (16 rows)
+                  @ r0 = image frame offset
+                  @ r1 = vram xy address
+                  @ r2 = frame (no longer needed)
+                  @ r3 = image (no longer needed)
+                  @ r4 = 32 length of row in bytes, 16px*2
+
+@ Step 3: Loop through each row of the sprite (16 rows)
+  ldr r2, [sp, #32]                     @ load 5th argument from stack 
+  mul r3, r2, r4                        @ frame count * 32
+  sub r3, r3, r4                        @ (frameCount * 32) - 32
+
+  mov r2, #16                           @ set row counter (16 rows)
 .LoopRow:
-  ldmia r3!, {r4-r7}
-  stmia r8!, {r4-r7}
+  ldmia r0!, {r4-r11}                   @ load pixels for current row of frame
+  stmia r1!, {r4-r11}                   @ write pixel values to vram
+  add r0, r0, r3                        @ move image offset to beginning of frame next row (currently only works for 4 frame animations)
+  add r1,  #448                         @ jump to next line VRAM, 480 - 32 to jump to next line at the beginning of the frame row
 
-  ldmia r3!, {r4-r7}
-  stmia r8!, {r4-r7}  @ draws one full row by this line
-
-  add r3, #96 @move image offset to beginning of frame next row
- add r8, r8, #448 @jump to next line VRAM, but subtract 32 for 16 pixels or beginning of frame
-
-  subs r6, r6, #1 @ decrement row counter
-  bhi .LoopRow
+  subs r2, #1
+  bne .LoopRow
 
   pop {r4-r11}
   bx lr 
