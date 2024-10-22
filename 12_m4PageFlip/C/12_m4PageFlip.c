@@ -1,16 +1,11 @@
 #include "engine.h"
-#include "gfx.h"
 
-#define PALRAM ((volatile u16 *)0x5000000)
-
-void setPaletteColor(u8 index, u16 color) { PALRAM[index] = color; }
-
-#define VRAM_PAGE1 ((u16 *)0x6000000)
-#define VRAM_PAGE2 ((u16 *)0x600A000)
-
+#define PALETTE ((volatile u16 *)0x5000000)
 #define PAGE_OFFSET 0xA000
 #define FLIP 0x0010
-u16 *bufferPage = VRAM_PAGE2;
+
+u16 *bufferPage = ((u16 *)0x600A000);
+void setPaletteColor(u8 index, u16 color) { PALETTE[index] = color; }
 
 u16 *pageFlip() {
   bufferPage = (u16 *)((u32)bufferPage ^ PAGE_OFFSET);
@@ -29,29 +24,38 @@ void m4_plotPixel(int x, int y, u8 clrid) {
 
 int main() {
   // initialize display
-  DSPC = MODE4 | BG2;
-  setPaletteColor(0, RGB(0, 0, 0));   // Palette index 0: Red
-  setPaletteColor(1, RGB(0, 31, 0));  // Palette index 1: Green
-  setPaletteColor(2, RGB(0, 0, 31));  // Palette index 2: Blue
-  setPaletteColor(3, RGB(31, 31, 0)); // Palette index 3: Yellow
-  setPaletteColor(4, RGB(31, 0, 31)); // Palette index 4: Magenta
-  setPaletteColor(5, RGB(0, 31, 31)); // Palette index 5: Cyan
+  DSPC = MODE3 | BG2;
 
-  m4_plotPixel(50, 50, 0);
-  m4_plotPixel(100, 80, 1);
-  m4_plotPixel(150, 120, 2);
+  // loop16x16 to set all palette colors
+  for (int x = 0; x < 16; x++) {
+    for (int y = 0; y < 16; y++) {
+      setPaletteColor((x * 16 + y), RGB(x * y, 0, x * y));
+    }
+  }
+
+  // loop 240x160 to plot all pixels on page2
+  // all values at given x same clrid,
+  for (int x = 0; x < 240; x++) {
+    for (int y = 0; y < 160; y++) {
+      m4_plotPixel(x, y, x);
+    }
+  }
+
+  DSPC = MODE4 | BG2;
 
   pageFlip();
 
-  m4_plotPixel(60, 60, 3);
-  m4_plotPixel(110, 90, 4);
-  m4_plotPixel(160, 130, 5);
+  for (int x = 0; x < 240; x++) {
+    for (int y = 0; y < 160; y++) {
+      m4_plotPixel(240 - x, y, x);
+    }
+  }
 
   pageFlip();
 
   while (1) {
     VBLANK();
-    for (volatile int i = 0; i <= 100000; i++)
+    for (volatile int i = 0; i <= 1000000; i++)
       ;
 
     pageFlip();
