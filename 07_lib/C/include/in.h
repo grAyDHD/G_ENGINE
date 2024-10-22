@@ -1,31 +1,8 @@
-//
-//  Input header
-//
-//! \file tonc_input.h
-//! \author J Vijn
-//! \date 20060508 - 20070406
-//
-// === NOTES ===
-// * 20070406: Changed KEY_RESET to Se+St+L+R, like it should be.
-// * 20070406: added key-repeat functionality.
-
 #ifndef TONC_INPUT
 #define TONC_INPUT
 #include "typedefs.h"
 
 #define REG_KEYINPUT *(volatile u16 *)(0x4000000 + 0x0130)
-/*!	\addtogroup grpInput
-        \brief	Routines for synchronous and asynchronous button states.
-
-        For details, see
-        <a href="http://www.coranac.com/tonc/text/keys.htm">tonc:keys</a>.
-*/
-
-/*! \{	*/
-
-// --------------------------------------------------------------------
-// CONSTANTS
-// --------------------------------------------------------------------
 
 typedef enum eKeyIndex {
   KI_A = 0,
@@ -55,12 +32,6 @@ typedef enum eKeyIndex {
 #define RT 0x0100
 #define LT 0x0200
 
-// --------------------------------------------------------------------
-// MACROS
-// --------------------------------------------------------------------
-
-// Check which of the specified keys are down or up right now
-
 #define KEY_DOWN_NOW(key) (~(REG_KEYINPUT) & key)
 #define KEY_UP_NOW(key) ((REG_KEYINPUT) & key)
 
@@ -70,8 +41,10 @@ typedef enum eKeyIndex {
 // will be true if and only if KEY_L and KEY_R are _both_ being pressed
 #define KEY_EQ(key_fun, keys) (key_fun(keys) == (keys))
 
-//#define KEY_TRIBOOL(fnKey, plus, minus)                                        \
-//  (bit_tribool(fnKey(KEY_FULL), plus, minus))
+/*
+#define KEY_TRIBOOL(fnKey, plus, minus)                                        \
+  (bit_tribool(fnKey(KEY_FULL), plus, minus))
+*/
 
 // --------------------------------------------------------------------
 // GLOBALS
@@ -159,24 +132,23 @@ INLINE u32 key_hit(u32 key) { return (__key_curr & ~__key_prev) & key; }
 INLINE u32 key_released(u32 key) { return (~__key_curr & __key_prev) & key; }
 
 /*
-//! Horizontal tribool (right,left)=(+,-)
+Horizontal tribool (right,left)=(+,-)
 INLINE int key_tri_horz(void) {
   return bit_tribool(__key_curr, KI_RIGHT, KI_LEFT);
 }
 
-//! Vertical tribool (down,up)=(+,-)
+Vertical tribool (down,up)=(+,-)
 INLINE int key_tri_vert(void) {
   return bit_tribool(__key_curr, KI_DOWN, KI_UP);
 }
 
-//! Shoulder-button tribool (R,L)=(+,-)
+Shoulder-button tribool (R,L)=(+,-)
 INLINE int key_tri_shoulder(void) {
   return bit_tribool(__key_curr, KI_R, KI_L);
 }
 
-//! Fire-button tribool (A,B)=(+,-)
+Fire-button tribool (A,B)=(+,-)
 INLINE int key_tri_fire(void) { return bit_tribool(__key_curr, KI_A, KI_B); }
 */
-/*	\}	*/
 
-#endif // TONC_INPUT
+#endif
