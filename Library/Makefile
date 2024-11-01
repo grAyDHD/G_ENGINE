@@ -3,8 +3,8 @@ $(error "Please set DEVKITARM in your environment. export DEVKITARM=<path to>dev
 endif
 include $(DEVKITARM)/gba_rules
 
-C_SRC_DIR := C
-ASM_SRC_DIR := asm
+SRC_DIR := src/c
+ASM_SRC_DIR := src/asm
 BUILD_DIR := build
 INCLUDE_DIR := $(C_SRC_DIR)/include $(C_SRC_DIR)
 G_ENGINE := $(BUILD_DIR)/g_engine.a
