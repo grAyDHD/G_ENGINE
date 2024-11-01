@@ -3,10 +3,13 @@ $(error "Please set DEVKITARM in your environment. export DEVKITARM=<path to>dev
 endif
 include $(DEVKITARM)/gba_rules
 
-SRC_DIR := src/c
+SRC_DIR := src
+C_SRC_DIR := src/C
 ASM_SRC_DIR := src/asm
 BUILD_DIR := build
-INCLUDE_DIR := $(C_SRC_DIR)/include $(C_SRC_DIR)
+INCLUDE_DIR := src/include $(C_SRC_DIR)
+
+# Library target
 LIBRARY := $(BUILD_DIR)/g_engine.a
 
 CC := arm-none-eabi-gcc

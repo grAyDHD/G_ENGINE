@@ -5,8 +5,12 @@ endif
 include $(DEVKITARM)/gba_rules
 
 #directory and file paths
-G_ENGINE_DIR := ../../07_lib
-G_ENGINE := $(G_ENGINE_DIR)/build/g_engine.a
+ifndef TOPDIR
+export TOPDIR := $(CURDIR)
+endif
+
+LIBRARY_DIR := $(abspath $(TOPDIR)/../..)
+LIBRARY := $(LIBRARY_DIR)/build/g_engine.a
 
 #build targets and source directories
 TARGET := $(notdir $(CURDIR))
@@ -14,7 +18,7 @@ BUILD := build
 SOURCES := C asm
 
 #include and asset directorie
-INCLUDES := $(G_ENGINE_DIR)/C/include $(G_ENGINE_DIR)/build 
+INCLUDES := $(LIBRARY_DIR)/src/include $(LIBRARY_DIR)/build 
 DATA := 
 MUSIC := 
 GRAPHICS :=
@@ -24,8 +28,7 @@ ARCH := -mthumb -mthumb-interwork
 CFLAGS := -g -Wall -O2\
 	-mcpu=arm7tdmi -mtune=arm7tdmi\
 	$(ARCH)
-
-CFLAGS += $(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir))
+CFLAGS += $(foreach dir,$(INCLUDES),-I$(dir))
 CXXFLAGS := $(CFLAGS) -fno-rtti -fno-exceptions
 ASFLAGS := -g $(ARCH)
 LDFLAGS := -g $(ARCH) -Wl,-Map,$(notdir $*.map) -specs=gba.specs
@@ -36,18 +39,18 @@ LD := arm-none-eabi-gcc
 OBJCOPY := arm-none-eabi-objcopy
 
 #libraries and paths
-LIBS := $(G_ENGINE)
-LIBDIRS := $(G_ENGINE_DIR)/build
+LIBS := $(LIBRARY)
+LIBDIRS := $(LIBRARY_DIR)/build
 
 #build in
 ifneq ($(BUILD),$(notdir $(CURDIR)))
 
 #exported vars/file lists-----
-export OUTPUT := $(CURDIR)/$(TARGET)
-export VPATH := $(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
-		$(foreach dir,$(DATA),$(CURDIR)/$(dir)) \
-		$(foreach dir,$(GRAPHICS),$(CURDIR)/$(dir))
-export DEPSDIR := $(CURDIR)/$(BUILD)
+export OUTPUT := $(TOPDIR)/$(TARGET)
+export VPATH := $(foreach dir,$(SOURCES),$(TOPDIR)/$(dir)) \
+		$(foreach dir,$(DATA),$(TOPDIR)/$(dir)) \
+		$(foreach dir,$(GRAPHICS),$(TOPDIR)/$(dir))
+export DEPSDIR := $(TOPDIR)/$(BUILD)
 
 CFILES := $(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
 SFILES := $(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
@@ -74,39 +77,29 @@ export OFILES_GRAPHICS := $(PNGFILES:.png:.o)
 export OFILES := $(OFILES_BIN) $(OFILES_SOURCES) $(OFILES_GRAPHICS)
 export HFILES := $(addsuffix .h,$(subst .,_,$(BINFILES))) $(PNGFILES:.png:.h)
 
-$(info CFILES are $(CFILES))
-$(info SFILES are $(SFILES))
-$(info OFILES_SOURCES are $(OFILES_SOURCES))
-$(info OFILES are $(OFILES))
-
-
-
 #include paths and library paths, for headers and libs
 export INCLUDE := $(foreach dir,$(INCLUDES),-iquote $(CURDIR)/$(dir)) \
 			$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
 			-I$(CURDIR)/$(BUILD)
-export LIBPATHS := -L$(G_ENGINE_DIR)/build
+export LIBPATHS := -L$(CURDIR)/$(LIBRARY_DIR)/build
 
 #Build Targets
 .PHONY: $(BUILD) clean all
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
-	$(info Current SFILES: $(SFILES))
-	$(info Current VPATH: $(VPATH))
-	$(info Current OFILES_SOURCES: $(OFILES_SOURCES))
 clean:
 	@echo clean ...
-	@rm -fr $(BUILD) $(TARGET).elf $(TARGET).gba $(G_ENGINE)
+	@rm -fr $(BUILD) $(TARGET).elf $(TARGET).gba $(LIBRARY)
 else
 #build rules else block
-all: $(OUTPUT).gba
+all: $(LIBRARY) $(OUTPUT).gba
+$(LIBRARY):
+	$(MAKE) -C $(LIBRARY_DIR)
 $(OUTPUT).gba: $(OUTPUT).elf
-$(OUTPUT).elf: $(OFILES) $(G_ENGINE)
+$(OUTPUT).elf: $(OFILES) $(LIBRARY)
 	$(LD) $(LDFLAGS) -o $@ $^ $(LIBPATHS) $(LIBS)
 $(OFILES_SOURCES): $(HFILES)
-$(G_ENGINE):
-	$(MAKE) -C $(G_ENGINE_DIR) build/g_engine.a
 # additional asset rules
 soundbank.bin soundbank.h: $(AUDIOFILES)
 	@mmutil $^ -osoundbank.bin -hsoundbank.h
@@ -118,7 +111,4 @@ soundbank.bin soundbank.h: $(AUDIOFILES)
 	@grit $< -fts -o$*
 .SECONDARY:
 -include $(DEPSDIR)/*.d
-$(info Updated SOURCES are $(SOURCES))
-$(info Updated SFILES are $(SFILES))
-$(info Updated OFILES_SOURCES are $(OFILES_SOURCES))
 endif

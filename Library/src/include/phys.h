@@ -6,6 +6,8 @@
 #define SHOOT_VEL 5  // Initial velocity when shooting with bumpers
 #define JUMP_VELOCITY -10
 
+extern int gravityDirection;
+
 struct Object {
   int x;
   int y;

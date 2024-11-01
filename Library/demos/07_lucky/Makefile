@@ -12,9 +12,6 @@ endif
 LIBRARY_DIR := $(abspath $(TOPDIR)/../..)
 LIBRARY := $(LIBRARY_DIR)/build/g_engine.a
 
-$(info LIBRARY_DIR is $(LIBRARY_DIR))
-$(info LIBRARY path is $(LIBRARY))
-
 #build targets and source directories
 TARGET := $(notdir $(CURDIR))
 BUILD := build
@@ -31,8 +28,7 @@ ARCH := -mthumb -mthumb-interwork
 CFLAGS := -g -Wall -O2\
 	-mcpu=arm7tdmi -mtune=arm7tdmi\
 	$(ARCH)
-
-CFLAGS += $(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir))
+CFLAGS += $(foreach dir,$(INCLUDES),-I$(dir))
 CXXFLAGS := $(CFLAGS) -fno-rtti -fno-exceptions
 ASFLAGS := -g $(ARCH)
 LDFLAGS := -g $(ARCH) -Wl,-Map,$(notdir $*.map) -specs=gba.specs
@@ -81,13 +77,6 @@ export OFILES_GRAPHICS := $(PNGFILES:.png:.o)
 export OFILES := $(OFILES_BIN) $(OFILES_SOURCES) $(OFILES_GRAPHICS)
 export HFILES := $(addsuffix .h,$(subst .,_,$(BINFILES))) $(PNGFILES:.png:.h)
 
-$(info CFILES are $(CFILES))
-$(info SFILES are $(SFILES))
-$(info OFILES_SOURCES are $(OFILES_SOURCES))
-$(info OFILES are $(OFILES))
-
-
-
 #include paths and library paths, for headers and libs
 export INCLUDE := $(foreach dir,$(INCLUDES),-iquote $(CURDIR)/$(dir)) \
 			$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
@@ -99,9 +88,6 @@ export LIBPATHS := -L$(CURDIR)/$(LIBRARY_DIR)/build
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
-	$(info Current SFILES: $(SFILES))
-	$(info Current VPATH: $(VPATH))
-	$(info Current OFILES_SOURCES: $(OFILES_SOURCES))
 clean:
 	@echo clean ...
 	@rm -fr $(BUILD) $(TARGET).elf $(TARGET).gba $(LIBRARY)
@@ -125,7 +111,4 @@ soundbank.bin soundbank.h: $(AUDIOFILES)
 	@grit $< -fts -o$*
 .SECONDARY:
 -include $(DEPSDIR)/*.d
-$(info Updated SOURCES are $(SOURCES))
-$(info Updated SFILES are $(SFILES))
-$(info Updated OFILES_SOURCES are $(OFILES_SOURCES))
 endif

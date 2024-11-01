@@ -7,7 +7,7 @@
 #define PAGE_OFFSET 0xA000
 #define FLIP 0x0010
 
-u16 *bufferPage = ((u16 *)0x600A000);
+extern u16 *bufferPage;
 
 void setPaletteColor(u8 index, u16 color);
 
