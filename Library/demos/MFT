@@ -5,8 +5,8 @@ endif
 include $(DEVKITARM)/gba_rules
 
 #directory and file paths
-G_ENGINE_DIR := ../../07_lib
-G_ENGINE := $(G_ENGINE_DIR)/build/g_engine.a
+LIBRARY_DIR := ../../
+LIBRARY := $(LIBRARY_DIR)/build/g_engine.a
 
 #build targets and source directories
 TARGET := $(notdir $(CURDIR))
@@ -14,7 +14,7 @@ BUILD := build
 SOURCES := C asm
 
 #include and asset directorie
-INCLUDES := $(G_ENGINE_DIR)/C/include $(G_ENGINE_DIR)/build 
+INCLUDES := $(LIBRARY_DIR)/src/include $(LIBRARY_DIR)/build 
 DATA := 
 MUSIC := 
 GRAPHICS :=
@@ -36,8 +36,8 @@ LD := arm-none-eabi-gcc
 OBJCOPY := arm-none-eabi-objcopy
 
 #libraries and paths
-LIBS := $(G_ENGINE)
-LIBDIRS := $(G_ENGINE_DIR)/build
+LIBS := $(LIBRARY)
+LIBDIRS := $(LIBRARY_DIR)/build
 
 #build in
 ifneq ($(BUILD),$(notdir $(CURDIR)))
@@ -85,7 +85,7 @@ $(info OFILES are $(OFILES))
 export INCLUDE := $(foreach dir,$(INCLUDES),-iquote $(CURDIR)/$(dir)) \
 			$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
 			-I$(CURDIR)/$(BUILD)
-export LIBPATHS := -L$(G_ENGINE_DIR)/build
+export LIBPATHS := -L$(LIBRARY_DIR)/build
 
 #Build Targets
 .PHONY: $(BUILD) clean all
@@ -97,16 +97,15 @@ $(BUILD):
 	$(info Current OFILES_SOURCES: $(OFILES_SOURCES))
 clean:
 	@echo clean ...
-	@rm -fr $(BUILD) $(TARGET).elf $(TARGET).gba $(G_ENGINE)
+	@rm -fr $(BUILD) $(TARGET).elf $(TARGET).gba $(LIBRARY)
 else
 #build rules else block
 all: $(OUTPUT).gba
 $(OUTPUT).gba: $(OUTPUT).elf
-$(OUTPUT).elf: $(OFILES) $(G_ENGINE)
+$(OUTPUT).elf: $(OFILES) $(LIBRARY)
 	$(LD) $(LDFLAGS) -o $@ $^ $(LIBPATHS) $(LIBS)
 $(OFILES_SOURCES): $(HFILES)
-$(G_ENGINE):
-	$(MAKE) -C $(G_ENGINE_DIR) build/g_engine.a
+$(LIBRARY):
 # additional asset rules
 soundbank.bin soundbank.h: $(AUDIOFILES)
 	@mmutil $^ -osoundbank.bin -hsoundbank.h

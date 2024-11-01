@@ -7,7 +7,7 @@ SRC_DIR := src/c
 ASM_SRC_DIR := src/asm
 BUILD_DIR := build
 INCLUDE_DIR := $(C_SRC_DIR)/include $(C_SRC_DIR)
-G_ENGINE := $(BUILD_DIR)/g_engine.a
+LIBRARY := $(BUILD_DIR)/g_engine.a
 
 CC := arm-none-eabi-gcc
 AS := arm-none-eabi-as
@@ -18,9 +18,9 @@ C_SOURCES := $(wildcard $(C_SRC_DIR)/**/*.c) $(wildcard $(C_SRC_DIR)/*.c)
 ASM_SOURCES := $(wildcard $(ASM_SRC_DIR)/**/*.s)
 OBJ_FILES := $(C_SOURCES:$(C_SRC_DIR)/%.c=$(BUILD_DIR)/%.o) $(ASM_SOURCES:$(ASM_SRC_DIR)/%.s=$(BUILD_DIR)/%.o)
 
-all: $(G_ENGINE)
+all: $(LIBRARY)
 
-$(G_ENGINE): $(OBJ_FILES)
+$(LIBRARY): $(OBJ_FILES)
 	@[ -d $(BUILD_DIR) ] || mkdir -p $(BUILD_DIR)
 	$(AR) rcs $@ $^
 
@@ -33,6 +33,6 @@ $(BUILD_DIR)/%.o: $(ASM_SRC_DIR)/%.s
 	$(AS) -o $@ $<
 
 clean:
-	rm -rf $(BUILD_DIR) $(G_ENGINE)
+	rm -rf $(BUILD_DIR) $(LIBRARY)
 
 .PHONY: all clean
