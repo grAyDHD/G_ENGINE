@@ -1,0 +1,8 @@
+06_rect get to compile with assembly/asm (asdf)
+13_inlineASM square not changing size on input?
+14,15 update makefiles from main branch, to use grit
+
+ensure Library Makefiles handles asm properly, 
+create test project from asm functions in demos
+
+update input.h to move away from tonc implementation in in.h
