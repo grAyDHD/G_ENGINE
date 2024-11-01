@@ -1,6 +1,6 @@
 G_Engine/
 │
-├── 07_lib/                 
+├── Library/                 
 │   ├── asm/                # Assembly source files
 │   │   ├── gfx.s           # Optimized graphics routines
 │   │   ├── physics.s       # Optimized physics calculations
@@ -66,6 +66,11 @@ G_Engine/
 ├── docs/                   # Documentation
 │   ├── API.md              # Documentation for the library API
 │   └── Tutorial.md         # Step-by-step tutorial for new users
+│
+├── demos/                  # Demo projects
+│   ├── XX_projectName      # Numbered projects are demos of a library feature
+│   ├── ngba.sh             # Shell script to generate new gba project
+│   └── MFT                 # Makefile template used by ngba.sh
 │
 ├── Makefile                # Main Makefile for building the library and tests
 └── README.md               # Project overview and setup instructions
