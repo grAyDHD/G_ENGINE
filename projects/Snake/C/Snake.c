@@ -7,6 +7,7 @@ typedef struct {
 
 int main() {
   DSPC = MODE3 | BG2;
+  key_poll();
 
   Snake player;
   Segment head = {.xy = {GW / 2, GH / 2}, .next = 0};
@@ -23,8 +24,6 @@ int main() {
     for (volatile int t = 0; t < 50000; t++) {
       handleInput(&player);
     };
-
-    UPDATE_KEYS();
   }
   return 0;
 }

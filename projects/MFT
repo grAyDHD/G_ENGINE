@@ -9,7 +9,7 @@ ifndef TOPDIR
 export TOPDIR := $(CURDIR)
 endif
 
-LIBRARY_DIR := $(abspath $(TOPDIR)/../..)
+LIBRARY_DIR := $(abspath $(TOPDIR)/../../Library)
 LIBRARY := $(LIBRARY_DIR)/build/g_engine.a
 
 #build targets and source directories
