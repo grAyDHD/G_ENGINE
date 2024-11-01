@@ -10,6 +10,7 @@ Workflow Summary
     Merge library and engine into main
 
 Step-by-Step Guide
+
 1. Start with an Up-to-Date library or engine Branch
 This guide outlines the process for contributing to the G_ENGINE repository. The main workflow involves making changes in either the library or engine branches. Each contribution begins with a feature branch under one of these primary branches, and once changes are tested, the feature branches are merged back into library or engine. Finally, the updated library and engine branches are merged into main. Workflow Summary
 
