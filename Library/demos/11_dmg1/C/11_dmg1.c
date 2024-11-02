@@ -1,7 +1,4 @@
-#include <dmg.h>
-#include <gfx.h>
-#include <in.h>
-#include <typedefs.h>
+#include "engine.h"
 
 u16 keyCache;
 u16 prevKeyCache;

@@ -2,7 +2,7 @@
 
 int main() {
   // initialize display
-  DSPC = MODE3 | BG2;
+  DSPC = MODE4 | BG2;
 
   // loop16x16 to set all palette colors
   for (int x = 0; x < 16; x++) {
@@ -18,8 +18,6 @@ int main() {
       m4_plotPixel(x, y, x);
     }
   }
-
-  DSPC = MODE4 | BG2;
 
   pageFlip();
 

@@ -1,12 +1,13 @@
+fix all projects that have input handling, none working at present
+  08_input works
+  13_inlineASM square not changing size on input?
+  09_phys not updating with input
+
 06_rect get to compile with assembly/asm (asdf)
-13_inlineASM square not changing size on input?
 
 ensure Library Makefiles handles asm properly, 
 create test project from asm functions in demos
-
 update input.h to move away from tonc implementation in in.h
 
 fix sierpinski in projects
 
-fix all projects that have input handling, none working at present
-  08_input works
