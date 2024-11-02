@@ -1,7 +1,7 @@
 #G_ENGINE
 
 ## Overview
-**G_ENGINE** is a library and toolset for GameBoy Advance (GBA) development, built from scratch for optimal performance and versatility. The project consists of two main components:
+**G_ENGINE**: First and foremost this is a personal educational pursuit, but the broader goal is web based application for GBA development that has simple GUI for assett management and conversion, alongside a library written in C that it relies upon for opimized performance.
 
 - **Library**: A custom C library for GBA development, currently primarily focused on bitmap modes (Modes 3, 4, and 5).
 - **NG**: A collection of Angular-based modules focused on simplified asset management with a GUI, with the ultimate intent of building a fully featured web-based GBA development engine. *Note: NG is currently in the setup phase* 
@@ -11,38 +11,18 @@
 - **Library** (GBA C Library)
   - Optimized for GBA bitmap display modes: **Mode 3**, **Mode 4**, and **Mode 5**
   - VRAM management and low-level graphics handling
-  - Planned expansions for tiled modes and additional hardware features
-
+  - Basic physics and collision handling
+  - Basic input handling
+  - Basic sound control (DMG1 only, rest in progress)
 - **NG** (Web Development Engine - Coming Soon)
   - Framework for creating a GBA development environment accessible online or locally
-  - Modular design for flexibility and scalability
+  - Modular design for flexibility, using as smaller individual applications as well as being integrated into a larger framework for gba development.
 
   
 ## Getting Started
-
-### Prerequisites
-- **devkitARM / devkitPro** - for compiling the GBA C library
-- **Neovim** - recommended for syntax highlighting and debugging
-- **mGBA** - for emulating and testing your GBA projects
-
+    coming soon, devkitarm required to make
 ### Installation
-
-1. **Clone the Repository**
-   ```bash
-   git clone https://github.com/username/G_ENGINE.git
-   cd G_ENGINE
-   ```
-
-2. **Build the Library**
-   ```bash
-   make -C Library
-   ```
-
-3. **Run in Emulator**
-   ```bash
-   mgba Library/build/output.gba
-   ```
-
+    coming soon
 
 ## Project Structure
 
@@ -52,20 +32,4 @@
 
 
 ## Usage
-
-To start experimenting with the GBA library, follow these steps:
-
-```bash
-# Compile a demo (replace 'demo_name' with a specific example)
-make -C Library demos/demo_name
-
-
-
-### 7. **Contributing**
-Encourage contributions with a simple guide or link to `CONTRIBUTING.md` (if you have one).
-
-```markdown
-## Contributing
-
-Contributions are welcome! To get started, please check the open issues or submit a pull request. For major changes, please open an issue to discuss them first.
-
+    coming soon
