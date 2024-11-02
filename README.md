@@ -1,196 +1,71 @@
-G_ENGINE Git Workflow Guide
+#G_ENGINE
 
-This guide outlines the process for contributing to the G_ENGINE repository. The main workflow involves making changes in either the library or engine branches. Each contribution begins with a feature branch under one of these primary branches, and once changes are tested, the feature branches are merged back into library or engine. Finally, the updated library and engine branches are merged into main.
-Workflow Summary
+## Overview
+**G_ENGINE** is a library and toolset for GameBoy Advance (GBA) development, built from scratch for optimal performance and versatility. The project consists of two main components:
 
-    Start with an Up-to-Date library or engine Branch
-    Create a Feature Branch Under library or engine
-    Make Changes, Commit, and Push the Feature Branch
-    Merge the Feature Branch into library or engine
-    Merge library and engine into main
+- **Library**: A custom C library for GBA development, currently primarily focused on bitmap modes (Modes 3, 4, and 5).
+- **NG**: A collection of Angular-based modules focused on simplified asset management with a GUI, with the ultimate intent of building a fully featured web-based GBA development engine. *Note: NG is currently in the setup phase* 
 
-Step-by-Step Guide
+## Features
 
-1. Start with an Up-to-Date library or engine Branch
-This guide outlines the process for contributing to the G_ENGINE repository. The main workflow involves making changes in either the library or engine branches. Each contribution begins with a feature branch under one of these primary branches, and once changes are tested, the feature branches are merged back into library or engine. Finally, the updated library and engine branches are merged into main. Workflow Summary
+- **Library** (GBA C Library)
+  - Optimized for GBA bitmap display modes: **Mode 3**, **Mode 4**, and **Mode 5**
+  - VRAM management and low-level graphics handling
+  - Planned expansions for tiled modes and additional hardware features
 
-Start with an Up-to-Date library or engine Branch
-Create a Feature Branch Under library or engine
-Make Changes, Commit, and Push the Feature Branch
-Merge the Feature Branch into library or engine
-Merge library and engine into main
+- **NG** (Web Development Engine - Coming Soon)
+  - Framework for creating a GBA development environment accessible online or locally
+  - Modular design for flexibility and scalability
 
-Step-by-Step Guide
+  
+## Getting Started
 
-    Start with an Up-to-Date library or engine Branch
+### Prerequisites
+- **devkitARM / devkitPro** - for compiling the GBA C library
+- **Neovim** - recommended for syntax highlighting and debugging
+- **mGBA** - for emulating and testing your GBA projects
 
-Begin by checking out the relevant primary branch (library or engine) and making sure it is up-to-date with the latest changes from the remote repository.
+### Installation
 
-bash
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/username/G_ENGINE.git
+   cd G_ENGINE
+   ```
 
-# Ensure you're on the latest main branch
-git checkout main
-git pull origin main
+2. **Build the Library**
+   ```bash
+   make -C Library
+   ```
 
-# Check out and pull updates for the 'library' branch
-git checkout library
-git pull origin library
+3. **Run in Emulator**
+   ```bash
+   mgba Library/build/output.gba
+   ```
 
-# Or, check out and pull updates for the 'engine' branch
-git checkout engine
-git pull origin engine
 
-2. Create a Feature Branch for Your Work
-Ensure you're on the latest main branch
+## Project Structure
 
-git checkout main git pull origin main
-Check out and pull updates for the 'library' branch
+- **Library/**: Core GBA library (written in C) for game development
+- **NG/**: Angular-based project for the development environment (in progress)
+- **README.md**: Project documentation
 
-git checkout library git pull origin library
-Or, check out and pull updates for the 'engine' branch
 
-git checkout engine git pull origin engine
+## Usage
 
-    Create a Feature Branch for Your Work
+To start experimenting with the GBA library, follow these steps:
 
-Create a new feature branch under either library or engine, depending on where your changes are focused.
+```bash
+# Compile a demo (replace 'demo_name' with a specific example)
+make -C Library demos/demo_name
 
-bash
 
-# From library branch
-git checkout library
-git checkout -b library-feature-branch
 
-# Or from engine branch
-git checkout engine
-git checkout -b engine-feature-branch
+### 7. **Contributing**
+Encourage contributions with a simple guide or link to `CONTRIBUTING.md` (if you have one).
 
-3. Make Changes, Commit, and Push the Feature Branch
+```markdown
+## Contributing
 
-    Make your changes in the relevant directory (Library for library changes, NG for engine changes).
-    Stage the files and commit your changes with a descriptive message.
+Contributions are welcome! To get started, please check the open issues or submit a pull request. For major changes, please open an issue to discuss them first.
 
-bash
-
-# Stage your changes
-git add <file-path>          # Add a specific file
-git add .                    # Or add all changes
-
-# Commit with a message
-git commit -m "Describe the feature or fix"
-
-    Push the feature branch to the remote repository.
-
-bash
-
-git push -u origin library-feature-branch  # or engine-feature-branch
-
-4. Merge the Feature Branch into library or engine
-From library branch
-
-git checkout library git checkout -b library-feature-branch
-Or from engine branch
-
-git checkout engine git checkout -b engine-feature-branch
-
-    Make Changes, Commit, and Push the Feature Branch
-
-    Make your changes in the relevant directory (Library for library changes, NG for engine changes). Stage the files and commit your changes with a descriptive message.
-
-bash
-Stage your changes
-
-git add # Add a specific file git add . # Or add all changes
-Commit with a message
-
-git commit -m "Describe the feature or fix"
-
-Push the feature branch to the remote repository.
-
-bash
-
-git push -u origin library-feature-branch # or engine-feature-branch
-
-    Merge the Feature Branch into library or engine
-
-    After testing and reviewing, merge your feature branch back into the main library or engine branch.
-
-bash
-
-# For library branch
-git checkout library
-git merge library-feature-branch
-
-# For engine branch
-git checkout engine
-git merge engine-feature-branch
-
-    Push the updated library or engine branch to the remote repository.
-
-bash
-
-git push origin library    # Or git push origin engine
-
-    Optionally, delete the feature branch locally and remotely after merging.
-
-bash
-
-git branch -d library-feature-branch
-git push origin --delete library-feature-branch  # or engine-feature-branch
-
-5. Merge library and engine into main
-For library branch
-
-git checkout library git merge library-feature-branch
-For engine branch
-
-git checkout engine git merge engine-feature-branch
-
-Push the updated library or engine branch to the remote repository.
-
-bash
-
-git push origin library # Or git push origin engine
-
-Optionally, delete the feature branch locally and remotely after merging.
-
-bash
-
-git branch -d library-feature-branch git push origin --delete library-feature-branch # or engine-feature-branch
-
-    Merge library and engine into main
-
-Once library and engine have stable updates, merge each of them into main.
-
-bash
-
-# Merge library into main
-git checkout main
-git merge library
-git push origin main
-
-# Merge engine into main
-git merge engine
-git push origin main
-Merge library into main
-
-git checkout main git merge library git push origin main
-Merge engine into main
-
-git merge engine git push origin main
-
-Explanation of Commands
-
-Here’s what each Git command does in this workflow:
-
-git checkout <branch-name>: Switches to the specified branch.
-git pull origin <branch-name>: Updates the local branch with changes from the remote branch.
-git checkout -b <new-branch-name>: Creates a new branch and switches to it.
-git add <file-path> or git add .: Stages files to be included in the next commit.
-git commit -m "message": Commits staged changes to the branch with a descriptive message.
-git push -u origin <branch-name>: Pushes the branch to the remote repository and sets it to track the remote branch.
-git merge <branch-name>: Merges changes from the specified branch into the current branch.
-git branch -d <branch-name>: Deletes the local branch after it has been merged.
-git push origin --delete <branch-name>: Deletes the specified branch from the remote repository.
-
-This workflow keeps main stable by allowing all feature work to be contained in separate branches under library or engine, promoting clean, organized development.
