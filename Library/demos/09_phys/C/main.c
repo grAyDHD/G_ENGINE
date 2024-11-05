@@ -1,27 +1,5 @@
-// objectives:
-// make sure jump isn't continuos on btn hold
-// bounmce whn hitting walls
-// three platforms- one bouncy, one giving jump boost, one cant jump from
-//
 #include "engine.h"
-// features to finish demo:
-// three platforms to jump on,
-// bitmap background
-// game play loop: 'A' is jump, and should trigger "jump" sound effect.
-// should only emit sound once while held, check if on ground when pressed, and
-// jump slightly higher if held longer. when gravity is reversed, ball 'lands'
-// on ceiling, and jumping works essentially the same but in reverse direction
-// also, jump sound should have adjusted parameters  to reverse the sweep sound
-// when gravity reversed. bumper buttons are used to launch the ball at a 45
-// degree angle against gravity.  There should be momentum introduced to provide
-// bouncing off of walls/platforms. A launch can be performed in the air, only
-// if ground has been made contact with since the last use of the launch.
-// gravity should have an accellerating effect, and the ball should bounce 0-3
-// times depending on collision speed with the ground. can land one of three
-// platforms, each emitting a unique collision sound.  launching into side of
-// platform is effective to bounce the opposite direction left and right buttons
-// move ball left and right at all times. holding 'B' reverses gravity until it
-// is released.
+
 void checkInput(struct Object *ball) {
 
   if (key_held(A)) {
@@ -73,6 +51,7 @@ int main() {
   Coordinate crnr = {ball.x, ball.y};
 
   while (1) {
+    key_poll();
     // erase current position
     drawRect(prevCrnr, BALL_SIZE, BALL_SIZE, 0x0000);
     checkInput(&ball);

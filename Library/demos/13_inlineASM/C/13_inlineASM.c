@@ -22,23 +22,22 @@ void changeSquareSize(Square *square) {
                        : "r"(square)
                        : "r1", "memory");
 };
-
 extern void increaseSquareSize(Square *square);
 extern void decreaseSquareSize(Square *square);
 //
 int main() {
   DSPC = MODE3 | BG2;
   Square square = {10, colors[0], {120, 80}};
-  key_poll();
 
   while (1) {
-    if (key_held(B)) {
+    key_poll();
+    if (key_hit(B)) {
       drawRect(square.coordinate, square.size, square.size, 0x0000);
       decreaseSquareSize(&square);
-    } else if (key_held(A)) {
+    } else if (key_hit(A)) {
       drawRect(square.coordinate, square.size, square.size, 0x0000);
       increaseSquareSize(&square);
-    } else if (key_held(RT | LT)) {
+    } else if (key_hit(RT | LT)) {
       changeSquareSize(&square);
     }
     drawRect(square.coordinate, square.size, square.size, square.color);
