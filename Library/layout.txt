@@ -18,7 +18,6 @@ G_Engine/
 │   │   │
 │   │   ├── input/          # Input handling functions
 │   │   │   ├── buttons.c   # Button input handling
-│   │   │   ├── touch.c     # Touch screen input handling (if needed)
 │   │   │   └── input_manager.c # General input manager
 │   │   │
 │   │   ├── physics/        # Physics functions

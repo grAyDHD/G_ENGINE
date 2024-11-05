@@ -1,5 +1,4 @@
 #include "engine.h"
-#include "in.h"
 
 u16 keyCache;
 int main() {
@@ -37,12 +36,12 @@ int main() {
     if (key_held(R)) {
       start.x++;
     }
-    if (key_held(L | R)) {
+    if (key_held(SL)) {
       rWidth = 20;
       rHeight = 20;
-    } else if (key_held(L)) {
+    } else if (key_held(LT)) {
       rWidth++;
-    } else if (key_held(R)) {
+    } else if (key_held(RT)) {
       rHeight++;
     }
 

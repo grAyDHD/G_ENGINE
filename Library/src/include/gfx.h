@@ -26,6 +26,10 @@
 #define OBJ 0x1000
 
 #define VCOUNT (*(volatile unsigned short *)0x04000006)
+
+#define dblClr(color) ((color) | (color << 16))
+
+extern void fillScreen(u32 clr);
 void VBLANK();
 
 #endif

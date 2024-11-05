@@ -18,7 +18,7 @@ AR := arm-none-eabi-ar
 CFLAGS := -mthumb -mthumb-interwork -O2 -Wall -fno-strict-aliasing $(foreach dir, $(INCLUDE_DIR), -I$(dir))
 
 C_SOURCES := $(wildcard $(C_SRC_DIR)/**/*.c) $(wildcard $(C_SRC_DIR)/*.c)
-ASM_SOURCES := $(wildcard $(ASM_SRC_DIR)/**/*.s)
+ASM_SOURCES := $(wildcard $(ASM_SRC_DIR)/**/*.s) $(wildcard $(ASM_SRC_DIR)/*.s)
 OBJ_FILES := $(C_SOURCES:$(C_SRC_DIR)/%.c=$(BUILD_DIR)/%.o) $(ASM_SOURCES:$(ASM_SRC_DIR)/%.s=$(BUILD_DIR)/%.o)
 
 all: $(LIBRARY)

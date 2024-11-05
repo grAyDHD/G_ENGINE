@@ -1,7 +1,4 @@
-#include <draw.h>
-#include <gfx.h>
-#include <in.h>
-#include <typedefs.h>
+#include "engine.h"
 
 u16 keyCache = 0;
 typedef struct {
@@ -12,6 +9,7 @@ typedef struct {
 
 int colors[] = {RGB(31, 0, 0), RGB(0, 31, 0), RGB(0, 0, 31), RGB(31, 31, 0),
                 RGB(31, 0, 31)};
+
 int colorCount = sizeof(colors) / sizeof(colors[0]);
 int currentColorIndex = 0;
 
@@ -24,23 +22,22 @@ void changeSquareSize(Square *square) {
                        : "r"(square)
                        : "r1", "memory");
 };
-
 extern void increaseSquareSize(Square *square);
 extern void decreaseSquareSize(Square *square);
 //
 int main() {
   DSPC = MODE3 | BG2;
   Square square = {10, colors[0], {120, 80}};
-  key_poll();
 
   while (1) {
-    if (key_is_down(B)) {
+    key_poll();
+    if (key_hit(B)) {
       drawRect(square.coordinate, square.size, square.size, 0x0000);
       decreaseSquareSize(&square);
-    } else if (key_is_down(A)) {
+    } else if (key_hit(A)) {
       drawRect(square.coordinate, square.size, square.size, 0x0000);
       increaseSquareSize(&square);
-    } else if (key_is_down(RT | LT)) {
+    } else if (key_hit(RT | LT)) {
       changeSquareSize(&square);
     }
     drawRect(square.coordinate, square.size, square.size, square.color);
