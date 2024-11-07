@@ -15,12 +15,12 @@ typedef struct REPEAT_REC {
   u8 repeat; //!< Limit for successive repeats.
 } ALIGN4 REPEAT_REC;
 
-u16 __key_curr = 0, __key_prev = 0;
+u16 keyCache = 0, prevKeyCache = 0;
 REPEAT_REC __key_rpt = {0, KEY_MASK, 60, 60, 30};
 
 void key_poll(void) {
-  __key_prev = __key_curr;
-  __key_curr = ~REG_KEYINPUT & KEY_MASK;
+  prevKeyCache = keyCache;
+  keyCache = ~KEYS & KEY_MASK;
 
   REPEAT_REC *rpt = &__key_rpt;
 
@@ -31,14 +31,14 @@ void key_poll(void) {
     // NOTE: this also counts as a repeat!
     if (key_transit(rpt->mask)) {
       rpt->count = rpt->delay;
-      rpt->keys = __key_curr;
+      rpt->keys = keyCache;
     } else
       rpt->count--;
 
     // Time's up: set repeats (for this frame)
     if (rpt->count == 0) {
       rpt->count = rpt->repeat;
-      rpt->keys = __key_curr & rpt->mask;
+      rpt->keys = keyCache & rpt->mask;
     }
   }
 }
