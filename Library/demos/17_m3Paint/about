@@ -5,10 +5,18 @@ These are the shapes:
   triangle 
   circle
   star
-  pentagon
   hexagon
 I'll use asesprite to test draw various sizes for each of these.
 The player can choose between a solid and a gradient, as well as select color with RGB sliders ranging 0-31 each (32,678 colors) I think that's the number lol
 In gradient mode, there is a range that the player sets, min and max for each slider. Each slider will also have a 3 way toggle for that color values gradient speed.
 Meaning, higher speed, that color cycles through it's gradient range faster.
 
+Step 1:
+
+Step 2:
+
+Step 3:
+
+Step 4:
+
+Step 5:
