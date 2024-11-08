@@ -1,5 +1,6 @@
 #include "input.h"
 #include <gfx.h>
+figure out how exactly repeats work, where used, and why it is in normal updateKeys function
 
 /*
 typedef struct REPEAT_REC
