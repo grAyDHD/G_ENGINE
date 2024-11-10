@@ -1,6 +1,7 @@
 #include "engine.h"
 #include "gfx.h"
 #include "in.h"
+#include "typedefs.h"
 
 enum MODE { DRAWING = 0, COLOR, SHAPE } MODE;
 enum COLOR_SELECT { RED = 0, GREEN, BLUE };
@@ -8,9 +9,7 @@ enum SHAPE_SELECT { SQUARE, TRIANGLE, CIRCLE, HEXAGON };
 
 // have u16 to represent color, perform bitwise operations to mask in each color
 // mode ensure max in each color is 31 and min is 0
-
-u16 color = 0x0000;
-
+int color = dblClr(RGB(3, 5, 9));
 // red   0x0000 0000 0001 1111
 // blue  0x0000 0011 1110 0000
 // green 0x0111 1100 0000 0000
@@ -22,10 +21,56 @@ void fillSquare(Coordinate cursor, int clr) {
   drawRect(cursor, 1, 1, clr);
 }
 
+Coordinate diagonalInputHandler(Coordinate cursor) {
+  fillSquare(cursor, color);
+  if (keyHeld(U)) {
+    fillSquare(cursor, 0);
+    cursor.y -= 1;
+    if (keyHeld(L)) {
+      cursor.x -= 1;
+    } else if (keyHeld(R)) {
+      cursor.x += 1;
+    }
+    for (volatile int x = 0; x < 10000; x++)
+      ;
+  } else if (keyHeld(D)) {
+    fillSquare(cursor, 0);
+    cursor.y += 1;
+    if (keyHeld(L)) {
+      cursor.x -= 1;
+    } else if (keyHeld(R)) {
+      cursor.x += 1;
+    }
+    for (volatile int x = 0; x < 10000; x++)
+      ;
+  } else if (keyHeld(R)) {
+    fillSquare(cursor, 0);
+    cursor.x += 1;
+    if (keyHeld(U)) {
+      cursor.y -= 1;
+    } else if (keyHeld(D)) {
+      cursor.y += 1;
+    }
+    for (volatile int x = 0; x < 10000; x++)
+      ;
+  } else if (keyHeld(L)) {
+    fillSquare(cursor, 0);
+    cursor.x -= 1;
+    if (keyHeld(U)) {
+      cursor.y -= 1;
+    } else if (keyHeld(D)) {
+      cursor.y += 1;
+    }
+    for (volatile int x = 0; x < 10000; x++)
+      ;
+  }
+  return cursor;
+}
+
 int main() {
   DSPC = MODE3 | BG2;
   // up/down cycle blue value
-  fillScreen(dblClr(RGB(3, 5, 9)));
+  fillScreen(color);
 
   enum MODE appState = DRAWING;
   //  enum COLOR_SELECT colorMode = RED;
@@ -39,32 +84,10 @@ int main() {
     switch (appState) {
     case (DRAWING):
       // input START sets appState to COLOR
-      fillSquare(cursor, color);
+      fillSquare(cursor, 0);
 
-      if (keyHeld(U)) {
-        fillSquare(cursor, 0);
-        cursor.y -= 1;
-        for (volatile int x = 0; x < 10000; x++)
-          ;
-      } else if (keyHeld(D)) {
-        fillSquare(cursor, 0);
-        cursor.y += 1;
-        for (volatile int x = 0; x < 10000; x++)
-          ;
-      } else if (keyHeld(R)) {
-        fillSquare(cursor, 0);
-        cursor.x += 1;
-        for (volatile int x = 0; x < 10000; x++)
-          ;
-      } else if (keyHeld(L)) {
-        fillSquare(cursor, 0);
-        cursor.x -= 1;
-        for (volatile int x = 0; x < 10000; x++)
-          ;
-      }
-
+      cursor = diagonalInputHandler(cursor);
       if (keyHeld(A)) {
-        fillSquare(cursor, color);
       }
       break;
     case (COLOR):
