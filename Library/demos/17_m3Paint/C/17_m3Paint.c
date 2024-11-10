@@ -1,6 +1,6 @@
-#include "draw.h"
+#include "engine.h"
 #include "gfx.h"
-#include "typedefs.h"
+#include "in.h"
 
 enum MODE { DRAWING = 0, COLOR, SHAPE } MODE;
 enum COLOR_SELECT { RED = 0, GREEN, BLUE };
@@ -34,10 +34,38 @@ int main() {
   Coordinate cursor = {0, 0};
 
   while (1) {
+    updateKeys();
+    VBLANK();
     switch (appState) {
     case (DRAWING):
       // input START sets appState to COLOR
       fillSquare(cursor, color);
+
+      if (keyHeld(U)) {
+        fillSquare(cursor, 0);
+        cursor.y -= 1;
+        for (volatile int x = 0; x < 10000; x++)
+          ;
+      } else if (keyHeld(D)) {
+        fillSquare(cursor, 0);
+        cursor.y += 1;
+        for (volatile int x = 0; x < 10000; x++)
+          ;
+      } else if (keyHeld(R)) {
+        fillSquare(cursor, 0);
+        cursor.x += 1;
+        for (volatile int x = 0; x < 10000; x++)
+          ;
+      } else if (keyHeld(L)) {
+        fillSquare(cursor, 0);
+        cursor.x -= 1;
+        for (volatile int x = 0; x < 10000; x++)
+          ;
+      }
+
+      if (keyHeld(A)) {
+        fillSquare(cursor, color);
+      }
       break;
     case (COLOR):
       break;
