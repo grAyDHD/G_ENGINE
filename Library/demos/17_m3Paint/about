@@ -48,3 +48,211 @@ Step 7:
 Step 8:
   implement screen clear function and activate it with input combo LT+RT+L+R
 
+
+
+
+Core Principles for Cursor Behavior
+
+    Non-Intrusive Cursor Movement:
+        When no drawing or erasing is performed (keyUp(A) && keyUp(B)), the cursor should pass over existing pixels without altering them. This preserves the screen state regardless of the cursor's position.
+
+    Temporary State Preservation:
+        The cursor's visual position can be indicated with a temporary overlay or marker, without altering the underlying pixel data permanently.
+
+Logic Refinement
+Key Steps:
+
+    Preserve Background State:
+        As the cursor moves, you need to cache the pixel colors under the cursor area. This ensures you can restore these pixels to their original state when the cursor moves away.
+        This can be achieved by maintaining a small buffer in memory, holding the original pixel values from the VRAM for the area under the cursor.
+
+    Render Temporary Cursor:
+        Overdraw the cursor location with a special color (a temporary cursor indicator) during keyUp(A) and keyUp(B).
+        When the cursor moves, restore the previous pixels from your cache and redraw the temporary cursor at the new location.
+
+    Brush Behavior with Input:
+        If keyHeld(A), erase by drawing eraseColor in the cursor area.
+        If keyHeld(B), draw the current brushColor.
+        If no buttons are held, restore the cached pixel values and overlay the cursor.
+
+Logic Overview for Each Frame:
+
+    Detect Input State:
+        Check if A or B is held.
+        If neither is held (keyUp(A) && keyUp(B)):
+            Restore the pixel data from your cache for the last cursor position.
+            Overlay the cursor at its current position with a temporary marker.
+        If A or B is held, perform the corresponding brush operation.
+
+    Update Cursor and Cache:
+        When the cursor moves:
+            Store the pixel values from the new cursor position to your cache.
+            Restore the pixel values from the old cursor position to keep the screen unchanged.
+
+Benefits of This Approach:
+
+    Preserves Existing Drawings: Ensures your brush only modifies pixels when explicitly drawing or erasing.
+    Efficient Pixel Management: By caching only the pixels under the brush area, you minimize memory usage while keeping the behavior predictable.
+    Non-Intrusive Cursor Visualization: The cursor can be visually distinct without interfering with the artwork.
+
+Considerations:
+
+    Optimization:
+        Cache the minimum number of pixels required for the current brush size.
+        Use hardware features (like double buffering) to minimize redraw flickering.
+
+    Input Handling:
+        Ensure smooth and responsive transitions between brush states (drawing, erasing, moving).
+
+This strategy simplifies cursor management while maintaining flexibility for more advanced features like shape-based brushes or gradients later. Let me know if you'd like to explore specific implementation strategies or optimizations!
+You said:
+could you provide code example now implementing this?
+ChatGPT said:
+GPT
+
+Below is an implementation for the refined cursor behavior, where the cursor preserves any underlying pixels unless explicitly drawing or erasing. This approach introduces a caching mechanism for the pixels under the cursor:
+Code Implementation
+
+#include "engine.h"
+#include "gfx.h"
+#include "in.h"
+#include "typedefs.h"
+
+enum MODE { DRAWING = 0, COLOR, SHAPE } MODE;
+enum COLOR_SELECT { RED = 0, GREEN, BLUE };
+enum SHAPE_SELECT { SQUARE, TRIANGLE, CIRCLE, HEXAGON };
+
+int brushColor = dblClr(RGB(3, 5, 9));
+int eraseColor = 0;
+int cursorIndicator = RGB(31, 31, 31);  // A distinct color for cursor overlay
+
+#define BRUSH_SIZE 4
+
+typedef struct {
+    u16 pixels[BRUSH_SIZE][BRUSH_SIZE];  // Cache for the pixels under the cursor
+} PixelCache;
+
+void cachePixels(Coordinate cursor, PixelCache *cache) {
+    for (int y = 0; y < BRUSH_SIZE; y++) {
+        for (int x = 0; x < BRUSH_SIZE; x++) {
+            cache->pixels[y][x] = getPixel(cursor.x + x, cursor.y + y);
+        }
+    }
+}
+
+void restorePixels(Coordinate cursor, PixelCache *cache) {
+    for (int y = 0; y < BRUSH_SIZE; y++) {
+        for (int x = 0; x < BRUSH_SIZE; x++) {
+            drawPixel(cursor.x + x, cursor.y + y, cache->pixels[y][x]);
+        }
+    }
+}
+
+void drawCursorOverlay(Coordinate cursor) {
+    for (int y = 0; y < BRUSH_SIZE; y++) {
+        for (int x = 0; x < BRUSH_SIZE; x++) {
+            drawPixel(cursor.x + x, cursor.y + y, cursorIndicator);
+        }
+    }
+}
+
+void updateBrushPosition(Coordinate *cursor) {
+    if (keyHeld(U)) {
+        cursor->y -= 1;
+        if (keyHeld(L)) {
+            cursor->x -= 1;
+        } else if (keyHeld(R)) {
+            cursor->x += 1;
+        }
+    } else if (keyHeld(D)) {
+        cursor->y += 1;
+        if (keyHeld(L)) {
+            cursor->x -= 1;
+        } else if (keyHeld(R)) {
+            cursor->x += 1;
+        }
+    } else if (keyHeld(R)) {
+        cursor->x += 1;
+        if (keyHeld(U)) {
+            cursor->y -= 1;
+        } else if (keyHeld(D)) {
+            cursor->y += 1;
+        }
+    } else if (keyHeld(L)) {
+        cursor->x -= 1;
+        if (keyHeld(U)) {
+            cursor->y -= 1;
+        } else if (keyHeld(D)) {
+            cursor->y += 1;
+        }
+    }
+}
+
+int main() {
+    DSPC = MODE3 | BG2;
+    fillScreen(eraseColor);
+
+    enum MODE appState = DRAWING;
+    Coordinate cursor = {0, 0};
+    PixelCache cache;
+    cachePixels(cursor, &cache);  // Initial cache at the starting position
+
+    while (1) {
+        updateKeys();
+        VBLANK();
+
+        switch (appState) {
+        case DRAWING:
+            // Restore the previous pixels before moving the cursor
+            restorePixels(cursor, &cache);
+
+            // Update the cursor position
+            updateBrushPosition(&cursor);
+
+            // Cache the new pixels under the cursor
+            cachePixels(cursor, &cache);
+
+            if (keyHeld(A)) {
+                // Erasing
+                fillSquare(cursor, eraseColor);
+            } else if (keyHeld(B)) {
+                // Drawing
+                fillSquare(cursor, brushColor);
+            } else {
+                // Cursor overlay without affecting underlying pixels
+                drawCursorOverlay(cursor);
+            }
+            break;
+
+        case COLOR:
+            // Handle color selection mode (not implemented yet)
+            break;
+
+        case SHAPE:
+            // Handle shape selection mode (not implemented yet)
+            break;
+        }
+    }
+
+    return 0;
+}
+
+Key Elements:
+
+    Pixel Cache:
+        cachePixels: Reads and stores the pixel data under the cursor.
+        restorePixels: Restores the cached pixel data when the cursor moves away.
+
+    Cursor Overlay:
+        drawCursorOverlay: Temporarily highlights the cursor area without altering underlying data permanently.
+
+    Brush Position Update:
+        updateBrushPosition: Moves the cursor and triggers caching and restoration as necessary.
+
+    Drawing and Erasing:
+        Drawing (keyHeld(B)) and erasing (keyHeld(A)) modify the screen contents only when the corresponding buttons are pressed.
+
+How It Works:
+
+    When no buttons are pressed, the cursor moves over the screen, restoring underlying pixels and overlaying the cursor for user feedback.
+    When A or B is held, it draws or erases as expected while maintaining the behavior of restoring pixels upon cursor movement.
