@@ -3,9 +3,29 @@
 #include "in.h"
 #include "typedefs.h"
 
+#define VRAME_SCREEN_END 0x06012C00
+#define CURSOR_CACHE ((u16)VRAME_SCREEN_END)
+
 enum MODE { DRAWING = 0, COLOR, SHAPE } MODE;
 enum COLOR_SELECT { RED = 0, GREEN, BLUE };
 enum SHAPE_SELECT { SQUARE, TRIANGLE, CIRCLE, HEXAGON };
+
+typedef struct {
+  Coordinate cursorPosition;
+  u16 pixels[4][4];
+} CursorCache;
+
+void saveToCursorCache(CursorCache *cache, Coordinate cursorPosition) {
+  // use memCopy32 to copy 4x4 square of pixels
+  //  for now, start with for loop, copying one pixel at a time
+  for (int y = 0; y < 4; y++) {
+    for (int x = 0; x < 4; x++) {
+      CURSOR_CACHE[y * 4 + x] =
+          VRAM[cursorPosition.y + y][cursorPosition.x + x];
+    }
+  }
+  cache->cursorPosition = cursorPosition;
+}
 
 int brushColor = dblClr(RGB(3, 5, 9));
 int eraseColor = 0;
@@ -25,8 +45,6 @@ void updateBrushPosition(Coordinate *cursor) {
     } else if (keyHeld(R)) {
       cursor->x += 1;
     }
-    for (volatile int x = 0; x < 10000; x++)
-      ;
   } else if (keyHeld(D)) {
     cursor->y += 1;
     if (keyHeld(L)) {
@@ -34,8 +52,6 @@ void updateBrushPosition(Coordinate *cursor) {
     } else if (keyHeld(R)) {
       cursor->x += 1;
     }
-    for (volatile int x = 0; x < 10000; x++)
-      ;
   } else if (keyHeld(R)) {
     cursor->x += 1;
     if (keyHeld(U)) {
@@ -43,18 +59,14 @@ void updateBrushPosition(Coordinate *cursor) {
     } else if (keyHeld(D)) {
       cursor->y += 1;
     }
-    for (volatile int x = 0; x < 10000; x++)
-      ;
   } else if (keyHeld(L)) {
     cursor->x -= 1;
     if (keyHeld(U)) {
       cursor->y -= 1;
-    } else if (keyHeld(D)) {
-      cursor->y += 1;
     }
-    for (volatile int x = 0; x < 10000; x++)
-      ;
   }
+  for (volatile int x = 0; x < 10000; x++)
+    ;
 }
 
 int main() {
