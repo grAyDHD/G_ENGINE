@@ -92,28 +92,25 @@ int main() {
       // input START sets appState to COLOR
 
       if (keyUp(A) && keyUp(B)) {
-        restoreFromCursorCache(cursor);
-        updateBrushPosition(&cursor);
-        saveToCursorCache(cursor);
-        fillSquare(cursor, brushColor);
+        if (keyWasDown(U) || keyWasDown(D) || keyWasDown(L) || keyWasDown(R)) {
+          restoreFromCursorCache(cursor);
+          updateBrushPosition(&cursor);
+          saveToCursorCache(cursor);
+          fillSquare(cursor, brushColor);
+        }
       } else if (keyHeld(A)) {
         fillSquare(cursor, brushColor);
-        updateBrushPosition(&cursor);
-      } else if (keyHeld(B)) {
-        fillSquare(cursor, eraseColor);
-        updateBrushPosition(&cursor);
+        saveToCursorCache(cursor);
+        if (keyWasDown(U) || keyWasDown(D) || keyWasDown(L) || keyWasDown(R)) {
+          restoreFromCursorCache(cursor);
+          updateBrushPosition(&cursor);
+          fillSquare(cursor, brushColor);
+          saveToCursorCache(cursor);
+        }
+        //} else if (keyHeld(B)) {
+        // fillSquare(cursor, eraseColor);
+        // updateBrushPosition(&cursor);
       }
-      /*
-      fillSquare(cursor, brushColor);
-
-
-      if (keyHeld(A)) {
-        fillSquare(cursor, brushColor);
-      } else if (keyHeld(B)) {
-        fillSquare(cursor, eraseColor);
-      }
-
-*/
 
       break;
     case (COLOR):
@@ -123,10 +120,9 @@ int main() {
     }
   }
 
-  //  drawRect({8, 8}, 4, 32, color);
-
   return 0;
 }
+
 /*
 case (COLOR):
 switch (colorMode) {
