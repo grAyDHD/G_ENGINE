@@ -18,7 +18,8 @@ Step 1:
 [x]      hold A + directions, draw
 [x]      hold B + directions, erase
 []     hold RT + A, draw with gradient?
-[]     hold LT + RT + A + B, clear screen
+[x]     hold LT + RT + A + B, clear screen
+            Right now is ST or START, will change to LT+RT+A+B 
 []      on pressing start, pause and enter RGB color selection mode
     while paused:
       in RGB color selection mode:
@@ -31,7 +32,7 @@ Step 1:
 Step 2:
 [x]  Set starting parameters for drawing and implement basic drawing and erasing with a 16x16 square (use a pattern?)
 
-    ROADBLOCK:
+    ROADBLOCK: RESOLVED!
         when not drawing OR erasing, cursor draws over old value.
     SOLUTION:
         preserve a cache for values within the cursor.
