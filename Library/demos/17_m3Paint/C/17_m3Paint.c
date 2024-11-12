@@ -1,4 +1,5 @@
 #include "engine.h"
+#include "gfx.h"
 #include "in.h"
 #include "typedefs.h"
 
@@ -40,9 +41,6 @@ void fillSquare(Coordinate cursor, int clr) {
 }
 
 void updateBrushPosition(Coordinate *cursor) {
-  // before brush updates, restore previous cache to screen, update cursor
-  // position, save new cursorPosition pixels to cache
-
   if (keyHeld(U)) {
     cursor->y -= 1;
     if (keyHeld(L)) {
@@ -70,7 +68,6 @@ void updateBrushPosition(Coordinate *cursor) {
       cursor->y -= 1;
     }
   }
-
   for (volatile int x = 0; x < 10000; x++)
     ;
 }
@@ -91,6 +88,11 @@ int main() {
     case (DRAWING):
       // input START sets appState to COLOR
 
+      if (keyDown(ST)) {
+        fillScreen(eraseColor);
+        saveToCursorCache(cursor);
+        fillSquare(cursor, brushColor);
+      }
       if (keyUp(A) && keyUp(B)) {
         if (keyWasDown(U) || keyWasDown(D) || keyWasDown(L) || keyWasDown(R)) {
           restoreFromCursorCache(cursor);
@@ -130,62 +132,3 @@ int main() {
 
   return 0;
 }
-
-/*
-case (COLOR):
-switch (colorMode) {
-// each colorMode individual color value change reflected in test square
-// white regions of test square to be drawn as RGB15
-case (RED):
-
-while (colorMode == RED && appState == COLOR) {
-u8 clr5 = 0;
-if (keyDown(UP)) {
-// if clr5 < 31, clr5++, wait- use key repeater to repeat every half
-// second?
-}
-if (keyDown(DOWN)) {
-
-// if clr5 > 0, clr5 --
-}
-if (keyDown(RIGHT)) {
-// colorMode = green
-}
-if (keyDown(RT)) {
-appState = SHAPE;
-}
-
-// up/down cycle red value ranging 0 to 31
-// whitish cursor, moves 2 pixels at a time upwards, 64 px tall
-// right, mode = GREEN
-//
-case (GREEN):
-// up/down cycle green value
-// left: red mode, right: blue mode
-break;
-
-case (BLUE):
-// up/down cycle blue value
-// left: green mode
-break;
-}
-break;
-
-case (SHAPE):
-switch (brushShape) {
-// only options here are left/right to toggle shapes for brushShape
-case (SQUARE):
-break;
-case (TRIANGLE):
-break;
-case (CIRCLE):
-break;
-case (HEXAGON):
-break;
-}
-
-
-
-  //  enum COLOR_SELECT colorMode = RED;
-  //  enum SHAPE_SELECT brushShape = SQUARE;
-  */
