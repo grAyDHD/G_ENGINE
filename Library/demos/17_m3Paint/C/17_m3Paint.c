@@ -1,34 +1,36 @@
 #include "engine.h"
-#include "gfx.h"
 #include "in.h"
 #include "typedefs.h"
 
-#define VRAME_SCREEN_END 0x06012C00
-#define CURSOR_CACHE ((u16)VRAME_SCREEN_END)
+#define VRAM_SCREEN_END 0x06012C00
+#define CURSOR_CACHE ((u16)VRAM_SCREEN_END)
 
 enum MODE { DRAWING = 0, COLOR, SHAPE } MODE;
 enum COLOR_SELECT { RED = 0, GREEN, BLUE };
 enum SHAPE_SELECT { SQUARE, TRIANGLE, CIRCLE, HEXAGON };
 
-typedef struct {
-  Coordinate cursorPosition;
-  u16 pixels[4][4];
-} CursorCache;
+u16 pixelCache[4][4];
+int brushColor = 0;
+int eraseColor = dblClr(RGB(3, 5, 9));
 
-void saveToCursorCache(CursorCache *cache, Coordinate cursorPosition) {
-  // use memCopy32 to copy 4x4 square of pixels
-  //  for now, start with for loop, copying one pixel at a time
-  for (int y = 0; y < 4; y++) {
-    for (int x = 0; x < 4; x++) {
-      CURSOR_CACHE[y * 4 + x] =
-          VRAM[cursorPosition.y + y][cursorPosition.x + x];
+// future params: shape, brush_size
+void saveToCursorCache(Coordinate cursorPosition) {
+  for (int x = 0; x < 4; x++) {
+    for (int y = 0; y < 4; y++) {
+      pixelCache[x][y] =
+          ((u16 *)VRAM)[(cursorPosition.y + y) * SW + (cursorPosition.x + x)];
     }
   }
-  cache->cursorPosition = cursorPosition;
 }
 
-int brushColor = dblClr(RGB(3, 5, 9));
-int eraseColor = 0;
+void restoreFromCursorCache(Coordinate cursorPosition) {
+  for (int x = 0; x < 4; x++) {
+    for (int y = 0; y < 4; y++) {
+      plotPixel((cursorPosition.x + x), (cursorPosition.y + y),
+                pixelCache[x][y]);
+    }
+  }
+}
 
 void fillSquare(Coordinate cursor, int clr) {
   drawRect(cursor, 4, 4, clr);
@@ -38,6 +40,9 @@ void fillSquare(Coordinate cursor, int clr) {
 }
 
 void updateBrushPosition(Coordinate *cursor) {
+  // before brush updates, restore previous cache to screen, update cursor
+  // position, save new cursorPosition pixels to cache
+
   if (keyHeld(U)) {
     cursor->y -= 1;
     if (keyHeld(L)) {
@@ -65,39 +70,51 @@ void updateBrushPosition(Coordinate *cursor) {
       cursor->y -= 1;
     }
   }
+
   for (volatile int x = 0; x < 10000; x++)
     ;
 }
 
 int main() {
   DSPC = MODE3 | BG2;
-  fillScreen(brushColor);
-
+  fillScreen(eraseColor);
   enum MODE appState = DRAWING;
-
   Coordinate cursor = {0, 0};
+
+  saveToCursorCache(cursor);
 
   while (1) {
     updateKeys();
     VBLANK();
+
     switch (appState) {
     case (DRAWING):
       // input START sets appState to COLOR
 
-      // cursor = diagonalInputHandler(cursor);
       if (keyUp(A) && keyUp(B)) {
+        restoreFromCursorCache(cursor);
+        updateBrushPosition(&cursor);
+        saveToCursorCache(cursor);
         fillSquare(cursor, brushColor);
+      } else if (keyHeld(A)) {
+        fillSquare(cursor, brushColor);
+        updateBrushPosition(&cursor);
+      } else if (keyHeld(B)) {
+        fillSquare(cursor, eraseColor);
+        updateBrushPosition(&cursor);
       }
+      /*
+      fillSquare(cursor, brushColor);
 
-      updateBrushPosition(&cursor);
 
       if (keyHeld(A)) {
-        fillSquare(cursor, eraseColor);
-      } else if (keyHeld(B)) {
         fillSquare(cursor, brushColor);
-      } else {
+      } else if (keyHeld(B)) {
         fillSquare(cursor, eraseColor);
       }
+
+*/
+
       break;
     case (COLOR):
       break;
