@@ -107,9 +107,17 @@ int main() {
           fillSquare(cursor, brushColor);
           saveToCursorCache(cursor);
         }
-        //} else if (keyHeld(B)) {
-        // fillSquare(cursor, eraseColor);
-        // updateBrushPosition(&cursor);
+      } else if (keyHeld(B)) {
+        fillSquare(cursor, eraseColor);
+        saveToCursorCache(cursor);
+        fillSquare(cursor, brushColor);
+        if (keyWasDown(U) || keyWasDown(D) || keyWasDown(L) || keyWasDown(R)) {
+          restoreFromCursorCache(cursor);
+          updateBrushPosition(&cursor);
+          fillSquare(cursor, eraseColor);
+          saveToCursorCache(cursor);
+          fillSquare(cursor, brushColor);
+        }
       }
 
       break;
