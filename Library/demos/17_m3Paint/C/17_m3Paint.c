@@ -1,3 +1,4 @@
+#include "draw.h"
 #include "engine.h"
 #include "gfx.h"
 #include "in.h"
@@ -6,14 +7,14 @@
 #define VRAM_SCREEN_END 0x06012C00
 #define CURSOR_CACHE ((u16)VRAM_SCREEN_END)
 
-enum MODE { DRAWING = 0, COLOR, SHAPE } MODE;
+enum MODE { DRAWING = 0, COLOR, SHAPE };
 enum COLOR_SELECT { RED = 0, GREEN, BLUE };
 enum SHAPE_SELECT { SQUARE, TRIANGLE, CIRCLE, HEXAGON };
 
 u16 pixelCache[4][4];
 int brushColor = 0;
-int eraseColor = dblClr(RGB(3, 5, 9));
-
+int eraseColor = RGB(3, 5, 9);
+//
 // future params: shape, brush_size
 void saveToCursorCache(Coordinate cursorPosition) {
   for (int x = 0; x < 4; x++) {
@@ -74,9 +75,11 @@ void updateBrushPosition(Coordinate *cursor) {
 
 int main() {
   DSPC = MODE3 | BG2;
-  fillScreen(eraseColor);
+  fillScreen(dblClr(eraseColor));
+
   enum MODE appState = DRAWING;
   Coordinate cursor = {0, 0};
+  Coordinate origin = {0, 0};
 
   saveToCursorCache(cursor);
 
@@ -87,8 +90,12 @@ int main() {
     switch (appState) {
     case (DRAWING):
       // input START sets appState to COLOR
-
       if (keyDown(ST)) {
+        appState = COLOR;
+        // save image section of rect boundary for gui
+        drawRect(origin, 64, 64, RGB(1, 15, 8));
+      }
+      if (keyDown(LT) && keyDown(RT) && keyDown(A) && keyDown(B)) {
         fillScreen(eraseColor);
         saveToCursorCache(cursor);
         fillSquare(cursor, brushColor);

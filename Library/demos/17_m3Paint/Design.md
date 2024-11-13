@@ -28,6 +28,7 @@ Step 1:
 []        (this will have a demo box showing current color, along with it's gradient variant)
 []      on pressing Right Trigger enter shape selection mode 
 []      on pressing Left Trigger enter color selection mode  
+[]
 
 Step 2:
 [x]  Set starting parameters for drawing and implement basic drawing and erasing with a 16x16 square (use a pattern?)
@@ -50,6 +51,11 @@ Step 2:
 
 Step 3:
   implement color slider selectors.
+    // on START change to COLOR mode;
+    // go draw yellow rectangle on screen (save screen to cache first)
+    // draw 3 bars, outline selected in black, else outline in white.  32 pixels tall, 8 pixel clearance from top/side of screen
+    // underneath 3 bars show TWO colors, B to set eraser and A to set brush.  directions adjust/select sliders.
+    
 Step 4:
   implement shape selection (no changeable sizes just yet)
 Step 5:
