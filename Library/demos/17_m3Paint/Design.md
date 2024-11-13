@@ -19,16 +19,6 @@ Step 1:
 [x]      hold B + directions, erase
 []     hold RT + A, draw with gradient?
 [x]     hold LT + RT + A + B, clear screen
-            Right now is ST or START, will change to LT+RT+A+B 
-[]      on pressing start, pause and enter RGB color selection mode
-    while paused:
-      in RGB color selection mode:
-[]        left|right cyle between RGB color value selector bars
-[]        up|down increase/decrease value of current RGB selector bar
-[]        (this will have a demo box showing current color, along with it's gradient variant)
-[]      on pressing Right Trigger enter shape selection mode 
-[]      on pressing Left Trigger enter color selection mode  
-[]
 
 Step 2:
 [x]  Set starting parameters for drawing and implement basic drawing and erasing with a 16x16 square (use a pattern?)
@@ -51,24 +41,35 @@ Step 2:
 
 Step 3:
   implement color slider selectors.
-    // on START change to COLOR mode;
-    // go draw yellow rectangle on screen (save screen to cache first)
-    // draw 3 bars, outline selected in black, else outline in white.  32 pixels tall, 8 pixel clearance from top/side of screen
-    // underneath 3 bars show TWO colors, B to set eraser and A to set brush.  directions adjust/select sliders.
+
+[x] on START change to COLOR mode;
+[] save screen to cache, size of color select gui
+[x] draw region on screen for color select gui
+[x] draw 3 bars, outline selected in white, else black
+[x] underneath 3 bars show 3 colors, B to set eraser and A to set brush. 3rd is RGB value.
+    while paused:
+      in RGB color selection mode:
+[x]        left|right cyle between RGB color value selector bars
+[x]        up|down increase/decrease value of current RGB selector bar
     
 Step 4:
-  implement shape selection (no changeable sizes just yet)
+  implement brush shape feature:
+[]      on pressing Right Trigger enter shape selection mode 
+[]      on pressing Left Trigger enter color selection mode  
+[]      up or down increases/decreases brush size.  default is a square.
+[] implement min/max sizes for default square brush.
+[] implement circle brush, set min/max sizes.
+[] implement hexagon brush
+[] implement triangle brush
+[] implement star brush
 Step 5:
   implement 3-5 gradiant variations in color selection
   implement 3-5 gradient patterns in shape selection
 Step 6:
-  implement shape size parameters (min/max depends on shape?)
 Step 7:
   implement symmetry modes:
     Quadrant symmetry:
       creates symmetries to current drawing in each quadrant
     Triangle symmetries:
       only when drawing triangles, there is a symmetry cycle, changing shape variant to draw different edges/faces
-Step 8:
-  implement screen clear function and activate it with input combo LT+RT+L+R
 
