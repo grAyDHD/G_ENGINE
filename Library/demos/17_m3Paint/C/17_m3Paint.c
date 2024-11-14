@@ -123,8 +123,9 @@ int main() {
         }
       }
 
-      if (keyDown(LT) && keyDown(RT) && keyDown(A) && keyDown(B)) {
-        fillScreen(eraseColor);
+      // if (keyDown(LT) && keyDown(RT) && keyDown(A) && keyDown(B)) {
+      if (keyDown(LT) && keyDown(RT)) {
+        fillScreen(dblClr(eraseColor));
         saveToCursorCache(cursor);
         fillSquare(cursor, brushColor);
       }
@@ -222,41 +223,54 @@ int main() {
         origin.y++;
       }
 
-      if (keyDown(L)) {
+      if (keyTapped(L)) {
         if (colorSelect == GREEN) {
           colorSelect = RED;
         } else if (colorSelect == BLUE) {
           colorSelect = GREEN;
         }
-      } else if (keyDown(R)) {
+      } else if (keyTapped(R)) {
         if (colorSelect == GREEN) {
           colorSelect = BLUE;
         } else if (colorSelect == RED) {
           colorSelect = GREEN;
         }
-      } else if (keyDown(U)) {
 
-        switch (colorSelect) {
-        case (RED):
-          red++;
-          break;
-        case (GREEN):
-          green++;
-          break;
-        case (BLUE):
-          blue++;
-          break;
-        }
       } else if (keyDown(D)) {
         switch (colorSelect) {
         case (RED):
-          red--;
+          if (red < 31) {
+            red++;
+          }
           break;
         case (GREEN):
-          green--;
+          if (green < 31) {
+            green++;
+          }
           break;
         case (BLUE):
-          blue--;
+          if (blue < 31) {
+            blue++;
+          }
+          break;
+        }
+
+      } else if (keyDown(U)) {
+        switch (colorSelect) {
+        case (RED):
+          if (red > 0) {
+            red--;
+          }
+          break;
+        case (GREEN):
+          if (green > 0) {
+            green--;
+          }
+          break;
+        case (BLUE):
+          if (blue > 0) {
+            blue--;
+          }
           break;
         }
       }
