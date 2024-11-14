@@ -63,17 +63,10 @@ Step 4:
 []      up or down increases/decreases brush size.  default is a square.
 [] implement min/max sizes for default square brush.
 [] implement circle brush, set min/max sizes.
-[] implement hexagon brush
-[] implement triangle brush
-[] implement star brush
 Step 5:
   implement 3-5 gradiant variations in color selection
   implement 3-5 gradient patterns in shape selection
 Step 6:
 Step 7:
-  implement symmetry modes:
-    Quadrant symmetry:
-      creates symmetries to current drawing in each quadrant
-    Triangle symmetries:
-      only when drawing triangles, there is a symmetry cycle, changing shape variant to draw different edges/faces
-
+  implement symmetry mode:
+[] drawing in any quadrant adds symmetry to all others.
