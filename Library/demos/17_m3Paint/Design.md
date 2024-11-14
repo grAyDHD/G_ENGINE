@@ -43,13 +43,17 @@ Step 3:
   implement color slider selectors.
 
 [x] on START change to COLOR mode;
-[] save screen to cache, size of color select gui
+
+
+[x] save screen to cache, size of color select gui
 [x] draw region on screen for color select gui
 [x] draw 3 bars, outline selected in white, else black
 [x] underneath 3 bars show 3 colors, B to set eraser and A to set brush. 3rd is RGB value.
     while paused:
       in RGB color selection mode:
+[] set upper/lower limits for RGB values, 
 [x]        left|right cyle between RGB color value selector bars
+[]         use keyTapped for above
 [x]        up|down increase/decrease value of current RGB selector bar
     
 Step 4:

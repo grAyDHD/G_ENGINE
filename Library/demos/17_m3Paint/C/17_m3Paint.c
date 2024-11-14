@@ -10,7 +10,9 @@
 enum MODE { DRAWING = 0, COLOR, SHAPE };
 enum COLOR_SELECT { RED = 0, GREEN, BLUE };
 enum SHAPE_SELECT { SQUARE, TRIANGLE, CIRCLE, HEXAGON };
+
 u16 pixelCache[4][4];
+u16 guiCache[64][64];
 int brushColor = 0;
 int eraseColor = RGB(31, 31, 31);
 //
@@ -24,11 +26,27 @@ void saveToCursorCache(Coordinate cursorPosition) {
   }
 }
 
+void saveToGUICache() {
+  for (int x = 0; x < 64; x++) {
+    for (int y = 0; y < 64; y++) {
+      guiCache[x][y] = ((u16 *)VRAM)[(y * 240) + x];
+    }
+  }
+}
+
 void restoreFromCursorCache(Coordinate cursorPosition) {
   for (int x = 0; x < 4; x++) {
     for (int y = 0; y < 4; y++) {
       plotPixel((cursorPosition.x + x), (cursorPosition.y + y),
                 pixelCache[x][y]);
+    }
+  }
+}
+
+void restoreFromGUICache() {
+  for (int x = 0; x < 64; x++) {
+    for (int y = 0; y < 64; y++) {
+      plotPixel(x, y, guiCache[x][y]);
     }
   }
 }
@@ -92,8 +110,9 @@ int main() {
     switch (appState) {
     case (DRAWING):
 
-      if (keyDown(ST)) {
+      if (keyTapped(ST)) {
         appState = COLOR;
+        saveToGUICache();
 
         origin.x = 0;
         origin.y = 0;
@@ -259,8 +278,9 @@ int main() {
       origin.x = 40;
       drawRect(origin, 5, 5, RGB(red, green, blue));
 
-      if (keyDown(ST) && keyDown(SL)) {
+      if (keyTapped(ST)) {
         appState = DRAWING;
+        restoreFromGUICache();
       }
       for (volatile int x = 0; x < 20000; x++)
         ;
