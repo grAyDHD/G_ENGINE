@@ -76,10 +76,19 @@ void draw(Brush brush) {
 }
 
 void erase(Brush brush) {
-  for (int x = 0; x < brush.size / 2; x++) {
-    Coordinate origin = {brush.coordinates.x + x, brush.coordinates.y + x};
-    drawRect(origin, (brush.size - (2 * x)), (brush.size - (2 * x)),
-             brush.eraserColor);
+  switch (brush.shape) {
+  case (SQUARE):
+    for (int x = 0; x < brush.size / 2; x++) {
+      Coordinate origin = {brush.coordinates.x + x, brush.coordinates.y + x};
+      drawRect(origin, (brush.size - (2 * x)), (brush.size - (2 * x)),
+               brush.eraserColor);
+    }
+    break;
+  case (CIRCLE):
+    drawCircle(brush.coordinates.x + brush.size,
+               brush.coordinates.y + brush.size, brush.size, brush.eraserColor);
+
+    break;
   }
 }
 
