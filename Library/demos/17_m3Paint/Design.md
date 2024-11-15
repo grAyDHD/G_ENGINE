@@ -60,9 +60,9 @@ Step 4:
   implement brush shape feature:
 [x]      on pressing Right Trigger enter shape selection mode 
 [x]      on pressing Left Trigger enter color selection mode  
-[]      set gui background properly
-[]      up or down increases/decreases brush size.  default is a square.
-[] implement min/max sizes for default square brush.
+[x]      set gui background properly
+[x]      up or down increases/decreases brush size.  default is a square.
+[x] implement min/max sizes for default square brush.
 [] implement circle brush, set min/max sizes.
 Step 5:
   implement 3-5 gradiant variations in color selection
