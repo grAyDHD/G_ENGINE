@@ -17,7 +17,6 @@ Step 1:
     while drawing:
 [x]      hold A + directions, draw
 [x]      hold B + directions, erase
-[]     hold RT + A, draw with gradient?
 [x]     hold LT + RT + A + B, clear screen
 
 Step 2:
@@ -81,13 +80,14 @@ Step 4:
     
 Step 5:
   implement symmetry mode:
-[] drawing in any quadrant while holding RT adds symmetry to all others.
+[]     hold RT + A, draw with symmetry
 Step 6:
     implement gradient drawing mode:
+[]  in COLORS or SHAPES modes, LT + RT goes to GRADIENTS
+[]  In GRADIENTS, LT goes to COLORS, RT goes to SHAPES
 []  implement single gradiant variation in color selection
-[]  implement single gradient pattern in shape selection
-[]  implement multiple gradient variations
-[]  implement multiple gradient patterns per brush shape.
+[]     hold LT + A, draw with gradient
+[]  implement multiple gradient variations/patterns?
 
 Step 7: 
     optimization time
