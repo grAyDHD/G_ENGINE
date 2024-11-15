@@ -11,7 +11,7 @@ enum MODE { DRAWING = 0, COLORS, SHAPES };
 enum COLOR { RED = 0, GREEN, BLUE };
 enum SHAPE { SQUARE, TRIANGLE, CIRCLE, HEXAGON };
 
-u16 pixelCache[32][32];
+u16 pixelCache[64][64];
 u16 guiCache[64][64];
 //
 // future params: shape, brush_size
@@ -24,8 +24,9 @@ typedef struct {
 } Brush;
 
 void saveToBrushCache(Brush brush) {
-  for (int x = 0; x < brush.size; x++) {
-    for (int y = 0; y < brush.size; y++) {
+
+  for (int x = 0; x < 64; x++) {
+    for (int y = 0; y < 64; y++) {
       pixelCache[x][y] = ((u16 *)VRAM)[(brush.coordinates.y + y) * SW +
                                        (brush.coordinates.x + x)];
     }
@@ -41,8 +42,8 @@ void saveToGUICache() {
 }
 
 void restoreFromBrushCache(Brush brush) {
-  for (int x = 0; x < brush.size; x++) {
-    for (int y = 0; y < brush.size; y++) {
+  for (int x = 0; x < 64; x++) {
+    for (int y = 0; y < 64; y++) {
       plotPixel((brush.coordinates.x + x), (brush.coordinates.y + y),
                 pixelCache[x][y]);
     }
@@ -58,10 +59,19 @@ void restoreFromGUICache() {
 }
 
 void draw(Brush brush) {
-  for (int x = 0; x < brush.size / 2; x++) {
-    Coordinate origin = {brush.coordinates.x + x, brush.coordinates.y + x};
-    drawRect(origin, (brush.size - (2 * x)), (brush.size - (2 * x)),
-             brush.color);
+  switch (brush.shape) {
+  case (SQUARE):
+    for (int x = 0; x < brush.size / 2; x++) {
+      Coordinate origin = {brush.coordinates.x + x, brush.coordinates.y + x};
+      drawRect(origin, (brush.size - (2 * x)), (brush.size - (2 * x)),
+               brush.color);
+    }
+    break;
+  case (CIRCLE):
+    drawCircle(brush.coordinates.x, brush.coordinates.y, brush.size,
+               brush.color);
+
+    break;
   }
 }
 
@@ -117,6 +127,7 @@ int main() {
   brush.size = 4;
   brush.color = RGB(0, 0, 0);
   brush.eraserColor = RGB(31, 31, 31);
+  brush.shape = SQUARE;
   brush.coordinates.x = 0;
   brush.coordinates.y = 0;
 
@@ -368,11 +379,13 @@ int main() {
           origin.x = 32;
           origin.y = 32;
           drawRect(origin, brush.size, brush.size, brush.eraserColor);
-
           brush.size--;
         }
+      } else if (keyTapped(R)) {
+        brush.shape = CIRCLE;
+      } else if (keyTapped(L)) {
+        brush.shape = SQUARE;
       }
-      //      drawRect(origin, brush.size, brush.size, brush.color);
 
       break;
     }

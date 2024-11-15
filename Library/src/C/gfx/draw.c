@@ -4,6 +4,36 @@
 
 void plotPixel(int x, int y, u16 clr) { ((u16 *)VRAM)[y * SW + x] = clr; }
 
+void drawCircle(int x, int y, int radius, unsigned short color) {
+  int r = radius;
+  int s = 0;
+  int decisionOver2 =
+      1 - r; // Decision criterion divided by 2 evaluated at r=r, s=0
+
+  while (r >= s) {
+    for (volatile int z = 0; z < 1000; z++)
+      ;
+
+    // Draw the eight octants
+    plotPixel(x + r, y + s, color); // Octant 1
+    plotPixel(x + s, y + r, color); // Octant 2
+    plotPixel(x - s, y + r, color); // Octant 3
+    plotPixel(x - r, y + s, color); // Octant 4
+    plotPixel(x - r, y - s, color); // Octant 5
+    plotPixel(x - s, y - r, color); // Octant 6
+    plotPixel(x + s, y - r, color); // Octant 7
+    plotPixel(x + r, y - s, color); // Octant 8
+
+    s++;
+    if (decisionOver2 <= 0) {
+      decisionOver2 += 2 * s + 1; // Move down in y-direction
+    } else {
+      r--;
+      decisionOver2 += 2 * (s - r) + 1; // Move down in both x and y
+    }
+  }
+}
+
 void drawLine(Coordinate start, Coordinate end, u16 color) {
   int dx = (end.x - start.x);
   int dy = (end.y - start.y);

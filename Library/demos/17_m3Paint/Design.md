@@ -63,7 +63,22 @@ Step 4:
 [x]      set gui background properly
 [x]      up or down increases/decreases brush size.  default is a square.
 [x] implement min/max sizes for default square brush.
-[] implement circle brush, set min/max sizes.
+[x] implement circle brush
+[] implement fillCircle function
+[] assembly implementations, memcopy/memset for cache?
+[] work out numbers for accurate placement of circle brush.
+
+    ROADBLOCK:
+        circle cache not behaving properly
+    SOLUTION:
+        work out math/numbers for square vs circle drawing 
+        finish fillCircle (asm?)
+        draw changing size circle in SHAPES mode to test
+        ensure cache save/restore operations succeed
+
+
+    IMPLEMENTATION:
+    
 Step 5:
   implement 3-5 gradiant variations in color selection
   implement 3-5 gradient patterns in shape selection
