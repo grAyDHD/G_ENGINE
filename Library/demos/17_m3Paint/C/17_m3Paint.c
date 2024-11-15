@@ -11,23 +11,23 @@ enum MODE { DRAWING = 0, COLORS, SHAPES };
 enum COLOR { RED = 0, GREEN, BLUE };
 enum SHAPE { SQUARE, TRIANGLE, CIRCLE, HEXAGON };
 
-u16 pixelCache[4][4];
+u16 pixelCache[32][32];
 u16 guiCache[64][64];
 //
 // future params: shape, brush_size
 typedef struct {
   Coordinate coordinates;
   enum SHAPE shape;
-  u16 size;
+  u16 size; // for now, max size of 32
   u16 color;
   u16 eraserColor;
 } Brush;
 
-void saveToCursorCache(Coordinate cursorPosition) {
-  for (int x = 0; x < 4; x++) {
-    for (int y = 0; y < 4; y++) {
-      pixelCache[x][y] =
-          ((u16 *)VRAM)[(cursorPosition.y + y) * SW + (cursorPosition.x + x)];
+void saveToCursorCache(Brush brush) {
+  for (int x = 0; x < brush.size; x++) {
+    for (int y = 0; y < brush.size; y++) {
+      pixelCache[x][y] = ((u16 *)VRAM)[(brush.coordinates.y + y) * SW +
+                                       (brush.coordinates.x + x)];
     }
   }
 }
@@ -40,10 +40,10 @@ void saveToGUICache() {
   }
 }
 
-void restoreFromCursorCache(Coordinate cursorPosition) {
+void restoreFromCursorCache(Brush brush) {
   for (int x = 0; x < 4; x++) {
     for (int y = 0; y < 4; y++) {
-      plotPixel((cursorPosition.x + x), (cursorPosition.y + y),
+      plotPixel((brush.coordinates.x + x), (brush.coordinates.y + y),
                 pixelCache[x][y]);
     }
   }
@@ -57,11 +57,18 @@ void restoreFromGUICache() {
   }
 }
 
-void fillSquare(Coordinate cursor, int clr) {
-  drawRect(cursor, 4, 4, clr);
-  drawRect(cursor, 3, 3, clr);
-  drawRect(cursor, 2, 2, clr);
-  drawRect(cursor, 1, 1, clr);
+void draw(Brush brush) {
+  for (int x = 0; x < brush.size / 2; x++) {
+    drawRect(brush.coordinates, (brush.size - (2 * x)), (brush.size - (2 * x)),
+             brush.color);
+  }
+}
+
+void erase(Brush brush) {
+  for (int x = 0; x < brush.size / 2; x++) {
+    drawRect(brush.coordinates, (brush.size - (2 * x)), (brush.size - (2 * x)),
+             brush.eraserColor);
+  }
 }
 
 void updateBrushPosition(Coordinate *cursor) {
@@ -113,7 +120,7 @@ int main() {
 
   fillScreen(dblClr(brush.eraserColor));
 
-  saveToCursorCache(brush.coordinates);
+  saveToCursorCache(brush);
 
   while (1) {
     updateKeys();
@@ -134,39 +141,39 @@ int main() {
         // if (keyDown(LT) && keyDown(RT) && keyDown(A) && keyDown(B)) {
         if (keyDown(LT) && keyDown(RT)) {
           fillScreen(dblClr(brush.eraserColor));
-          saveToCursorCache(brush.coordinates);
-          fillSquare(brush.coordinates, brush.color);
+          saveToCursorCache(brush);
+          draw(brush);
         }
 
         if (keyUp(A) && keyUp(B)) {
           if (keyWasDown(U) || keyWasDown(D) || keyWasDown(L) ||
               keyWasDown(R)) {
-            restoreFromCursorCache(brush.coordinates);
+            restoreFromCursorCache(brush);
             updateBrushPosition(&brush.coordinates);
-            saveToCursorCache(brush.coordinates);
-            fillSquare(brush.coordinates, brush.color);
+            saveToCursorCache(brush);
+            draw(brush);
           }
         } else if (keyHeld(A)) {
-          fillSquare(brush.coordinates, brush.color);
-          saveToCursorCache(brush.coordinates);
+          draw(brush);
+          saveToCursorCache(brush);
           if (keyWasDown(U) || keyWasDown(D) || keyWasDown(L) ||
               keyWasDown(R)) {
-            restoreFromCursorCache(brush.coordinates);
+            restoreFromCursorCache(brush);
             updateBrushPosition(&brush.coordinates);
-            fillSquare(brush.coordinates, brush.color);
-            saveToCursorCache(brush.coordinates);
+            draw(brush);
+            saveToCursorCache(brush);
           }
         } else if (keyHeld(B)) {
-          fillSquare(brush.coordinates, brush.eraserColor);
-          saveToCursorCache(brush.coordinates);
-          fillSquare(brush.coordinates, brush.color);
+          erase(brush);
+          saveToCursorCache(brush);
+          draw(brush);
           if (keyWasDown(U) || keyWasDown(D) || keyWasDown(L) ||
               keyWasDown(R)) {
-            restoreFromCursorCache(brush.coordinates);
+            restoreFromCursorCache(brush);
             updateBrushPosition(&brush.coordinates);
-            fillSquare(brush.coordinates, brush.eraserColor);
-            saveToCursorCache(brush.coordinates);
-            fillSquare(brush.coordinates, brush.color);
+            erase(brush);
+            saveToCursorCache(brush);
+            draw(brush);
           }
         }
 
