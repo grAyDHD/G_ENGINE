@@ -64,25 +64,31 @@ Step 4:
 [x]      up or down increases/decreases brush size.  default is a square.
 [x] implement min/max sizes for default square brush.
 [x] implement circle brush
-[] implement fillCircle function
-[] assembly implementations, memcopy/memset for cache?
-[] work out numbers for accurate placement of circle brush.
+[x] work out numbers for accurate placement of circle brush.
+[] implement circle sizing
 
-    ROADBLOCK:
+    ROADBLOCK: SOLVED
         circle cache not behaving properly
     SOLUTION:
         work out math/numbers for square vs circle drawing 
-        finish fillCircle (asm?)
-        draw changing size circle in SHAPES mode to test
         ensure cache save/restore operations succeed
-
-
     IMPLEMENTATION:
+        for drawing circle, the  x y coordinates are the center of the circle,
+        size is passed as the radius
+        offsetting circle coordinates puts the brush 
+        in the same pixel region as the SQUARE brush shape, 
+        now gets along nicely with the cache.
     
 Step 5:
-  implement 3-5 gradiant variations in color selection
-  implement 3-5 gradient patterns in shape selection
-Step 6:
-Step 7:
   implement symmetry mode:
 [] drawing in any quadrant adds symmetry to all others.
+Step 6:
+  implement 3-5 gradiant variations in color selection
+  implement 3-5 gradient patterns in shape selection
+Step 7: 
+    optimization time
+[] implement fillCircle function
+[] assembly implementations, memcopy/memset for cache?
+[] utilize VRAM_CACHE
+[] optimize cache save/restore operations, assembly?
+
