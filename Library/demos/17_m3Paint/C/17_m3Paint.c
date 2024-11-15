@@ -23,7 +23,7 @@ typedef struct {
   u16 eraserColor;
 } Brush;
 
-void saveToCursorCache(Brush brush) {
+void saveToBrushCache(Brush brush) {
   for (int x = 0; x < brush.size; x++) {
     for (int y = 0; y < brush.size; y++) {
       pixelCache[x][y] = ((u16 *)VRAM)[(brush.coordinates.y + y) * SW +
@@ -40,9 +40,9 @@ void saveToGUICache() {
   }
 }
 
-void restoreFromCursorCache(Brush brush) {
-  for (int x = 0; x < 4; x++) {
-    for (int y = 0; y < 4; y++) {
+void restoreFromBrushCache(Brush brush) {
+  for (int x = 0; x < brush.size; x++) {
+    for (int y = 0; y < brush.size; y++) {
       plotPixel((brush.coordinates.x + x), (brush.coordinates.y + y),
                 pixelCache[x][y]);
     }
@@ -59,14 +59,16 @@ void restoreFromGUICache() {
 
 void draw(Brush brush) {
   for (int x = 0; x < brush.size / 2; x++) {
-    drawRect(brush.coordinates, (brush.size - (2 * x)), (brush.size - (2 * x)),
+    Coordinate origin = {brush.coordinates.x + x, brush.coordinates.y + x};
+    drawRect(origin, (brush.size - (2 * x)), (brush.size - (2 * x)),
              brush.color);
   }
 }
 
 void erase(Brush brush) {
   for (int x = 0; x < brush.size / 2; x++) {
-    drawRect(brush.coordinates, (brush.size - (2 * x)), (brush.size - (2 * x)),
+    Coordinate origin = {brush.coordinates.x + x, brush.coordinates.y + x};
+    drawRect(origin, (brush.size - (2 * x)), (brush.size - (2 * x)),
              brush.eraserColor);
   }
 }
@@ -120,7 +122,7 @@ int main() {
 
   fillScreen(dblClr(brush.eraserColor));
 
-  saveToCursorCache(brush);
+  saveToBrushCache(brush);
 
   while (1) {
     updateKeys();
@@ -144,35 +146,35 @@ int main() {
       // if (keyDown(LT) && keyDown(RT) && keyDown(A) && keyDown(B)) {
       if (keyDown(LT) && keyDown(RT)) {
         fillScreen(dblClr(brush.eraserColor));
-        saveToCursorCache(brush);
+        saveToBrushCache(brush);
         draw(brush);
       }
 
       if (keyUp(A) && keyUp(B)) {
         if (keyWasDown(U) || keyWasDown(D) || keyWasDown(L) || keyWasDown(R)) {
-          restoreFromCursorCache(brush);
+          restoreFromBrushCache(brush);
           updateBrushPosition(&brush.coordinates);
-          saveToCursorCache(brush);
+          saveToBrushCache(brush);
           draw(brush);
         }
       } else if (keyHeld(A)) {
         draw(brush);
-        saveToCursorCache(brush);
+        saveToBrushCache(brush);
         if (keyWasDown(U) || keyWasDown(D) || keyWasDown(L) || keyWasDown(R)) {
-          restoreFromCursorCache(brush);
+          restoreFromBrushCache(brush);
           updateBrushPosition(&brush.coordinates);
           draw(brush);
-          saveToCursorCache(brush);
+          saveToBrushCache(brush);
         }
       } else if (keyHeld(B)) {
         erase(brush);
-        saveToCursorCache(brush);
+        saveToBrushCache(brush);
         draw(brush);
         if (keyWasDown(U) || keyWasDown(D) || keyWasDown(L) || keyWasDown(R)) {
-          restoreFromCursorCache(brush);
+          restoreFromBrushCache(brush);
           updateBrushPosition(&brush.coordinates);
           erase(brush);
-          saveToCursorCache(brush);
+          saveToBrushCache(brush);
           draw(brush);
         }
       }
@@ -356,7 +358,19 @@ int main() {
         origin.y++;
       }
       if (keyTapped(U)) {
-        brush.size++;
+        if (brush.size < 32) {
+
+          brush.size++;
+        }
+      } else if (keyTapped(D)) {
+        if (brush.size > 2) {
+
+          origin.x = 32;
+          origin.y = 32;
+          drawRect(origin, brush.size, brush.size, brush.eraserColor);
+
+          brush.size--;
+        }
       }
       //      drawRect(origin, brush.size, brush.size, brush.color);
 
