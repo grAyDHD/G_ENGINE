@@ -68,8 +68,8 @@ void draw(Brush brush) {
     }
     break;
   case (CIRCLE):
-    drawCircle(brush.coordinates.x, brush.coordinates.y, brush.size,
-               brush.color);
+    drawCircle(brush.coordinates.x + brush.size,
+               brush.coordinates.y + brush.size, brush.size, brush.color);
 
     break;
   }
