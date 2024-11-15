@@ -81,10 +81,14 @@ Step 4:
     
 Step 5:
   implement symmetry mode:
-[] drawing in any quadrant adds symmetry to all others.
+[] drawing in any quadrant while holding RT adds symmetry to all others.
 Step 6:
-  implement 3-5 gradiant variations in color selection
-  implement 3-5 gradient patterns in shape selection
+    implement gradient drawing mode:
+[]  implement single gradiant variation in color selection
+[]  implement single gradient pattern in shape selection
+[]  implement multiple gradient variations
+[]  implement multiple gradient patterns per brush shape.
+
 Step 7: 
     optimization time
 [] implement fillCircle function
