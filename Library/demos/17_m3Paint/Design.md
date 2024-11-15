@@ -65,7 +65,7 @@ Step 4:
 [x] implement min/max sizes for default square brush.
 [x] implement circle brush
 [x] work out numbers for accurate placement of circle brush.
-[] implement circle sizing
+[x] implement circle sizing
 
     ROADBLOCK: SOLVED
         circle cache not behaving properly

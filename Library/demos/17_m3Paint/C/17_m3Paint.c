@@ -212,6 +212,21 @@ int main() {
           origin.x++;
           origin.y++;
         }
+
+        // drawShapeGUI, drawing rectangle size of brush.size
+        origin.x = 32;
+        origin.y = 32;
+        if (brush.shape == SQUARE) {
+          for (int x = brush.size; x > 0; x--) {
+            drawRect(origin, x, x, brush.color);
+            origin.x++;
+            origin.y++;
+          }
+        } else if (brush.shape == CIRCLE) {
+          drawCircle(origin.x - brush.size, origin.y - brush.size, brush.size,
+                     brush.color);
+        }
+
         break;
       }
 
@@ -368,30 +383,32 @@ int main() {
         appState = DRAWING;
       }
 
-      // drawShapeGUI, drawing rectangle size of brush.size
       origin.x = 32;
       origin.y = 32;
-
-      for (int x = brush.size; x > 0; x--) {
-        drawRect(origin, x, x, brush.color);
-        origin.x++;
-        origin.y++;
-      }
       if (keyTapped(U)) {
-        if (brush.size < 32) {
-
+        if (brush.shape == SQUARE && brush.size < 32) {
           brush.size++;
+          drawRect(origin, brush.size, brush.size, brush.color);
+        } else if (brush.shape == CIRCLE && brush.size < 16) {
+          brush.size++;
+          drawCircle(origin.x - brush.size, origin.x - brush.size, brush.size,
+                     brush.color);
         }
       } else if (keyTapped(D)) {
-        if (brush.size > 2) {
+        if (brush.shape == SQUARE && brush.size > 2) {
 
-          origin.x = 32;
-          origin.y = 32;
           drawRect(origin, brush.size, brush.size, brush.eraserColor);
+          brush.size--;
+        } else if (brush.shape == CIRCLE && brush.size > 2) {
+          drawCircle(origin.x - brush.size, origin.y - brush.size, brush.size,
+                     brush.eraserColor);
           brush.size--;
         }
       } else if (keyTapped(R)) {
         brush.shape = CIRCLE;
+        if (brush.size > 16) {
+          brush.size = 16;
+        }
       } else if (keyTapped(L)) {
         brush.shape = SQUARE;
       }
