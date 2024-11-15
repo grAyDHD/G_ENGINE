@@ -51,15 +51,16 @@ Step 3:
 [x] underneath 3 bars show 3 colors, B to set eraser and A to set brush. 3rd is RGB value.
     while paused:
       in RGB color selection mode:
-[] set upper/lower limits for RGB values, 
+[x] set upper/lower limits for RGB values, 
 [x]        left|right cyle between RGB color value selector bars
-[]         use keyTapped for above
+[x]         use keyTapped for above
 [x]        up|down increase/decrease value of current RGB selector bar
     
 Step 4:
   implement brush shape feature:
-[]      on pressing Right Trigger enter shape selection mode 
-[]      on pressing Left Trigger enter color selection mode  
+[x]      on pressing Right Trigger enter shape selection mode 
+[x]      on pressing Left Trigger enter color selection mode  
+[]      set gui background properly
 []      up or down increases/decreases brush size.  default is a square.
 [] implement min/max sizes for default square brush.
 [] implement circle brush, set min/max sizes.
