@@ -1,22 +1,31 @@
 #include "../include/f.h"
 #include "engine.h"
+#include "typedefs.h"
+
+enum MODE handlePause() {
+  Coordinate origin = {0, 0};
+  enum MODE appState = COLORS;
+  saveToGUICache();
+  origin.x = 0;
+  origin.y = 0;
+  for (int x = 32; x > 0; x--) {
+    drawRect(origin, 2 * x, 2 * x, RGB(10, 10, 5));
+    origin.x++;
+    origin.y++;
+  }
+  return appState;
+}
 
 int main() {
   DSPC = MODE3 | BG2;
 
   enum MODE appState = DRAWING;
   enum COLOR colorSelect = RED;
+
   int red = 0, green = 0, blue = 0;
+  Brush brush = initiateBrush();
+
   Coordinate origin = {0, 0};
-  Brush brush;
-
-  brush.size = 4;
-  brush.color = RGB(0, 0, 0);
-  brush.eraserColor = RGB(31, 31, 31);
-  brush.shape = SQUARE;
-  brush.coordinates.x = 0;
-  brush.coordinates.y = 0;
-
   fillScreen(dblClr(brush.eraserColor));
 
   saveToBrushCache(brush);
@@ -26,27 +35,25 @@ int main() {
     VBLANK();
 
     switch (appState) {
+    // handle all DRAWING mode state.
     case (DRAWING):
 
+      // pause (to COLORS mode)
       if (keyTapped(ST)) {
-        appState = COLORS;
-        saveToGUICache();
-        origin.x = 0;
-        origin.y = 0;
-        for (int x = 32; x > 0; x--) {
-          drawRect(origin, 2 * x, 2 * x, RGB(10, 10, 5));
-          origin.x++;
-          origin.y++;
-        }
+        appState = handlePause();
       }
 
-      // if (keyDown(LT) && keyDown(RT) && keyDown(A) && keyDown(B)) {
+      // clearScreen function
       if (keyDown(LT) && keyDown(RT)) {
+        // if (keyDown(LT) && keyDown(RT) && keyDown(A) && keyDown(B)) {
         fillScreen(dblClr(brush.eraserColor));
+        // once screen cleared, save region under brush to cache
         saveToBrushCache(brush);
+        // draw temp brush
         draw(brush);
       }
 
+      // handle brush drawing when not painting/erasing
       if (keyUp(A) && keyUp(B)) {
         if (keyWasDown(U) || keyWasDown(D) || keyWasDown(L) || keyWasDown(R)) {
           restoreFromBrushCache(brush);
@@ -54,19 +61,30 @@ int main() {
           saveToBrushCache(brush);
           draw(brush);
         }
+
+        // handle painting
       } else if (keyHeld(A)) {
         draw(brush);
+        // save draw to cache
         saveToBrushCache(brush);
+
+        // if painted while direction held, update position
         if (keyWasDown(U) || keyWasDown(D) || keyWasDown(L) || keyWasDown(R)) {
           restoreFromBrushCache(brush);
           updateBrushPosition(&brush.coordinates);
           draw(brush);
           saveToBrushCache(brush);
         }
+
+        // handle erasing
       } else if (keyHeld(B)) {
+        // erases current position
         erase(brush);
+        // saves erase result to cache
         saveToBrushCache(brush);
+        // draw temp brush at brush coordinates
         draw(brush);
+
         if (keyWasDown(U) || keyWasDown(D) || keyWasDown(L) || keyWasDown(R)) {
           restoreFromBrushCache(brush);
           updateBrushPosition(&brush.coordinates);
@@ -77,8 +95,11 @@ int main() {
       }
 
       break;
+
     case (COLORS):
       // draw 3 rects, 8 px wide, 4 px spacing, 36 px tall
+
+      // go to SHAPES mode
       if (keyTapped(RT)) {
         appState = SHAPES;
         origin.x = 0;

@@ -108,3 +108,15 @@ void updateBrushPosition(Coordinate *cursor) {
   for (volatile int x = 0; x < 10000; x++)
     ;
 }
+
+Brush initiateBrush() {
+  Brush brush;
+  brush.size = 4;
+  brush.color = RGB(0, 0, 0);
+  brush.eraserColor = RGB(31, 31, 31);
+  brush.shape = SQUARE;
+  brush.coordinates.x = 0;
+  brush.coordinates.y = 0;
+
+  return brush;
+}

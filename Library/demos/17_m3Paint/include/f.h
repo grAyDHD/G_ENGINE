@@ -32,5 +32,6 @@ void restoreFromGUICache();
 void draw(Brush brush);
 void erase(Brush brush);
 void updateBrushPosition(Coordinate *cursor);
+Brush initiateBrush();
 
 #endif // F_H
