@@ -47,5 +47,6 @@ void adjustColorValue(enum COLOR colorSelect, int *red, int *green, int *blue,
                       int increase);
 
 enum COLOR handleColorSelection(enum COLOR colorSelect);
+void symmetryPaint(Brush brush);
 
 #endif // F_H

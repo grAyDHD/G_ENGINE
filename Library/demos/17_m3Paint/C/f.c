@@ -1,6 +1,7 @@
 #include "../include/f.h"
 #include "draw.h"
 #include "gfx.h"
+#include "in.h"
 #include "typedefs.h"
 
 // Static global cache arrays
@@ -41,7 +42,7 @@ void restoreFromGUICache() {
   }
 }
 
-void draw(Brush brush) {
+void paint(Brush brush) {
   switch (brush.shape) {
   case SQUARE:
     for (int x = 0; x < brush.size / 2; x++) {
@@ -81,14 +82,14 @@ void handleBrushInput(Brush *brush) {
   if (keyDown(LT) && keyDown(RT)) {
     // if (keyDown(LT) && keyDown(RT) && keyDown(A) && keyDown(B)) {
     clearScreen(*brush);
-    draw(*brush);
+    paint(*brush);
   } else if (keyTapped(A)) {
-    draw(*brush);
+    paint(*brush);
     saveToBrushCache(*brush);
   } else if (keyTapped(B)) {
     erase(*brush);
     saveToBrushCache(*brush);
-    draw(*brush);
+    paint(*brush);
   }
 
   if (keyHeld(U))
@@ -100,21 +101,85 @@ void handleBrushInput(Brush *brush) {
   if (keyHeld(R))
     brush->coordinates.x += 1;
 
-  if (keyUp(A) && keyUp(B)) {
+  // all happens AFTER coordinate update
+  // issues???
+  if (keyUp(A) && keyUp(B)) { // move brush and show position
     saveToBrushCache(*brush);
-    draw(*brush);
-    draw(*brush);
-  } else if (keyHeld(A)) {
-    draw(*brush);
-    saveToBrushCache(*brush);
+    paint(*brush);
+  } else if (keyHeld(A)) { // draw brush at current position
+    if (keyDown(RT)) {     // draw with symmetry
+      symmetryPaint(*brush);
+      saveToBrushCache(*brush);
+    } else { // draw
+      paint(*brush);
+      saveToBrushCache(*brush);
+    }
   } else if (keyHeld(B)) {
-    erase(*brush);
-    saveToBrushCache(*brush);
-    draw(*brush);
+    if (keyDown(RT)) { // draw with symmetry
+                       // symmetryErase(*brush)
+    } else {           // erase brush at current position
+      erase(*brush);
+      saveToBrushCache(*brush);
+      paint(*brush);
+    }
   }
 
   for (volatile int x = 0; x < 10000; x++)
     ;
+}
+
+void symmetryPaint(Brush brush) {
+  Coordinate flipX = {(SW - brush.coordinates.x - brush.size),
+                      brush.coordinates.y};
+  Coordinate flipY = {brush.coordinates.x,
+                      (SH - brush.coordinates.y - brush.size)};
+  Coordinate flipXY = {(SW - brush.coordinates.x - brush.size),
+                       (SH - brush.coordinates.y - brush.size)};
+  switch (brush.shape) {
+  case SQUARE:
+
+    drawRect(brush.coordinates, brush.size, brush.size, brush.color);
+    drawRect(flipX, brush.size, brush.size, brush.color);
+    drawRect(flipY, brush.size, brush.size, brush.color);
+    drawRect(flipXY, brush.size, brush.size, brush.color);
+
+    // draw at brush coordinates,
+    // flip x, flip y, flip x and y
+    //
+
+    /*
+    // BRUSH IS IN Q1
+  if (brush.coordinates.x >= 0 && brush.coordinates.y >= 0 &&
+      brush.coordinates.x <= ((SW / 2) - brush.size) &&
+      brush.coordinates.y <= ((SH / 2) - brush.size)) {
+  } else if (brush.coordinates.x >= (SW / 2) && brush.coordinates.y >= 0 &&
+             brush.coordinates.x <= (SW - brush.size) &&
+             brush.coordinates.y <= ((SH / 2) - brush.size)) {
+  } else if (brush.coordinates.x >= 0 && brush.coordinates.y >= (SH / 2) &&
+             brush.coordinates.x <= ((SW / 2) - brush.size) &&
+             brush.coordinates.y <= (SH - brush.size)) {
+  } else if (brush.coordinates.x >= (SW / 2) &&
+             brush.coordinates.y >= (SH / 2) &&
+             brush.coordinates.x <= (SW - brush.size) &&
+             brush.coordinates.y <= (SH - brush.size)) {
+  }
+
+  */
+
+    /*
+  for (int x = 0; x < brush.size / 2; x++) {
+    Coordinate origin = {brush.coordinates.x + x, brush.coordinates.y + x};
+    drawRect(origin, (brush.size - (2 * x)), (brush.size - (2 * x)),
+             brush.color);
+  }
+    */
+    break;
+  case CIRCLE:
+    drawCircle(brush.coordinates.x + brush.size,
+               brush.coordinates.y + brush.size, brush.size, brush.color);
+    break;
+    // Other shapes can be implemented as needed.
+  }
 }
 
 Brush initiateBrush() {

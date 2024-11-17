@@ -80,7 +80,52 @@ Step 4:
     
 Step 5:
   implement symmetry mode:
-[]     hold RT + A, draw with symmetry
+[x]     hold RT + A, draw with symmetry
+
+    ROADBLOCK: SOLVED
+        unsure how to implement symmetrical drawing.
+    SOLUTION:
+        determine necessary constraints, then work out formulas
+    IMPLEMENTATION:
+        check which, if any, quadrant resides entirely within
+        for now, NO portion of brush can over hang or it wont draw at all
+        start with square for simplicity, then add in circle
+        
+        
+    QUADRANTS:
+        1- top left
+        2- top right
+        3- bottom left
+        4- bottom right
+    SQUARE:
+        in first quadrant:
+            x min = 0, x max = 120 - brush size 
+            y min = 0, y max = 80 - brush size
+
+            paint at brush coordinate
+            2nd quadrant: x = 240 - brush.x - brush.size, y = original
+            3rd quadrant: x = original, y = 160 - brush.y - brush.size
+            4th: x = 240 - brush.x - brush.size, y = 160 - brush.y - brush.size
+        in second quadrant:
+            x min = 120, x max 240 - brush size
+            y min = 0, y max = 80 - brush size
+
+            paint at brush coordinate
+            1st: x = 240 - brush.x - brush size, y = original
+            3rd: both flip
+            4th: x = original, y = 160 - brush.y - brush.size
+
+        in third quadrant:
+            x min = 0, x max = 120 - brush size
+            y min = 80, y max = 160 - brush size
+        in fourth quadrant:
+            x min = 120, x max = 240 - brush size
+            y min = 80, y max = 160 - brush size
+
+        CONCLUSION:
+            to flip along X-axis, screen width - brush.x - brush.size
+            to flip along Y-axis, screen height - brush.y - brush.size
+
 Step 6:
     implement gradient drawing mode:
 []  in COLORS or SHAPES modes, LT + RT goes to GRADIENTS
@@ -90,15 +135,18 @@ Step 6:
 []  implement multiple gradient variations/patterns?
 
 Step 7: 
-    optimization time
+    optimization/expansion time
 [] implement fillCircle function
 [] assembly implementations, memcopy/memset for cache?
 [] utilize VRAM_CACHE
 [] optimize cache save/restore operations, assembly?
-
+[] half max brush size to reduce cache size by half
+[] implement circle symmetry
 
 
 
 BUGLOG:
 after refactoring handleBrush entirely to one function, may be an improper order of operations that only happens occasionally, sometimes big rectangular block of pixels gets shifted left by one pixel.
+    seems to happen when directions are held and A is tapped?
+some square sizes have single empty pixel, implement better squareFill function
 
