@@ -13,7 +13,7 @@
 // Enumerations for modes, colors, and shapes
 enum MODE { DRAWING = 0, COLORS, SHAPES };
 enum COLOR { RED = 0, GREEN, BLUE };
-enum SHAPE { SQUARE, TRIANGLE, CIRCLE, HEXAGON };
+enum SHAPE { SQUARE, CIRCLE };
 typedef enum { MOVE, DRAW, ERASE } BrushAction;
 
 // Brush struct definition
@@ -39,5 +39,13 @@ void clearScreen(Brush brush);
 void handleBrushInput(Brush *brush, BrushAction action);
 void drawColorSliders(enum COLOR colorSelect, int red, int green, int blue);
 enum MODE changeState(enum MODE appState, Brush *brush);
+void changeBrushShape(Brush *brush);
+void changeBrushSize(Brush *brush);
+void drawColorDemos(Brush brush, int color);
+
+void adjustColorValue(enum COLOR colorSelect, int *red, int *green, int *blue,
+                      int increase);
+
+enum COLOR handleColorSelection(enum COLOR colorSelect);
 
 #endif // F_H
