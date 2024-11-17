@@ -24,27 +24,9 @@ int main() {
       if (keyTapped(ST)) {
         appState = handlePause();
         break;
-      } else if (keyDown(LT) && keyDown(RT)) {
-        // if (keyDown(LT) && keyDown(RT) && keyDown(A) && keyDown(B)) {
-        clearScreen(brush);
-        draw(brush);
-      } else if (keyTapped(A)) {
-        draw(brush);
-        saveToBrushCache(brush);
-      } else if (keyTapped(B)) {
-        erase(brush);
-        saveToBrushCache(brush);
-        draw(brush);
       }
 
-      if (keyUp(A) && keyUp(B)) {
-        handleBrushInput(&brush, MOVE);
-      } else if (keyHeld(A)) {
-        handleBrushInput(&brush, DRAW);
-      } else if (keyHeld(B)) {
-        handleBrushInput(&brush, ERASE);
-      }
-
+      handleBrushInput(&brush);
       break;
 
     case (COLORS):

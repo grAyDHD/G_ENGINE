@@ -75,8 +75,21 @@ void erase(Brush brush) {
   }
 }
 
-void handleBrushInput(Brush *brush, BrushAction action) {
+void handleBrushInput(Brush *brush) {
   restoreFromBrushCache(*brush);
+
+  if (keyDown(LT) && keyDown(RT)) {
+    // if (keyDown(LT) && keyDown(RT) && keyDown(A) && keyDown(B)) {
+    clearScreen(*brush);
+    draw(*brush);
+  } else if (keyTapped(A)) {
+    draw(*brush);
+    saveToBrushCache(*brush);
+  } else if (keyTapped(B)) {
+    erase(*brush);
+    saveToBrushCache(*brush);
+    draw(*brush);
+  }
 
   if (keyHeld(U))
     brush->coordinates.y -= 1;
@@ -87,22 +100,19 @@ void handleBrushInput(Brush *brush, BrushAction action) {
   if (keyHeld(R))
     brush->coordinates.x += 1;
 
-  switch (action) {
-  case DRAW:
+  if (keyUp(A) && keyUp(B)) {
+    saveToBrushCache(*brush);
+    draw(*brush);
+    draw(*brush);
+  } else if (keyHeld(A)) {
     draw(*brush);
     saveToBrushCache(*brush);
-    break;
-  case ERASE:
+  } else if (keyHeld(B)) {
     erase(*brush);
     saveToBrushCache(*brush);
     draw(*brush);
-    break;
-  case MOVE:
-    saveToBrushCache(*brush);
-    draw(*brush);
-    draw(*brush);
-    break;
   }
+
   for (volatile int x = 0; x < 10000; x++)
     ;
 }
