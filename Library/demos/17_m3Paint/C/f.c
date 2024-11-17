@@ -137,3 +137,104 @@ void clearScreen(Brush brush) {
   fillScreen(dblClr(brush.eraserColor));
   saveToBrushCache(brush);
 }
+
+void drawColorSliders(enum COLOR colorSelect, int red, int green, int blue) {
+  Coordinate origin;
+
+  // RED slider
+  origin.x = 8;
+  origin.y = 8;
+  if (colorSelect == RED) {
+    drawRect(origin, 8, 34, RGB(31, 31, 31));
+    for (int x = 0; x < 8; x++) {
+      plotPixel(origin.x + x, origin.y + red, RGB(20, 20, 20));
+      plotPixel(origin.x + x, origin.y + red + 2, RGB(14, 14, 12));
+    }
+  } else {
+    drawRect(origin, 8, 34, RGB(0, 0, 0));
+  }
+
+  origin.x = 9;
+  origin.y = 9;
+  for (int x = 0; x < 32; x++) {
+    drawRect(origin, 6, 1, RGB(x, 0, 0));
+    origin.y++;
+  }
+
+  // GREEN slider
+  origin.x = 20;
+  origin.y = 8;
+  if (colorSelect == GREEN) {
+    drawRect(origin, 8, 34, RGB(31, 31, 31));
+    for (int x = 0; x < 8; x++) {
+      plotPixel(origin.x + x, origin.y + green, RGB(20, 20, 20));
+      plotPixel(origin.x + x, origin.y + green + 2, RGB(14, 14, 12));
+    }
+  } else {
+    drawRect(origin, 8, 34, RGB(0, 0, 0));
+  }
+
+  origin.x = 21;
+  origin.y = 9;
+  for (int x = 0; x < 32; x++) {
+    drawRect(origin, 6, 1, RGB(0, x, 0));
+    origin.y++;
+  }
+
+  // BLUE slider
+  origin.x = 32;
+  origin.y = 8;
+  if (colorSelect == BLUE) {
+    drawRect(origin, 8, 34, RGB(31, 31, 31));
+    for (int x = 0; x < 8; x++) {
+      plotPixel(origin.x + x, origin.y + blue, RGB(20, 20, 20));
+      plotPixel(origin.x + x, origin.y + blue + 2, RGB(14, 14, 12));
+    }
+  } else {
+    drawRect(origin, 8, 34, RGB(0, 0, 0));
+  }
+
+  origin.x = 33;
+  origin.y = 9;
+  for (int x = 0; x < 32; x++) {
+    drawRect(origin, 6, 1, RGB(0, 0, x));
+    origin.y++;
+  }
+}
+
+enum MODE changeState(enum MODE appState, Brush *brush) {
+  switch (appState) {
+    Coordinate origin = {0, 0};
+
+  case SHAPES:
+    appState = SHAPES;
+    origin.x = 0;
+    origin.y = 0;
+
+    for (int x = 32; x > 0; x--) {
+      drawRect(origin, 2 * x, 2 * x, RGB(10, 0, 12));
+      origin.x++;
+      origin.y++;
+    }
+
+    // drawShapeGUI, drawing rectangle size of brush.size
+    origin.x = 32;
+    origin.y = 32;
+
+    if (brush->shape == SQUARE) {
+      for (int x = brush->size; x > 0; x--) {
+        drawRect(origin, x, x, brush->color);
+        origin.x++;
+        origin.y++;
+      }
+    } else if (brush->shape == CIRCLE) {
+      drawCircle(origin.x - brush->size, origin.y - brush->size, brush->size,
+                 brush->color);
+    }
+
+    break;
+  case COLORS:
+    break;
+  }
+  return appState;
+}

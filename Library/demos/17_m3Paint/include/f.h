@@ -37,5 +37,7 @@ Brush initiateBrush();
 enum MODE handlePause();
 void clearScreen(Brush brush);
 void handleBrushInput(Brush *brush, BrushAction action);
+void drawColorSliders(enum COLOR colorSelect, int red, int green, int blue);
+enum MODE changeState(enum MODE appState, Brush *brush);
 
 #endif // F_H
