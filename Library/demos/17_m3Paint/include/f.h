@@ -14,6 +14,7 @@
 enum MODE { DRAWING = 0, COLORS, SHAPES };
 enum COLOR { RED = 0, GREEN, BLUE };
 enum SHAPE { SQUARE, TRIANGLE, CIRCLE, HEXAGON };
+typedef enum { MOVE, DRAW, ERASE } BrushAction;
 
 // Brush struct definition
 typedef struct {
@@ -31,7 +32,10 @@ void restoreFromBrushCache(Brush brush);
 void restoreFromGUICache();
 void draw(Brush brush);
 void erase(Brush brush);
-void updateBrushPosition(Coordinate *cursor);
+void updateBrushPosition(Brush *brush);
 Brush initiateBrush();
+enum MODE handlePause();
+void clearScreen(Brush brush);
+void handleBrushInput(Brush *brush, BrushAction action);
 
 #endif // F_H

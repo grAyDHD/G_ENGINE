@@ -1,97 +1,48 @@
 #include "../include/f.h"
 #include "engine.h"
+#include "in.h"
 #include "typedefs.h"
-
-enum MODE handlePause() {
-  Coordinate origin = {0, 0};
-  enum MODE appState = COLORS;
-  saveToGUICache();
-  origin.x = 0;
-  origin.y = 0;
-  for (int x = 32; x > 0; x--) {
-    drawRect(origin, 2 * x, 2 * x, RGB(10, 10, 5));
-    origin.x++;
-    origin.y++;
-  }
-  return appState;
-}
 
 int main() {
   DSPC = MODE3 | BG2;
 
-  enum MODE appState = DRAWING;
-  enum COLOR colorSelect = RED;
-
   int red = 0, green = 0, blue = 0;
   Brush brush = initiateBrush();
-
+  enum MODE appState = DRAWING;
+  enum COLOR colorSelect = RED;
   Coordinate origin = {0, 0};
-  fillScreen(dblClr(brush.eraserColor));
 
-  saveToBrushCache(brush);
+  clearScreen(brush);
 
   while (1) {
     updateKeys();
     VBLANK();
 
     switch (appState) {
-    // handle all DRAWING mode state.
-    case (DRAWING):
 
-      // pause (to COLORS mode)
+    case (DRAWING):
       if (keyTapped(ST)) {
         appState = handlePause();
-      }
-
-      // clearScreen function
-      if (keyDown(LT) && keyDown(RT)) {
+        break;
+      } else if (keyDown(LT) && keyDown(RT)) {
         // if (keyDown(LT) && keyDown(RT) && keyDown(A) && keyDown(B)) {
-        fillScreen(dblClr(brush.eraserColor));
-        // once screen cleared, save region under brush to cache
+        clearScreen(brush);
+        draw(brush);
+      } else if (keyTapped(A)) {
+        draw(brush);
         saveToBrushCache(brush);
-        // draw temp brush
+      } else if (keyTapped(B)) {
+        erase(brush);
+        saveToBrushCache(brush);
         draw(brush);
       }
 
-      // handle brush drawing when not painting/erasing
       if (keyUp(A) && keyUp(B)) {
-        if (keyWasDown(U) || keyWasDown(D) || keyWasDown(L) || keyWasDown(R)) {
-          restoreFromBrushCache(brush);
-          updateBrushPosition(&brush.coordinates);
-          saveToBrushCache(brush);
-          draw(brush);
-        }
-
-        // handle painting
+        handleBrushInput(&brush, MOVE);
       } else if (keyHeld(A)) {
-        draw(brush);
-        // save draw to cache
-        saveToBrushCache(brush);
-
-        // if painted while direction held, update position
-        if (keyWasDown(U) || keyWasDown(D) || keyWasDown(L) || keyWasDown(R)) {
-          restoreFromBrushCache(brush);
-          updateBrushPosition(&brush.coordinates);
-          draw(brush);
-          saveToBrushCache(brush);
-        }
-
-        // handle erasing
+        handleBrushInput(&brush, DRAW);
       } else if (keyHeld(B)) {
-        // erases current position
-        erase(brush);
-        // saves erase result to cache
-        saveToBrushCache(brush);
-        // draw temp brush at brush coordinates
-        draw(brush);
-
-        if (keyWasDown(U) || keyWasDown(D) || keyWasDown(L) || keyWasDown(R)) {
-          restoreFromBrushCache(brush);
-          updateBrushPosition(&brush.coordinates);
-          erase(brush);
-          saveToBrushCache(brush);
-          draw(brush);
-        }
+        handleBrushInput(&brush, ERASE);
       }
 
       break;
