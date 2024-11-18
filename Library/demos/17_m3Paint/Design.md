@@ -128,11 +128,16 @@ Step 5:
 
 Step 6:
     implement gradient drawing mode:
-[]  in COLORS or SHAPES modes, LT + RT goes to GRADIENTS
-[]  In GRADIENTS, LT goes to COLORS, RT goes to SHAPES
-[]  implement single gradiant variation in color selection
-[]     hold LT + A, draw with gradient
-[]  implement multiple gradient variations/patterns?
+[x]  in COLORS or SHAPES modes, LT + RT goes to GRADIENTS
+[x]  In GRADIENTS, LT goes to COLORS, RT goes to SHAPES
+[x]  implement single gradiant variation in color selection
+[x]     hold LT + A, draw with gradient
+[x]  implement multiple gradient variations/patterns?
+[]  implement parameters in GRADIENTS mode:
+    [] red scaling
+    [] blue scaling
+    [] green scaling
+[] implement preview of current gradient/shape/pattern
 
 Step 7: 
     optimization/expansion time
@@ -142,7 +147,12 @@ Step 7:
 [] optimize cache save/restore operations, assembly?
 [] half max brush size to reduce cache size by half
 [] implement circle symmetry
+[] implement circle gradients
 [] refactor all state management into single function that is called once per switch case in main, handles inputs
+
+Step 8:
+    add HEXAGONS:
+
 
 BUGLOG:
 after refactoring handleBrush entirely to one function, may be an improper order of operations that only happens occasionally, sometimes big rectangular block of pixels gets shifted left by one pixel.
@@ -150,3 +160,5 @@ after refactoring handleBrush entirely to one function, may be an improper order
 some square sizes have single empty pixel, implement better squareFill function
 
 on clearing screen, the current brush position gets drawn
+
+no condition to unpause from COLORS mode
