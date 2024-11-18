@@ -134,10 +134,23 @@ Step 6:
 [x]     hold LT + A, draw with gradient
 [x]  implement multiple gradient variations/patterns?
 []  implement parameters in GRADIENTS mode:
-    [] red scaling
+    (first color is brush color, each successive color scaled for gradient)
+    [] red scaling 
     [] blue scaling
     [] green scaling
 [] implement preview of current gradient/shape/pattern
+
+    ROADBLOCK:
+        handling gradient scaling
+    SOLUTION:
+        making decisions through trial and error once GUI is implemented
+    IMPLEMENTATION:
+        determine min/max scaler values (trial and error, negative values?)
+        decide if I want to loop back around when surpassing 31 color value, or keep at 31 for further colors
+        implement inputs in GRADIENTS mode to select scaler and increment/decrement scaler value
+        three stacks of vertical squares, one per scaler value per color scaler
+        Left/Right to select scaler, A/B to cycle gradient patterns
+    
 
 Step 7: 
     optimization/expansion time

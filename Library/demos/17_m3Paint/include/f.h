@@ -30,6 +30,10 @@ typedef struct {
   u16 size; // Max size of 32
   u16 color;
   u16 eraserColor;
+
+  int gradientScaleR;
+  int gradientScaleG;
+  int gradientScaleB;
 } Brush;
 
 // Function prototypes

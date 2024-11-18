@@ -147,24 +147,38 @@ void paintGradient(Brush brush) {
   case VERTICAL:
     endPoint.y += brush.size;
     for (int x = 0; x < brush.size; x++) {
-      drawLine(origin, endPoint, RGB(red + x, green + (2 * x), blue));
+      red += (x * brush.gradientScaleR);
+      green += (x * brush.gradientScaleG);
+      blue += (x * brush.gradientScaleB);
+
+      drawLine(origin, endPoint, RGB(red, green, blue));
       origin.x++;
       endPoint.x++;
     }
     break;
+
   case PERIMETER:
     for (int x = 0; x < brush.size / 2; x++) {
-      origin.x += x;
-      origin.y += x;
-      drawRect(origin, (brush.size - (2 * x)), (brush.size - (2 * x)),
-               RGB(red + x, green + (2 * x), blue));
-    }
+      origin.x += 1;
+      origin.y += 1;
 
+      red += (x * brush.gradientScaleR);
+      green += (x * brush.gradientScaleG);
+      blue += (x * brush.gradientScaleB);
+      drawRect(origin, (brush.size - (2 * x)), (brush.size - (2 * x)),
+               RGB(red, green, blue));
+    }
     break;
+
   case HORIZONTAL:
     endPoint.x += brush.size;
+
     for (int x = 0; x < brush.size; x++) {
-      drawLine(origin, endPoint, RGB(red + x, green + (2 * x), blue));
+      red += (x * brush.gradientScaleR);
+      green += (x * brush.gradientScaleG);
+      blue += (x * brush.gradientScaleB);
+
+      drawLine(origin, endPoint, RGB(red, green, blue));
       origin.y++;
       endPoint.y++;
     }
@@ -250,6 +264,9 @@ Brush initiateBrush() {
   brush.coordinates.y = 0;
   brush.gradient = PERIMETER;
 
+  brush.gradientScaleR = 4;
+  brush.gradientScaleG = 2;
+  brush.gradientScaleB = 1;
   return brush;
 }
 
