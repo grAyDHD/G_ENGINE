@@ -106,14 +106,20 @@ void handleBrushInput(Brush *brush) {
   if (keyUp(A) && keyUp(B)) { // move brush and show position
     saveToBrushCache(*brush);
     paint(*brush);
+
   } else if (keyHeld(A)) { // draw brush at current position
     if (keyDown(RT)) {     // draw with symmetry
       symmetryPaint(*brush);
+      saveToBrushCache(*brush);
+    } else if (keyDown(LT)) {
+      // draw gradient shape
+      paintGradient(*brush);
       saveToBrushCache(*brush);
     } else { // draw
       paint(*brush);
       saveToBrushCache(*brush);
     }
+
   } else if (keyHeld(B)) {
     if (keyDown(RT)) { // draw with symmetry
                        // symmetryErase(*brush)
@@ -128,6 +134,41 @@ void handleBrushInput(Brush *brush) {
     ;
 }
 
+void paintGradient(Brush brush) {
+  Coordinate origin = brush.coordinates;
+  Coordinate endPoint = brush.coordinates;
+  // only handles SQUARE brush for time being
+  // get RGB values from brush.color to construct gradients
+
+  switch (brush.gradient) {
+  case VERTICAL:
+    endPoint.y += brush.size;
+    for (int x = 0; x < brush.size; x++) {
+      drawLine(origin, endPoint, brush.color);
+      origin.x++;
+      endPoint.x++;
+    }
+    break;
+  case PERIMETER:
+    for (int x = 0; x < brush.size / 2; x++) {
+      origin.x += x;
+      origin.y += x;
+      drawRect(origin, (brush.size - (2 * x)), (brush.size - (2 * x)),
+               brush.color);
+    }
+
+    break;
+  case HORIZONTAL:
+    endPoint.x += brush.size;
+    for (int x = 0; x < brush.size; x++) {
+      drawLine(origin, endPoint, brush.color);
+      origin.y++;
+      endPoint.y++;
+    }
+    break;
+  }
+}
+
 void symmetryPaint(Brush brush) {
   Coordinate flipX = {(SW - brush.coordinates.x - brush.size),
                       brush.coordinates.y};
@@ -137,15 +178,10 @@ void symmetryPaint(Brush brush) {
                        (SH - brush.coordinates.y - brush.size)};
   switch (brush.shape) {
   case SQUARE:
-
     drawRect(brush.coordinates, brush.size, brush.size, brush.color);
     drawRect(flipX, brush.size, brush.size, brush.color);
     drawRect(flipY, brush.size, brush.size, brush.color);
     drawRect(flipXY, brush.size, brush.size, brush.color);
-
-    // draw at brush coordinates,
-    // flip x, flip y, flip x and y
-    //
 
     /*
     // BRUSH IS IN Q1
@@ -182,6 +218,25 @@ void symmetryPaint(Brush brush) {
   }
 }
 
+void manageGradientType(Brush *brush) {
+  if (keyTapped(L)) {
+    if (brush->gradient == PERIMETER) {
+      brush->gradient = VERTICAL;
+    } else if (brush->gradient == HORIZONTAL) {
+      brush->gradient = PERIMETER;
+    }
+
+  } else if (keyTapped(R)) {
+    if (brush->gradient == PERIMETER) {
+      brush->gradient = HORIZONTAL;
+    } else if (brush->gradient == VERTICAL) {
+      brush->gradient = PERIMETER;
+    }
+  }
+}
+
+void drawGradient(Brush *brush) {}
+
 Brush initiateBrush() {
   Brush brush;
   brush.size = 4;
@@ -190,6 +245,7 @@ Brush initiateBrush() {
   brush.shape = SQUARE;
   brush.coordinates.x = 0;
   brush.coordinates.y = 0;
+  brush.gradient = PERIMETER;
 
   return brush;
 }

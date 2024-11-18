@@ -76,6 +76,17 @@ int main() {
 
       break;
     case (GRADIENTS):
+      // set horizontal gradient
+      manageGradientType(&brush);
+      // handleState
+      if (keyTapped(LT)) {
+        appState = changeState(COLORS, &brush);
+      } else if (keyTapped(RT)) {
+        appState = changeState(SHAPES, &brush);
+      } else if (keyTapped(ST)) {
+        appState = changeState(DRAWING, &brush);
+      }
+
       break;
     }
   }

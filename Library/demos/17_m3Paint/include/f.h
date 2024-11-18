@@ -11,15 +11,18 @@
 #define CURSOR_CACHE ((u16)VRAM_SCREEN_END)
 
 // Enumerations for modes, colors, and shapes
-enum MODE { DRAWING = 0, COLORS, SHAPES, GRADIENTS };
-enum COLOR { RED = 0, GREEN, BLUE };
+enum MODE { DRAWING, COLORS, SHAPES, GRADIENTS };
+enum COLOR { RED, GREEN, BLUE };
 enum SHAPE { SQUARE, CIRCLE, HEXAGON };
+enum GRADIENT { HORIZONTAL, VERTICAL, PERIMETER };
+
 typedef enum { MOVE, DRAW, ERASE } BrushAction;
 
 // Brush struct definition
 typedef struct {
   Coordinate coordinates;
   enum SHAPE shape;
+  enum GRADIENT gradient;
   u16 size; // Max size of 32
   u16 color;
   u16 eraserColor;
@@ -48,5 +51,7 @@ void adjustColorValue(enum COLOR colorSelect, int *red, int *green, int *blue,
 
 enum COLOR handleColorSelection(enum COLOR colorSelect);
 void symmetryPaint(Brush brush);
+void manageGradientType(Brush *brush);
+void paintGradient(Brush brush);
 
 #endif // F_H
