@@ -149,4 +149,4 @@ after refactoring handleBrush entirely to one function, may be an improper order
     seems to happen when directions are held and A is tapped?
 some square sizes have single empty pixel, implement better squareFill function
 
-
+on clearing screen, the current brush position gets drawn

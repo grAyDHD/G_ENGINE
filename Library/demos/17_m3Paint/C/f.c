@@ -139,12 +139,15 @@ void paintGradient(Brush brush) {
   Coordinate endPoint = brush.coordinates;
   // only handles SQUARE brush for time being
   // get RGB values from brush.color to construct gradients
+  int red = GET_RED(brush.color);
+  int green = GET_RED(brush.color);
+  int blue = GET_RED(brush.color);
 
   switch (brush.gradient) {
   case VERTICAL:
     endPoint.y += brush.size;
     for (int x = 0; x < brush.size; x++) {
-      drawLine(origin, endPoint, brush.color);
+      drawLine(origin, endPoint, RGB(red + x, green + (2 * x), blue));
       origin.x++;
       endPoint.x++;
     }
@@ -154,14 +157,14 @@ void paintGradient(Brush brush) {
       origin.x += x;
       origin.y += x;
       drawRect(origin, (brush.size - (2 * x)), (brush.size - (2 * x)),
-               brush.color);
+               RGB(red + x, green + (2 * x), blue));
     }
 
     break;
   case HORIZONTAL:
     endPoint.x += brush.size;
     for (int x = 0; x < brush.size; x++) {
-      drawLine(origin, endPoint, brush.color);
+      drawLine(origin, endPoint, RGB(red + x, green + (2 * x), blue));
       origin.y++;
       endPoint.y++;
     }

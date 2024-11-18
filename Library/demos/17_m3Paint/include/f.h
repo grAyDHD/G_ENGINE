@@ -10,6 +10,10 @@
 #define VRAM_SCREEN_END 0x06012C00
 #define CURSOR_CACHE ((u16)VRAM_SCREEN_END)
 
+#define GET_RED(color) (color & 0x1F)
+#define GET_GREEN(color) ((color >> 5) & 0x1F)
+#define GET_BLUE(color) ((color >> 10) & 0x1F)
+
 // Enumerations for modes, colors, and shapes
 enum MODE { DRAWING, COLORS, SHAPES, GRADIENTS };
 enum COLOR { RED, GREEN, BLUE };
