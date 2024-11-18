@@ -17,6 +17,7 @@
 #define BG2 (u16)0x003
 
 void plotPixel(int x, int y, u16 clr) { ((u16 *)VRAM)[y * SW + x] = clr; }
+
 void drawCircle(int x, int y, int radius, unsigned short color) {
   int r = radius;
   int s = 0;

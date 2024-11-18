@@ -7,6 +7,8 @@
 
 void plotPixel(int x, int y, unsigned short color);
 void drawLine(Coordinate start, Coordinate end, unsigned short color);
+void drawCircle(int x, int y, int radius, unsigned short color);
+void fillCircle(int x, int y, int radius, unsigned short color);
 void drawRect(Coordinate start, int width, int height, unsigned short color);
 
 #endif
