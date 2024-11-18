@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SharedComponent } from './shared.component';
+import { PixelCanvasComponent } from './pixel-canvas.component';
 
-describe('SharedComponent', () => {
-  let component: SharedComponent;
-  let fixture: ComponentFixture<SharedComponent>;
+describe('PixelCanvasComponent', () => {
+  let component: PixelCanvasComponent;
+  let fixture: ComponentFixture<PixelCanvasComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SharedComponent]
+      imports: [PixelCanvasComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(SharedComponent);
+    fixture = TestBed.createComponent(PixelCanvasComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
