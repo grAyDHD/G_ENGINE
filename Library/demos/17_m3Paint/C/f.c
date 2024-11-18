@@ -194,20 +194,6 @@ Brush initiateBrush() {
   return brush;
 }
 
-enum MODE handlePause() {
-  Coordinate origin = {0, 0};
-  enum MODE appState = COLORS;
-  saveToGUICache();
-  origin.x = 0;
-  origin.y = 0;
-  for (int x = 32; x > 0; x--) {
-    drawRect(origin, 2 * x, 2 * x, RGB(10, 10, 5));
-    origin.x++;
-    origin.y++;
-  }
-  return appState;
-}
-
 void clearScreen(Brush brush) {
   fillScreen(dblClr(brush.eraserColor));
   saveToBrushCache(brush);
@@ -277,6 +263,20 @@ void drawColorSliders(enum COLOR colorSelect, int red, int green, int blue) {
   }
 }
 
+enum MODE handlePause() {
+  Coordinate origin = {0, 0};
+  enum MODE appState = COLORS;
+  saveToGUICache();
+  origin.x = 0;
+  origin.y = 0;
+  for (int x = 32; x > 0; x--) {
+    drawRect(origin, 2 * x, 2 * x, RGB(10, 10, 5));
+    origin.x++;
+    origin.y++;
+  }
+  return appState;
+}
+
 enum MODE changeState(enum MODE appState, Brush *brush) {
   Coordinate origin = {0, 0};
   switch (appState) {
@@ -317,6 +317,11 @@ enum MODE changeState(enum MODE appState, Brush *brush) {
       origin.y++;
     }
     break;
+  case GRADIENTS:
+
+    drawRect(origin, 32, 32, RGB(20, 20, 30));
+    appState = GRADIENTS;
+    break;
   }
   return appState;
 }
@@ -356,7 +361,7 @@ void changeBrushSize(Brush *brush) {
   }
 }
 
-void drawColorDemos(Brush brush, int color) {
+void drawColorPreview(Brush brush, int color) {
   Coordinate origin;
 
   // draw demo eraser

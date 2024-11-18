@@ -11,9 +11,9 @@
 #define CURSOR_CACHE ((u16)VRAM_SCREEN_END)
 
 // Enumerations for modes, colors, and shapes
-enum MODE { DRAWING = 0, COLORS, SHAPES };
+enum MODE { DRAWING = 0, COLORS, SHAPES, GRADIENTS };
 enum COLOR { RED = 0, GREEN, BLUE };
-enum SHAPE { SQUARE, CIRCLE };
+enum SHAPE { SQUARE, CIRCLE, HEXAGON };
 typedef enum { MOVE, DRAW, ERASE } BrushAction;
 
 // Brush struct definition
@@ -41,7 +41,7 @@ void drawColorSliders(enum COLOR colorSelect, int red, int green, int blue);
 enum MODE changeState(enum MODE appState, Brush *brush);
 void changeBrushShape(Brush *brush);
 void changeBrushSize(Brush *brush);
-void drawColorDemos(Brush brush, int color);
+void drawColorPreview(Brush brush, int color);
 
 void adjustColorValue(enum COLOR colorSelect, int *red, int *green, int *blue,
                       int increase);

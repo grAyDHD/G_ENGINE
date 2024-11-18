@@ -142,11 +142,11 @@ Step 7:
 [] optimize cache save/restore operations, assembly?
 [] half max brush size to reduce cache size by half
 [] implement circle symmetry
-
-
+[] refactor all state management into single function that is called once per switch case in main, handles inputs
 
 BUGLOG:
 after refactoring handleBrush entirely to one function, may be an improper order of operations that only happens occasionally, sometimes big rectangular block of pixels gets shifted left by one pixel.
     seems to happen when directions are held and A is tapped?
 some square sizes have single empty pixel, implement better squareFill function
+
 

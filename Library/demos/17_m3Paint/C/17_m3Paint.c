@@ -1,4 +1,5 @@
 #include "../include/f.h"
+#include "draw.h"
 #include "engine.h"
 #include "in.h"
 #include "typedefs.h"
@@ -10,7 +11,6 @@ int main() {
   Brush brush = initiateBrush();
   enum MODE appState = DRAWING;
   enum COLOR colorSelect = RED;
-  Coordinate origin = {0, 0};
 
   clearScreen(brush);
 
@@ -30,7 +30,10 @@ int main() {
       break;
 
     case (COLORS):
-      if (keyTapped(RT)) {
+      if (keyDown(RT) && keyDown(LT)) {
+        appState = changeState(GRADIENTS, &brush);
+        break;
+      } else if (keyTapped(RT)) {
         appState = changeState(SHAPES, &brush);
         break;
       }
@@ -51,14 +54,16 @@ int main() {
         brush.eraserColor = RGB(red, green, blue);
       }
 
-      drawColorDemos(brush, RGB(red, green, blue));
+      drawColorPreview(brush, RGB(red, green, blue));
 
       for (volatile int x = 0; x < 20000; x++)
         ;
       break;
     case (SHAPES):
 
-      if (keyTapped(LT)) {
+      if (keyDown(LT) && keyDown(RT)) {
+        appState = changeState(GRADIENTS, &brush);
+      } else if (keyTapped(LT)) {
         appState = changeState(COLORS, &brush);
         break;
       } else if (keyTapped(ST)) {
@@ -69,6 +74,8 @@ int main() {
       changeBrushSize(&brush);
       changeBrushShape(&brush);
 
+      break;
+    case (GRADIENTS):
       break;
     }
   }
