@@ -61,5 +61,6 @@ enum COLOR handleColorSelection(enum COLOR colorSelect);
 void symmetryPaint(Brush brush);
 void manageGradientType(Brush *brush);
 void paintGradient(Brush brush);
+void handleGradientControls(enum COLOR colorSelect, Brush *brush);
 
 #endif // F_H

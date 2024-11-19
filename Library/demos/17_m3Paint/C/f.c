@@ -502,3 +502,67 @@ enum COLOR handleColorSelection(enum COLOR colorSelect) {
 
   return colorSelect;
 }
+
+void handleGradientControls(enum COLOR colorSelect, Brush *brush) {
+  if (keyTapped(A)) { // this would be a nice spot for a tribool!!!!
+    switch (brush->gradient) {
+    case HORIZONTAL:
+      brush->gradient = VERTICAL;
+      break;
+    case VERTICAL:
+      brush->gradient = PERIMETER;
+      break;
+    case PERIMETER:
+      brush->gradient = HORIZONTAL;
+      break;
+    }
+  } else if (keyTapped(B)) {
+    switch (brush->gradient) {
+    case HORIZONTAL:
+      brush->gradient = PERIMETER;
+      break;
+    case VERTICAL:
+      brush->gradient = HORIZONTAL;
+      break;
+    case PERIMETER:
+      brush->gradient = VERTICAL;
+      break;
+    }
+  } else if (keyTapped(U)) {
+    switch (colorSelect) {
+    case RED:
+      if (brush->gradientScaleR < 8) {
+        brush->gradientScaleR++;
+      }
+      break;
+    case GREEN:
+      if (brush->gradientScaleG < 8) {
+        brush->gradientScaleG++;
+      }
+      break;
+    case BLUE:
+      if (brush->gradientScaleB < 8) {
+        brush->gradientScaleB++;
+      }
+      break;
+    }
+  } else if (keyTapped(D)) {
+    switch (colorSelect) {
+    case RED:
+      if (brush->gradientScaleR > 0) {
+        brush->gradientScaleR--;
+      }
+      break;
+    case GREEN:
+      if (brush->gradientScaleG > 0) {
+        brush->gradientScaleG--;
+      }
+      break;
+    case BLUE:
+      if (brush->gradientScaleB > 0) {
+        brush->gradientScaleB--;
+      }
+      break;
+    }
+  }
+}

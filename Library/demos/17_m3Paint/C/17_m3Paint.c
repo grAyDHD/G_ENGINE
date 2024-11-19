@@ -82,29 +82,19 @@ int main() {
       break;
     case (GRADIENTS):
 
-      // other parameters to manage:
-      // left right to select RGB scaler
-      // up down to increase/decrease scaling rate
-      // 0 - lowest gradient scaling (none)
-      // 4 - max scaling (adjust max value?)
+      colorSelect = handleColorSelection(colorSelect);
+      handleGradientControls(colorSelect, &brush);
 
+      // drawUI(colorSelect, &brush) {}
       // draw 3 squares, RGB
       // outline selected SCALER, left right to select
       // when zero, just the one square.
       // for each digit increase, draw black bar above colored square
-
-      // drawUI(colorSelect, &brush) {}
       //  draw squares 8x8, 8 px apart
       //  outline selected COLOR as current scaler
       //  near bottom of 64x64 GUI region
       //  detect input to switch pattern,
-      //  left/right select scaler
-      //  up/down inc/dec scaler value
 
-      // change to A/B cycling?
-      //      manageGradientType(&brush);
-
-      // handleState
       if (keyTapped(LT)) {
         appState = changeState(COLORS, &brush);
       } else if (keyTapped(RT)) {
