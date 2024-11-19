@@ -78,22 +78,15 @@ int main() {
 
       changeBrushSize(&brush);
       changeBrushShape(&brush);
-
       break;
     case (GRADIENTS):
 
       colorSelect = handleColorSelection(colorSelect);
       handleGradientControls(colorSelect, &brush);
 
-      // drawUI(colorSelect, &brush) {}
-      // draw 3 squares, RGB
-      // outline selected SCALER, left right to select
-      // when zero, just the one square.
-      // for each digit increase, draw black bar above colored square
-      //  draw squares 8x8, 8 px apart
-      //  outline selected COLOR as current scaler
-      //  near bottom of 64x64 GUI region
-      //  detect input to switch pattern,
+      // todo- in GUI function, align black squares, remove black squares;
+      drawGradientsGUI(colorSelect, brush);
+      // drawGradientDemo();
 
       if (keyTapped(LT)) {
         appState = changeState(COLORS, &brush);

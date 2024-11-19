@@ -395,7 +395,11 @@ enum MODE changeState(enum MODE appState, Brush *brush) {
     break;
   case GRADIENTS:
 
-    drawRect(origin, 32, 32, RGB(20, 20, 30));
+    for (int x = 32; x > 0; x--) {
+      drawRect(origin, 2 * x, 2 * x, RGB(20, 20, 30));
+      origin.x++;
+      origin.y++;
+    }
     appState = GRADIENTS;
     break;
   }
@@ -531,17 +535,17 @@ void handleGradientControls(enum COLOR colorSelect, Brush *brush) {
   } else if (keyTapped(U)) {
     switch (colorSelect) {
     case RED:
-      if (brush->gradientScaleR < 8) {
+      if (brush->gradientScaleR < 4) {
         brush->gradientScaleR++;
       }
       break;
     case GREEN:
-      if (brush->gradientScaleG < 8) {
+      if (brush->gradientScaleG < 4) {
         brush->gradientScaleG++;
       }
       break;
     case BLUE:
-      if (brush->gradientScaleB < 8) {
+      if (brush->gradientScaleB < 4) {
         brush->gradientScaleB++;
       }
       break;
@@ -563,6 +567,91 @@ void handleGradientControls(enum COLOR colorSelect, Brush *brush) {
         brush->gradientScaleB--;
       }
       break;
+    }
+  }
+}
+
+void drawGradientsGUI(enum COLOR colorSelect, Brush brush) {
+  Coordinate origin = {12, 56};
+
+  drawRect(origin, 4, 4, RGB(31, 0, 0));
+  if (colorSelect == RED) {
+    origin.x++;
+    origin.y++;
+    drawRect(origin, 2, 2, RGB(31, 31, 31));
+    origin.x--;
+    origin.y--;
+  } else {
+    origin.x++;
+    origin.y++;
+    drawRect(origin, 2, 2, RGB(31, 0, 0));
+    origin.x--;
+    origin.y--;
+  }
+  origin.x += 12;
+
+  drawRect(origin, 4, 4, RGB(0, 31, 0));
+  if (colorSelect == GREEN) {
+    origin.x++;
+    origin.y++;
+    drawRect(origin, 2, 2, RGB(31, 31, 31));
+    origin.x--;
+    origin.y--;
+  } else {
+    origin.x++;
+    origin.y++;
+    drawRect(origin, 2, 2, RGB(31, 0, 0));
+    origin.x--;
+    origin.y--;
+  }
+  origin.x += 12;
+
+  drawRect(origin, 4, 4, RGB(0, 0, 31));
+  if (colorSelect == BLUE) {
+    origin.x++;
+    origin.y++;
+    drawRect(origin, 2, 2, RGB(31, 31, 31));
+    origin.x--;
+    origin.y--;
+  } else {
+    origin.x++;
+    origin.y++;
+    drawRect(origin, 2, 2, RGB(31, 0, 0));
+    origin.x--;
+    origin.y--;
+  }
+
+  // draw gradient bar levels
+  origin.x = 12; // y = 56
+  for (int x = 0; x < 4; x++) {
+    origin.y -= 6;
+    if (brush.gradientScaleR >= x) {
+      drawRect(origin, 4, 2, 0);
+    } else {
+      drawRect(origin, 4, 2, RGB(20, 20, 30));
+    }
+  }
+
+  origin.x += 12;
+  origin.y = 56; // y = 56
+  for (int x = 0; x < 4; x++) {
+    origin.y -= 6;
+    if (brush.gradientScaleG >= x) {
+      drawRect(origin, 4, 2, 0);
+    } else {
+      drawRect(origin, 4, 2, RGB(20, 20, 30));
+    }
+  }
+  origin.x += 12;
+
+  origin.x += 12;
+  origin.y = 56; // y = 56
+  for (int x = 0; x < 4; x++) {
+    origin.y -= 6;
+    if (brush.gradientScaleB >= x) {
+      drawRect(origin, 4, 2, 0);
+    } else {
+      drawRect(origin, 4, 2, RGB(20, 20, 30));
     }
   }
 }
