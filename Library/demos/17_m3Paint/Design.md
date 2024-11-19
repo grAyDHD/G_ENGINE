@@ -138,7 +138,7 @@ Step 6:
     [x] red scaling 
     [x] blue scaling
     [x] green scaling
-[] implement preview of current gradient/shape/pattern
+[x] implement preview of current gradient/shape/pattern
 
     ROADBLOCK: SOLVED
         handling gradient scaling

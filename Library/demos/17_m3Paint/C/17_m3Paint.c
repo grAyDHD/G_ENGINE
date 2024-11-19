@@ -86,7 +86,12 @@ int main() {
 
       // todo- in GUI function, align black squares, remove black squares;
       drawGradientsGUI(colorSelect, brush);
-      // drawGradientDemo();
+
+      origin = brush.coordinates;
+      brush.coordinates.x = 0;
+      brush.coordinates.y = 0;
+      paintGradient(brush);
+      brush.coordinates = origin;
 
       if (keyTapped(LT)) {
         appState = changeState(COLORS, &brush);
