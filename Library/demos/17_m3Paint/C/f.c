@@ -45,6 +45,7 @@ void restoreFromGUICache() {
 void paint(Brush brush) {
   switch (brush.shape) {
   case SQUARE:
+    // fillSquare();
     for (int x = 0; x < brush.size / 2; x++) {
       Coordinate origin = {brush.coordinates.x + x, brush.coordinates.y + x};
       drawRect(origin, (brush.size - (2 * x)), (brush.size - (2 * x)),
@@ -52,6 +53,7 @@ void paint(Brush brush) {
     }
     break;
   case CIRCLE:
+    // fillCircle();
     drawCircle(brush.coordinates.x + brush.size,
                brush.coordinates.y + brush.size, brush.size, brush.color);
     break;

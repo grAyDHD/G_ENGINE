@@ -153,19 +153,18 @@ Step 6:
     
 
 Step 7: 
-    optimization/expansion time
+    optimizations
 [] implement fillCircle function
-[] assembly implementations, memcopy/memset for cache?
-[] utilize VRAM_CACHE
-[] optimize cache save/restore operations, assembly?
-[] half max brush size to reduce cache size by half
 [] implement circle symmetry
 [] implement circle gradients
+[] assembly implementations, memcopy/memset for cache?
+[] optimize cache save/restore operations, assembly?
+[] half max brush size to reduce cache size by half
+[] utilize VRAM_CACHE
 [] refactor all state management into single function that is called once per switch case in main, handles inputs
 
 Step 8:
-    add HEXAGONS:
-
+    additional features?
 
 BUGLOG:
 after refactoring handleBrush entirely to one function, may be an improper order of operations that only happens occasionally, sometimes big rectangular block of pixels gets shifted left by one pixel.
