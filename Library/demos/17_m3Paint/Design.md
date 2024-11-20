@@ -155,13 +155,13 @@ Step 6:
 Step 7: 
     optimizations
 [] half max brush size to reduce cache size by half
-[] implement fillCircle function
+[x] implement fillCircle function
 [] implement circle symmetry
 [] implement circle gradients
+[] refactor all state management into single function that is called once per switch case in main, handles inputs
 [] assembly implementations, memcopy/memset for cache?
 [] optimize cache save/restore operations, assembly?
 [] utilize VRAM_CACHE
-[] refactor all state management into single function that is called once per switch case in main, handles inputs
 
 Step 8:
     additional features?
