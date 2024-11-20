@@ -65,4 +65,9 @@ void paintGradient(Brush brush);
 void handleGradientControls(enum COLOR colorSelect, Brush *brush);
 void drawGradientsGUI(enum COLOR colorSelect, Brush brush);
 
+void fillCircle(int x, int y, int radius, unsigned short color);
+void drawHorizontalLine(int x_start, int x_end, int y, unsigned short color);
+
+void simpleWait(int delay);
+
 #endif // F_H

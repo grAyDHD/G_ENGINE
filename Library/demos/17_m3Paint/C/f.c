@@ -54,7 +54,7 @@ void paint(Brush brush) {
     break;
   case CIRCLE:
     // fillCircle();
-    drawCircle(brush.coordinates.x + brush.size,
+    fillCircle(brush.coordinates.x + brush.size,
                brush.coordinates.y + brush.size, brush.size, brush.color);
     break;
     // Other shapes can be implemented as needed.
@@ -71,7 +71,7 @@ void erase(Brush brush) {
     }
     break;
   case CIRCLE:
-    drawCircle(brush.coordinates.x + brush.size,
+    fillCircle(brush.coordinates.x + brush.size,
                brush.coordinates.y + brush.size, brush.size, brush.eraserColor);
     break;
     // Other shapes can be implemented as needed.
@@ -230,7 +230,7 @@ void symmetryPaint(Brush brush) {
     */
     break;
   case CIRCLE:
-    drawCircle(brush.coordinates.x + brush.size,
+    fillCircle(brush.coordinates.x + brush.size,
                brush.coordinates.y + brush.size, brush.size, brush.color);
     break;
     // Other shapes can be implemented as needed.
@@ -381,7 +381,7 @@ enum MODE changeState(enum MODE appState, Brush *brush) {
         origin.y++;
       }
     } else if (brush->shape == CIRCLE) {
-      drawCircle(origin.x - brush->size, origin.y - brush->size, brush->size,
+      fillCircle(origin.x - brush->size, origin.y - brush->size, brush->size,
                  brush->color);
     }
 
@@ -427,7 +427,7 @@ void changeBrushSize(Brush *brush) {
       drawRect(origin, brush->size, brush->size, brush->color);
     } else if (brush->shape == CIRCLE && brush->size < 16) {
       brush->size++;
-      drawCircle(origin.x - brush->size, origin.x - brush->size, brush->size,
+      fillCircle(origin.x - brush->size, origin.x - brush->size, brush->size,
                  brush->color);
     }
   } else if (keyTapped(D)) {
@@ -436,7 +436,7 @@ void changeBrushSize(Brush *brush) {
       drawRect(origin, brush->size, brush->size, brush->eraserColor);
       brush->size--;
     } else if (brush->shape == CIRCLE && brush->size > 2) {
-      drawCircle(origin.x - brush->size, origin.y - brush->size, brush->size,
+      fillCircle(origin.x - brush->size, origin.y - brush->size, brush->size,
                  brush->eraserColor);
       brush->size--;
     }
@@ -656,4 +656,48 @@ void drawGradientsGUI(enum COLOR colorSelect, Brush brush) {
       drawRect(origin, 4, 2, RGB(20, 20, 30));
     }
   }
+}
+
+void fillCircle(int x, int y, int radius, unsigned short color) {
+  int r = radius;
+  int s = 0;
+  int decisionOver2 =
+      1 - r; // Decision variable for the midpoint circle algorithm
+
+  // Iterate until the step crosses the radius
+  while (r >= s) {
+
+    // Draw horizontal lines between mirrored points at each step
+    // Top half
+    drawHorizontalLine(x - r, x + r, y + s, color); // Line at y + s
+    drawHorizontalLine(x - s, x + s, y + r, color); // Line at y + r
+
+    // Bottom half
+    drawHorizontalLine(x - r, x + r, y - s, color); // Line at y - s
+    drawHorizontalLine(x - s, x + s, y - r, color); // Line at y - r
+
+    // Update s and adjust the decision variable
+    s++;
+    if (decisionOver2 <= 0) {
+      // Midpoint is within the circle
+      decisionOver2 += 2 * s + 1;
+    } else {
+      // Midpoint is outside the circle, reduce r
+      r--;
+      decisionOver2 += 2 * (s - r) + 1;
+    }
+  }
+}
+
+// Helper function to draw a horizontal line from x_start to x_end at a specific
+// y
+void drawHorizontalLine(int x_start, int x_end, int y, unsigned short color) {
+  for (int x = x_start; x <= x_end; x++) {
+    plotPixel(x, y, color); // Plot each pixel on the horizontal line
+  }
+}
+
+void simpleWait(int delay) {
+  for (volatile int z = 0; z < (delay * 1000); z++)
+    ;
 }

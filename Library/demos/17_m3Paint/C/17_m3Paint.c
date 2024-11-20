@@ -12,8 +12,29 @@ int main() {
   enum MODE appState = DRAWING;
   enum COLOR colorSelect = RED;
   Coordinate origin = {0, 0};
+  Coordinate end = {0, 0};
 
   clearScreen(brush);
+
+  origin.x = 20 - 16;
+  origin.y = 100;
+  end.x = 20 + 16;
+  end.y = 100;
+  drawLine(origin, end, 0);
+
+  origin.x = 20;
+  origin.y = 100 - 16;
+  end.x = 20;
+  end.y = 100 + 16;
+  drawLine(origin, end, 0);
+
+  origin.x = 20 - 16;
+  origin.y = 100 - 16;
+  drawRect(origin, 33, 33, RGB(0, 20, 12));
+
+  fillCircle(20, 100, 5, RGB(20, 2, 15));
+  fillCircle(20, 100, 10, RGB(20, 2, 15));
+  fillCircle(20, 100, 16, RGB(20, 2, 15));
 
   while (1) {
     updateKeys();

@@ -11,8 +11,6 @@ void drawCircle(int x, int y, int radius, unsigned short color) {
       1 - r; // Decision criterion divided by 2 evaluated at r=r, s=0
 
   while (r >= s) {
-    for (volatile int z = 0; z < 1000; z++)
-      ;
 
     // Draw the eight octants
     plotPixel(x + r, y + s, color); // Octant 1
