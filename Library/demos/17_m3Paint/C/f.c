@@ -411,8 +411,8 @@ enum MODE changeState(enum MODE appState, Brush *brush) {
 void changeBrushShape(Brush *brush) {
   if (keyTapped(R)) {
     brush->shape = CIRCLE;
-    if (brush->size > 16) {
-      brush->size = 16;
+    if (brush->size > 8) {
+      brush->size = 8;
     }
   } else if (keyTapped(L)) {
     brush->shape = SQUARE;
@@ -422,10 +422,10 @@ void changeBrushShape(Brush *brush) {
 void changeBrushSize(Brush *brush) {
   Coordinate origin = {32, 32};
   if (keyTapped(U)) {
-    if (brush->shape == SQUARE && brush->size < 32) {
+    if (brush->shape == SQUARE && brush->size < 16) {
       brush->size++;
       drawRect(origin, brush->size, brush->size, brush->color);
-    } else if (brush->shape == CIRCLE && brush->size < 16) {
+    } else if (brush->shape == CIRCLE && brush->size < 8) {
       brush->size++;
       fillCircle(origin.x - brush->size, origin.x - brush->size, brush->size,
                  brush->color);
