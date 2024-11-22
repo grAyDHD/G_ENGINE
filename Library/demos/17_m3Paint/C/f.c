@@ -232,6 +232,12 @@ void symmetryPaint(Brush brush) {
   case CIRCLE:
     fillCircle(brush.coordinates.x + brush.size,
                brush.coordinates.y + brush.size, brush.size, brush.color);
+    fillCircle(flipX.x + brush.size, flipX.y + brush.size, brush.size,
+               brush.color);
+    fillCircle(flipY.x + brush.size, flipY.y + brush.size, brush.size,
+               brush.color);
+    fillCircle(flipXY.x + brush.size, flipXY.y + brush.size, brush.size,
+               brush.color);
     break;
     // Other shapes can be implemented as needed.
   }

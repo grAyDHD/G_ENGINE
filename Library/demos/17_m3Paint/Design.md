@@ -157,7 +157,7 @@ Step 7:
 [x] half max brush size
 [x] half cache size
 [x] implement fillCircle function
-[] implement circle symmetry
+[x] implement circle symmetry
 [] implement circle gradients
 [] refactor all state management into single function that is called once per switch case in main, handles inputs
 [] assembly implementations, memcopy/memset for cache?
