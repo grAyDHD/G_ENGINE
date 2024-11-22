@@ -5,12 +5,12 @@
 #include "typedefs.h"
 
 // Static global cache arrays
-static u16 pixelCache[64][64];
+static u16 pixelCache[32][32];
 static u16 guiCache[64][64];
 
 void saveToBrushCache(Brush brush) {
-  for (int x = 0; x < 64; x++) {
-    for (int y = 0; y < 64; y++) {
+  for (int x = 0; x < 32; x++) {
+    for (int y = 0; y < 32; y++) {
       pixelCache[x][y] = ((u16 *)VRAM)[(brush.coordinates.y + y) * SW +
                                        (brush.coordinates.x + x)];
     }
@@ -26,8 +26,8 @@ void saveToGUICache() {
 }
 
 void restoreFromBrushCache(Brush brush) {
-  for (int x = 0; x < 64; x++) {
-    for (int y = 0; y < 64; y++) {
+  for (int x = 0; x < 32; x++) {
+    for (int y = 0; y < 32; y++) {
       plotPixel((brush.coordinates.x + x), (brush.coordinates.y + y),
                 pixelCache[x][y]);
     }

@@ -155,7 +155,7 @@ Step 6:
 Step 7: 
     optimizations
 [x] half max brush size
-[] half cache size
+[x] half cache size
 [x] implement fillCircle function
 [] implement circle symmetry
 [] implement circle gradients
