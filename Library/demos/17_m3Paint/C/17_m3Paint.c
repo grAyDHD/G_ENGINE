@@ -24,6 +24,7 @@ int main() {
     case (DRAWING):
       if (keyTapped(ST)) {
         appState = handlePause();
+
         break;
       }
 
@@ -38,8 +39,8 @@ int main() {
         appState = changeState(SHAPES, &brush);
         break;
       } else if (keyTapped(ST)) {
-        restoreFromGUICache();
-        appState = DRAWING;
+        //        restoreFromGUICache();
+        appState = changeState(DRAWING, &brush);
         break;
       }
 
@@ -72,8 +73,8 @@ int main() {
         appState = changeState(COLORS, &brush);
         break;
       } else if (keyTapped(ST)) {
-        restoreFromGUICache();
-        appState = DRAWING;
+        //   restoreFromGUICache();
+        appState = changeState(DRAWING, &brush);
       }
 
       changeBrushSize(&brush);

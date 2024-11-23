@@ -474,12 +474,15 @@ enum MODE handlePause() {
 enum MODE changeState(enum MODE appState, Brush *brush) {
   Coordinate origin = {0, 0};
   switch (appState) {
+  case DRAWING:
+    restoreFromGUICache();
+    appState = DRAWING;
+    break;
 
   case SHAPES:
     appState = SHAPES;
     origin.x = 0;
     origin.y = 0;
-
     for (int x = 32; x > 0; x--) {
       drawRect(origin, 2 * x, 2 * x, RGB(10, 0, 12));
       origin.x++;
@@ -489,7 +492,6 @@ enum MODE changeState(enum MODE appState, Brush *brush) {
     // drawShapeGUI, drawing rectangle size of brush.size
     origin.x = 32;
     origin.y = 32;
-
     if (brush->shape == SQUARE) {
       for (int x = brush->size; x > 0; x--) {
         drawRect(origin, x, x, brush->color);
@@ -500,8 +502,8 @@ enum MODE changeState(enum MODE appState, Brush *brush) {
       fillCircle(origin.x - brush->size, origin.y - brush->size, brush->size,
                  brush->color);
     }
-
     break;
+
   case COLORS:
     drawRect(origin, 64, 64, RGB(10, 0, 12));
     appState = COLORS;
@@ -511,8 +513,8 @@ enum MODE changeState(enum MODE appState, Brush *brush) {
       origin.y++;
     }
     break;
-  case GRADIENTS:
 
+  case GRADIENTS:
     for (int x = 32; x > 0; x--) {
       drawRect(origin, 2 * x, 2 * x, RGB(20, 20, 30));
       origin.x++;

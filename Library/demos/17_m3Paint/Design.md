@@ -159,7 +159,7 @@ Step 7:
 [x] implement fillCircle function
 [x] implement circle symmetry
 [x] implement circle gradients
-[] refactor all state management into single function that is called once per switch case in main, handles inputs
+[x] refactor all state management into single function that is called once per switch case in main, handles inputs
 [] assembly implementations, memcopy/memset for cache?
 [] optimize cache save/restore operations, assembly?
 [] utilize VRAM_CACHE
