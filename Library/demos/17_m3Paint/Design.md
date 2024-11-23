@@ -160,6 +160,7 @@ Step 7:
 [x] implement circle symmetry
 [x] implement circle gradients
 [x] refactor all state management into single function that is called once per switch case in main, handles inputs
+[x] refactor headers/function definitions into multiple files
 [] assembly implementations, memcopy/memset for cache?
 [] optimize cache save/restore operations, assembly?
 [] utilize VRAM_CACHE

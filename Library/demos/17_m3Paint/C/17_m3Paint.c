@@ -1,8 +1,10 @@
-#include "../include/f.h"
+#include "../include/brush.h"
+#include "../include/drw.h"
+#include "../include/state.h"
+#include "../include/types.h"
 #include "draw.h"
-#include "engine.h"
+#include "gfx.h"
 #include "in.h"
-#include "typedefs.h"
 
 int main() {
   DSPC = MODE3 | BG2;
