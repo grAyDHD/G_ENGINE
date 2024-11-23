@@ -170,7 +170,7 @@ Step 8:
 BUGLOG:
 after refactoring handleBrush entirely to one function, may be an improper order of operations that only happens occasionally, sometimes big rectangular block of pixels gets shifted left by one pixel.
     seems to happen when directions are held and A is tapped?
-some square sizes have single empty pixel, implement better squareFill function
+some square sizes have single empty pixel, implement better squareFill function (due to odd dimensions not being divisible by 2)
 
 on clearing screen, the current brush position gets drawn
 
