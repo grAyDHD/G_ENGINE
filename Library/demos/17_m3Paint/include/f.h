@@ -67,6 +67,7 @@ void drawGradientsGUI(enum COLOR colorSelect, Brush brush);
 
 void fillCircle(int x, int y, int radius, unsigned short color);
 void drawHorizontalLine(int x_start, int x_end, int y, unsigned short color);
+void drawVerticalLine(int y_start, int y_end, int x, unsigned short color);
 
 void simpleWait(int delay);
 

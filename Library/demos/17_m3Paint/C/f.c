@@ -85,13 +85,6 @@ void handleBrushInput(Brush *brush) {
     // if (keyDown(LT) && keyDown(RT) && keyDown(A) && keyDown(B)) {
     clearScreen(*brush);
     paint(*brush);
-  } else if (keyTapped(A)) {
-    paint(*brush);
-    saveToBrushCache(*brush);
-  } else if (keyTapped(B)) {
-    erase(*brush);
-    saveToBrushCache(*brush);
-    paint(*brush);
   }
 
   if (keyHeld(U))
@@ -103,8 +96,18 @@ void handleBrushInput(Brush *brush) {
   if (keyHeld(R))
     brush->coordinates.x += 1;
 
-  // all happens AFTER coordinate update
-  // issues???
+  // Paint or erase only if LT and RT are NOT held
+  if (!keyDown(LT) && !keyDown(RT)) {
+    if (keyTapped(A)) {
+      paint(*brush);
+      saveToBrushCache(*brush);
+    } else if (keyTapped(B)) {
+      erase(*brush);
+      saveToBrushCache(*brush);
+      paint(*brush);
+    }
+  }
+
   if (keyUp(A) && keyUp(B)) { // move brush and show position
     saveToBrushCache(*brush);
     paint(*brush);
@@ -145,44 +148,143 @@ void paintGradient(Brush brush) {
   int green = GET_RED(brush.color);
   int blue = GET_RED(brush.color);
 
-  switch (brush.gradient) {
-  case VERTICAL:
-    endPoint.y += brush.size;
-    for (int x = 0; x < brush.size; x++) {
-      red += (x * brush.gradientScaleR);
-      green += (x * brush.gradientScaleG);
-      blue += (x * brush.gradientScaleB);
+  switch (brush.shape) {
+  case SQUARE:
+    switch (brush.gradient) {
+    case VERTICAL:
+      endPoint.y += brush.size;
+      for (int x = 0; x < brush.size; x++) {
+        red += (x * brush.gradientScaleR);
+        green += (x * brush.gradientScaleG);
+        blue += (x * brush.gradientScaleB);
 
-      drawLine(origin, endPoint, RGB(red, green, blue));
-      origin.x++;
-      endPoint.x++;
+        drawLine(origin, endPoint, RGB(red, green, blue));
+        origin.x++;
+        endPoint.x++;
+      }
+      break;
+
+    case PERIMETER:
+      for (int x = 0; x < brush.size / 2; x++) {
+        origin.x += 1;
+        origin.y += 1;
+
+        red += (x * brush.gradientScaleR);
+        green += (x * brush.gradientScaleG);
+        blue += (x * brush.gradientScaleB);
+        drawRect(origin, (brush.size - (2 * x)), (brush.size - (2 * x)),
+                 RGB(red, green, blue));
+      }
+      break;
+
+    case HORIZONTAL:
+      endPoint.x += brush.size;
+
+      for (int x = 0; x < brush.size; x++) {
+        red += (x * brush.gradientScaleR);
+        green += (x * brush.gradientScaleG);
+        blue += (x * brush.gradientScaleB);
+
+        drawLine(origin, endPoint, RGB(red, green, blue));
+        origin.y++;
+        endPoint.y++;
+      }
+      break;
     }
     break;
 
-  case PERIMETER:
-    for (int x = 0; x < brush.size / 2; x++) {
-      origin.x += 1;
-      origin.y += 1;
+  case CIRCLE:
+    switch (brush.gradient) {
+    case VERTICAL: {
+      int radius = brush.size;
+      int r = radius, s = 0;
+      int decisionOver2 = 1 - r;
 
-      red += (x * brush.gradientScaleR);
-      green += (x * brush.gradientScaleG);
-      blue += (x * brush.gradientScaleB);
-      drawRect(origin, (brush.size - (2 * x)), (brush.size - (2 * x)),
-               RGB(red, green, blue));
+      while (r >= s) {
+        unsigned short currentColor = RGB(red, green, blue);
+
+        // Draw vertical lines across the circle
+        // Right half
+        drawVerticalLine(origin.y - r + brush.size, origin.y + r + brush.size,
+                         origin.x + s + brush.size,
+                         currentColor); // Vertical line at x + s
+        drawVerticalLine(origin.y - s + brush.size, origin.y + s + brush.size,
+                         origin.x + r + brush.size,
+                         currentColor); // Vertical line at x + r
+
+        // Left half
+        drawVerticalLine(origin.y - r + brush.size, origin.y + r + brush.size,
+                         origin.x - s + brush.size,
+                         currentColor); // Vertical line at x - s
+        drawVerticalLine(origin.y - s + brush.size, origin.y + s + brush.size,
+                         origin.x - r + brush.size,
+                         currentColor); // Vertical line at x - r
+
+        // Update gradient color for the next lines (vertical change)
+        red += brush.gradientScaleR;
+        green += brush.gradientScaleG;
+        blue += brush.gradientScaleB;
+
+        // Adjust the decision variable for the circle
+        s++;
+        if (decisionOver2 <= 0) {
+          decisionOver2 += 2 * s + 1;
+        } else {
+          r--;
+          decisionOver2 += 2 * (s - r) + 1;
+        }
+      }
+      break;
     }
-    break;
+    case PERIMETER:
+      for (int x = brush.size; x > 0; x--) {
+        drawCircle(origin.x + brush.size, origin.y + brush.size, x,
+                   RGB(red, green, blue));
+        red += brush.gradientScaleR;
+        green += brush.gradientScaleG;
+        blue += brush.gradientScaleB;
+      }
+      break;
 
-  case HORIZONTAL:
-    endPoint.x += brush.size;
+    case HORIZONTAL: {
+      int radius = brush.size;
+      int r = radius, s = 0;
+      int decisionOver2 = 1 - r;
 
-    for (int x = 0; x < brush.size; x++) {
-      red += (x * brush.gradientScaleR);
-      green += (x * brush.gradientScaleG);
-      blue += (x * brush.gradientScaleB);
+      while (r >= s) {
+        // Adjust the gradient for each horizontal step
+        unsigned short currentColor = RGB(red, green, blue);
+        //    drawHorizontalLine(int x_start, int x_end, int y, unsigned short
+        //    color)
 
-      drawLine(origin, endPoint, RGB(red, green, blue));
-      origin.y++;
-      endPoint.y++;
+        // Top half lines
+        drawHorizontalLine(origin.x - r + brush.size, origin.x + r + brush.size,
+                           origin.y + s + brush.size, currentColor);
+        drawHorizontalLine(origin.x - s + brush.size, origin.x + s + brush.size,
+                           origin.y + r + brush.size, currentColor);
+
+        // Bottom half lines
+        drawHorizontalLine(origin.x - r + brush.size, origin.x + r + brush.size,
+                           origin.y - s + brush.size, currentColor);
+        drawHorizontalLine(origin.x - s + brush.size, origin.x + s + brush.size,
+                           origin.y - r + brush.size, currentColor);
+
+        // Update gradient color for the next lines (horizontal change)
+        red += brush.gradientScaleR;
+        green += brush.gradientScaleG;
+        blue += brush.gradientScaleB;
+
+        // Adjust the decision variable for the circle
+        s++;
+        if (decisionOver2 <= 0) {
+          decisionOver2 += 2 * s + 1;
+        } else {
+          r--;
+          decisionOver2 += 2 * (s - r) + 1;
+        }
+      }
+      break;
+    }
     }
     break;
   }
@@ -195,6 +297,7 @@ void symmetryPaint(Brush brush) {
                       (SH - brush.coordinates.y - brush.size)};
   Coordinate flipXY = {(SW - brush.coordinates.x - brush.size),
                        (SH - brush.coordinates.y - brush.size)};
+
   switch (brush.shape) {
   case SQUARE:
     drawRect(brush.coordinates, brush.size, brush.size, brush.color);
@@ -227,6 +330,15 @@ void symmetryPaint(Brush brush) {
     drawRect(origin, (brush.size - (2 * x)), (brush.size - (2 * x)),
              brush.color);
   }
+        red += (x * brush.gradientScaleR);
+        green += (x * brush.gradientScaleG);
+        blue += (x * brush.gradientScaleB);
+        red += (x * brush.gradientScaleR);
+        green += (x * brush.gradientScaleG);
+        blue += (x * brush.gradientScaleB);
+        red += (x * brush.gradientScaleR);
+        green += (x * brush.gradientScaleG);
+        blue += (x * brush.gradientScaleB);
     */
     break;
   case CIRCLE:
@@ -259,8 +371,6 @@ void manageGradientType(Brush *brush) {
     }
   }
 }
-
-void drawGradient(Brush *brush) {}
 
 Brush initiateBrush() {
   Brush brush;
@@ -681,6 +791,7 @@ void fillCircle(int x, int y, int radius, unsigned short color) {
     // Bottom half
     drawHorizontalLine(x - r, x + r, y - s, color); // Line at y - s
     drawHorizontalLine(x - s, x + s, y - r, color); // Line at y - r
+    //
 
     // Update s and adjust the decision variable
     s++;
@@ -700,6 +811,12 @@ void fillCircle(int x, int y, int radius, unsigned short color) {
 void drawHorizontalLine(int x_start, int x_end, int y, unsigned short color) {
   for (int x = x_start; x <= x_end; x++) {
     plotPixel(x, y, color); // Plot each pixel on the horizontal line
+  }
+}
+
+void drawVerticalLine(int y_start, int y_end, int x, unsigned short color) {
+  for (int y = y_start; y <= y_end; y++) {
+    plotPixel(x, y, color); // Plot each pixel on the vertical line
   }
 }
 
