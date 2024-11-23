@@ -161,6 +161,16 @@ Step 7:
 [x] implement circle gradients
 [x] refactor all state management into single function that is called once per switch case in main, handles inputs
 [x] refactor headers/function definitions into multiple files
+
+    ROADBLOCK:
+        Unsure where to begin further optimization, too much overall code.
+    SOLUTION:
+         assess all points of performance imparirment one by one, find catching point in main
+    IMPLEMENTATION:
+        [] flickering cursor: update less of cursor per frame?
+        [] circle gradient slow down: asm drawing routines? 
+        [] symmetry slowdown: asm cache operations
+
 [] assembly implementations, memcopy/memset for cache?
 [] optimize cache save/restore operations, assembly?
 [] utilize VRAM_CACHE
@@ -170,9 +180,10 @@ Step 8:
 
 BUGLOG:
 after refactoring handleBrush entirely to one function, may be an improper order of operations that only happens occasionally, sometimes big rectangular block of pixels gets shifted left by one pixel.
-    seems to happen when directions are held and A is tapped?
+seems to happen when directions are held and A is tapped?
+
 some square sizes have single empty pixel, implement better squareFill function (due to odd dimensions not being divisible by 2)
 
 on clearing screen, the current brush position gets drawn
 
-no condition to unpause from COLORS mode
+[x] no condition to unpause from COLORS mode

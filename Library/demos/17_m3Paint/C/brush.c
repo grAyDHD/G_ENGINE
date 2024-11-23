@@ -59,12 +59,15 @@ void erase(Brush brush) {
 }
 
 void handleBrushInput(Brush *brush) {
-  restoreFromBrushCache(*brush);
+  // restores area BEHIND brush, on canvas
+  // rename to restore from canvas cache?
+  // so, flickering happens by this writing to screen then drawing brush right
+  // after
+  //  restoreFromBrushCache(*brush);
 
   if (keyDown(LT) && keyDown(RT)) {
     // if (keyDown(LT) && keyDown(RT) && keyDown(A) && keyDown(B)) {
     clearScreen(*brush);
-    paint(*brush);
   }
 
   if (keyHeld(U))
