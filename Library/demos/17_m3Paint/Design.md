@@ -175,14 +175,13 @@ Step 7:
 Step 8: 
     finalize basic features/refine GUI
 DRAWING:
-[] create fillSquare (or rect) function and replace wherever needed
-[] symmetry draw - ensure other squares fill in
+    [] create fillSquare (or rect) function and replace wherever needed
+    [] symmetry draw - ensure other squares fill in
 
 COLORS:
 [x] spread color bars out evenly
-[] fill in demo squares
-[]  align B/A between RGB
-        preview to right
+[x]  align B/A between RGB, preview to right
+    [] fill in demo squares
 [x] change background color (may refine further)
 
 SHAPES:
