@@ -165,7 +165,7 @@ Step 7:
     ROADBLOCK: SOLVED
         Flickering cursor-brush not displaying clearly only near top of screen
     SOLUTION:
-        assess all points of performance imparirment one by once
+        assess all points of performance impairment one by once
         find catching point in handleBrushInput
         seems things aren't aligned with VBLANK
     IMPLEMENTATION:
@@ -186,10 +186,11 @@ COLORS:
 
 SHAPES:
 [x] change background color
-[] when changing to circle, erase square and draw circle
-[] erase circle to background color and redraw on resize
-[] erase circle when changing to square
-[] erase square to background color on redraw
+[x] when changing to circle, erase square and draw circle
+[x] erase circle to background color and redraw on resize
+[x] erase circle when changing to square
+[x] erase square to background color on redraw
+[] have shape check on input L or R
 
 GRADIENTS:
 [] ensure proper number of bars representing scaling
@@ -228,6 +229,7 @@ BASE APP FINISHED
 BUGLOG:
 after refactoring handleBrush entirely to one function, may be an improper order of operations that only happens occasionally, sometimes big rectangular block of pixels gets shifted left by one pixel.
 seems to happen when directions are held and A is tapped?
+
 
 some square sizes have single empty pixel, implement better squareFill function (due to odd dimensions not being divisible by 2)
 

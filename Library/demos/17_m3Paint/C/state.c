@@ -4,6 +4,7 @@
 #include "draw.h"
 #include "gfx.h"
 #include "in.h"
+#include "typedefs.h"
 
 static u16 pixelCache[32][32];
 static u16 guiCache[64][64];
@@ -111,13 +112,38 @@ enum MODE changeState(enum MODE appState, Brush *brush) {
 }
 
 void changeBrushShape(Brush *brush) {
+  Coordinate origin = {32, 32};
   if (keyTapped(R)) {
+
     brush->shape = CIRCLE;
-    if (brush->size > 8) {
-      brush->size = 8;
+    brush->size = (brush->size / 2);
+
+    // draw circle
+    fillCircle(origin.x - 8, origin.y - 8, brush->size, RGB(0, 0, 0));
+
+    // clear square at 32,32
+    for (int x = 0; x < 8; x++) {
+      drawRect(origin, 16 - (2 * x), 16 - (2 * x), RGB(18, 18, 28));
+      origin.x++;
+      origin.y++;
     }
+
   } else if (keyTapped(L)) {
+
     brush->shape = SQUARE;
+    brush->size = (brush->size * 2);
+
+    // clear circle
+    fillCircle(origin.x - 8, origin.y - 8, brush->size, RGB(18, 18, 28));
+
+    // todo: fillRect
+    // draw square: increments origin, must go second to reduce operations
+    for (int x = 0; x < brush->size / 2; x++) {
+      drawRect(origin, brush->size - (2 * x), brush->size - (2 * x),
+               RGB(0, 0, 0));
+      origin.x++;
+      origin.y++;
+    }
   }
 }
 
@@ -129,8 +155,7 @@ void changeBrushSize(Brush *brush) {
       drawRect(origin, brush->size, brush->size, brush->color);
     } else if (brush->shape == CIRCLE && brush->size < 8) {
       brush->size++;
-      fillCircle(origin.x - brush->size, origin.x - brush->size, brush->size,
-                 brush->color);
+      fillCircle(origin.x - 8, origin.x - 8, brush->size, RGB(0, 0, 0));
     }
   } else if (keyTapped(D)) {
     if (brush->shape == SQUARE && brush->size > 2) {
@@ -138,8 +163,7 @@ void changeBrushSize(Brush *brush) {
       drawRect(origin, brush->size, brush->size, brush->eraserColor);
       brush->size--;
     } else if (brush->shape == CIRCLE && brush->size > 2) {
-      fillCircle(origin.x - brush->size, origin.y - brush->size, brush->size,
-                 brush->eraserColor);
+      fillCircle(origin.x - 8, origin.x - 8, brush->size, RGB(18, 18, 28));
       brush->size--;
     }
   }
