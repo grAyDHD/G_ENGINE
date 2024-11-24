@@ -162,17 +162,17 @@ Step 7:
 [x] refactor all state management into single function that is called once per switch case in main, handles inputs
 [x] refactor headers/function definitions into multiple files
 
-    ROADBLOCK:
-        Unsure where to begin further optimization, too much overall code.
+    ROADBLOCK: SOLVED
+        Flickering cursor-brush not displaying clearly only near top of screen
     SOLUTION:
-         assess all points of performance imparirment one by one, find catching point in main
+        assess all points of performance imparirment one by once
+        find catching point in handleBrushInput
+        seems things aren't aligned with VBLANK
     IMPLEMENTATION:
-        [] flickering cursor: update less of cursor per frame?
-        [] circle gradient slow down: asm drawing routines? 
-        [] symmetry slowdown: asm cache operations
+        shortened loops in cache operations based on brush size.
+        issue: this bug will likely return at larger brush size, asm will resolve
 
-[] assembly implementations, memcopy/memset for cache?
-[] optimize cache save/restore operations, assembly?
+[] assembly implementations for cache: memcopy32
 [] utilize VRAM_CACHE
 
 Step 8:
