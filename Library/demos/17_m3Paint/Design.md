@@ -2,9 +2,9 @@ This is a painting program. The player can cycle between paintbrush shapes, as w
 A minimum and maximum size will be set dependant on smallest recognizable drawing of each shape.
 These are the shapes:
   square/rectangle
-  triangle 
   circle
   hexagon
+  triangle 
 I'll use asesprite to test draw various sizes for each of these.
 The player can choose between a solid and a gradient, as well as select color with RGB sliders ranging 0-31 each 
 In color selection mode, there is given a selection of gradients based upon the chosen RGB value
@@ -172,11 +172,54 @@ Step 7:
         shortened loops in cache operations based on brush size.
         issue: this bug will likely return at larger brush size, asm will resolve
 
+Step 8: 
+    finalize basic features/refine GUI
+DRAWING:
+[] symmetry draw - ensure other squares fill in
+
+COLORS:
+[] spread color bars out evenly
+[] fill in demo squares and align B/A between RGBpreview
+    preview to right
+[] change background color
+
+SHAPES:
+[] change background color
+[] when changing to circle, erase square and draw circle
+[] erase circle to background color and redraw on resize
+[] erase circle when changing to square
+[] erase square to background color on redraw
+
+GRADIENTS:
+[] ensure proper number of bars representing scaling
+[] align third bar over blue scaler square
+[] fill unselected green/blue scaler squares with green/blue
+[] have circles follow gradient scaling of squares
+
+    FEATURE IDEA:
+        Gradient toggle button, for two forms of gradient:
+        Smooth (current circle gradient scaling)
+        Harsh (current square gradient scaling)
+        4th selector, is two way toggle, up or down
+
+    FEATURE IDEA:
+        Gradient symmetry on holding LT && RT
+        Will require major optimizations for circles 
+
+BASE APP FINISHED
+----------------------------------------------------
+    Additional Features
+
+[] Gradient symmetry
+[] Gradient toggle
+[] hexagon implementation
+[] rotational symmetry?
+[] diagonal gradients
+[] reverse gradient directions
 [] assembly implementations for cache: memcopy32
 [] utilize VRAM_CACHE
-
-Step 8:
-    additional features?
+[] optimize square drawing
+[] asm circle drawing?  fillCircle and drawCircle
 
 BUGLOG:
 after refactoring handleBrush entirely to one function, may be an improper order of operations that only happens occasionally, sometimes big rectangular block of pixels gets shifted left by one pixel.
@@ -184,6 +227,6 @@ seems to happen when directions are held and A is tapped?
 
 some square sizes have single empty pixel, implement better squareFill function (due to odd dimensions not being divisible by 2)
 
-on clearing screen, the current brush position gets drawn
+[x] on clearing screen, the current brush position gets drawn
 
 [x] no condition to unpause from COLORS mode
