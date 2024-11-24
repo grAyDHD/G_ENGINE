@@ -1,8 +1,10 @@
-#include "../include/f.h"
+#include "../include/brush.h"
+#include "../include/drw.h"
+#include "../include/state.h"
+#include "../include/types.h"
 #include "draw.h"
-#include "engine.h"
+#include "gfx.h"
 #include "in.h"
-#include "typedefs.h"
 
 int main() {
   DSPC = MODE3 | BG2;
@@ -11,6 +13,7 @@ int main() {
   Brush brush = initiateBrush();
   enum MODE appState = DRAWING;
   enum COLOR colorSelect = RED;
+  Coordinate origin = {0, 0};
 
   clearScreen(brush);
 
@@ -23,6 +26,7 @@ int main() {
     case (DRAWING):
       if (keyTapped(ST)) {
         appState = handlePause();
+
         break;
       }
 
@@ -35,6 +39,10 @@ int main() {
         break;
       } else if (keyTapped(RT)) {
         appState = changeState(SHAPES, &brush);
+        break;
+      } else if (keyTapped(ST)) {
+        //        restoreFromGUICache();
+        appState = changeState(DRAWING, &brush);
         break;
       }
 
@@ -67,18 +75,27 @@ int main() {
         appState = changeState(COLORS, &brush);
         break;
       } else if (keyTapped(ST)) {
-        restoreFromGUICache();
-        appState = DRAWING;
+        //   restoreFromGUICache();
+        appState = changeState(DRAWING, &brush);
       }
 
       changeBrushSize(&brush);
       changeBrushShape(&brush);
-
       break;
     case (GRADIENTS):
-      // set horizontal gradient
-      manageGradientType(&brush);
-      // handleState
+
+      colorSelect = handleColorSelection(colorSelect);
+      handleGradientControls(colorSelect, &brush);
+
+      // todo- in GUI function, align black squares, remove black squares;
+      drawGradientsGUI(colorSelect, brush);
+
+      origin = brush.coordinates;
+      brush.coordinates.x = 0;
+      brush.coordinates.y = 0;
+      paintGradient(brush);
+      brush.coordinates = origin;
+
       if (keyTapped(LT)) {
         appState = changeState(COLORS, &brush);
       } else if (keyTapped(RT)) {

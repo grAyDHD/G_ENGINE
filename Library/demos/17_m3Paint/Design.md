@@ -2,7 +2,6 @@ This is a painting program. The player can cycle between paintbrush shapes, as w
 A minimum and maximum size will be set dependant on smallest recognizable drawing of each shape.
 These are the shapes:
   square/rectangle
-  triangle 
   circle
   hexagon
 I'll use asesprite to test draw various sizes for each of these.
@@ -133,19 +132,19 @@ Step 6:
 [x]  implement single gradiant variation in color selection
 [x]     hold LT + A, draw with gradient
 [x]  implement multiple gradient variations/patterns?
-[]  implement parameters in GRADIENTS mode:
+[x]  implement parameters in GRADIENTS mode:
     (first color is brush color, each successive color scaled for gradient)
-    [] red scaling 
-    [] blue scaling
-    [] green scaling
-[] implement preview of current gradient/shape/pattern
+    [x] red scaling 
+    [x] blue scaling
+    [x] green scaling
+[x] implement preview of current gradient/shape/pattern
 
-    ROADBLOCK:
+    ROADBLOCK: SOLVED
         handling gradient scaling
     SOLUTION:
         making decisions through trial and error once GUI is implemented
     IMPLEMENTATION:
-        determine min/max scaler values (trial and error, negative values?)
+        determine min/max scaler values (trial and error)
         decide if I want to loop back around when surpassing 31 color value, or keep at 31 for further colors
         implement inputs in GRADIENTS mode to select scaler and increment/decrement scaler value
         three stacks of vertical squares, one per scaler value per color scaler
@@ -153,25 +152,101 @@ Step 6:
     
 
 Step 7: 
-    optimization/expansion time
-[] implement fillCircle function
-[] assembly implementations, memcopy/memset for cache?
+    optimizations
+[x] half max brush size
+[x] half cache size
+[x] implement fillCircle function
+[x] implement circle symmetry
+[x] implement circle gradients
+[x] refactor all state management into single function that is called once per switch case in main, handles inputs
+[x] refactor headers/function definitions into multiple files
+
+    ROADBLOCK: SOLVED
+        Flickering cursor-brush not displaying clearly only near top of screen
+    SOLUTION:
+        assess all points of performance impairment one by once
+        find catching point in handleBrushInput
+        seems things aren't aligned with VBLANK
+    IMPLEMENTATION:
+        shortened loops in cache operations based on brush size.
+        issue: this bug will likely return at larger brush size, asm will resolve
+
+Step 8: 
+    finalize basic features/refine GUI
+DRAWING:
+
+COLORS:
+[x] spread color bars out evenly
+[x]  align B/A between RGB, preview to right
+[x] change background color (may refine further)
+
+SHAPES:
+[x] change background color
+[x] when changing to circle, erase square and draw circle
+[x] erase circle to background color and redraw on resize
+[x] erase circle when changing to square
+[x] erase square to background color on redraw
+[] have shape check on input L or R
+
+GRADIENTS:
+[x] ensure proper number of bars representing scaling
+[x] align third bar over blue scaler square
+[x] fill unselected green/blue scaler squares with green/blue
+
+    [] create fillSquare (or rect) function and replace wherever needed
+    [] symmetry draw - ensure other squares fill in
+    [] fill in COLORS demo squares
+    [] all other places to use fillSquare
+
+    may further refine colors in GUI
+
+BASE APP FINISHED
+----------------------------------------------------
+    Additional Features
+
+    FEATURE IDEA:
+        Gradient toggle button, for two forms of gradient:
+        Smooth (current circle gradient scaling)
+Harsh (current square gradient scaling)
+        4th selector, is two way toggle, up or down
+
+    FEATURE IDEA:
+        Gradient symmetry on holding LT && RT
+        Will require major optimizations for circles 
+
+    OPTIMIZATION IDEA:
+        Current brushCache is actually the canvas cache (will rename) 
+        Create brushCache in addition to canvas cache for gradients
+        This will ensure fewer operations per draw, set cache in GUI
+
+[] Gradient toggle (toggles how gradient scales)
+[] diagonal gradients (new GRADIENT case)
+[] reverse gradient directions (toggleable option in GRADIENTS)
+[] Gradient symmetry
+
+
 [] utilize VRAM_CACHE
-[] optimize cache save/restore operations, assembly?
-[] half max brush size to reduce cache size by half
-[] implement circle symmetry
-[] implement circle gradients
-[] refactor all state management into single function that is called once per switch case in main, handles inputs
+[] assembly implementations for cache: memcopy32
+[] asm circle drawing?  fillCircle and drawCircle
+[] optimize square drawing
 
-Step 8:
-    add HEXAGONS:
+[] holding LT: preview gradient - this should be straightforward
+[] holding RT: preview symmetry - this will require 3 additional canvas caches.
 
+[] with improved cache restoriation, utilize larger cache for larger max brush size?
+    [] calculate how much available space in VRAM mode 3
+
+[] hexagon implementation
 
 BUGLOG:
 after refactoring handleBrush entirely to one function, may be an improper order of operations that only happens occasionally, sometimes big rectangular block of pixels gets shifted left by one pixel.
-    seems to happen when directions are held and A is tapped?
-some square sizes have single empty pixel, implement better squareFill function
+seems to happen when directions are held and A is tapped?
 
-on clearing screen, the current brush position gets drawn
 
-no condition to unpause from COLORS mode
+some square sizes have single empty pixel, implement better squareFill function (due to odd dimensions not being divisible by 2)
+
+when reducing square size and unpausing, previous square size drawn on unpausing
+
+
+[x] on clearing screen, the current brush position gets drawn
+[x] no condition to unpause from COLORS mode
