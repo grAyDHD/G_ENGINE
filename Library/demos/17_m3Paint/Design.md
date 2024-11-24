@@ -175,13 +175,10 @@ Step 7:
 Step 8: 
     finalize basic features/refine GUI
 DRAWING:
-    [] create fillSquare (or rect) function and replace wherever needed
-    [] symmetry draw - ensure other squares fill in
 
 COLORS:
 [x] spread color bars out evenly
 [x]  align B/A between RGB, preview to right
-    [] fill in demo squares
 [x] change background color (may refine further)
 
 SHAPES:
@@ -193,11 +190,20 @@ SHAPES:
 [] have shape check on input L or R
 
 GRADIENTS:
-[] ensure proper number of bars representing scaling
-[] align third bar over blue scaler square
-[] fill unselected green/blue scaler squares with green/blue
+[x] ensure proper number of bars representing scaling
+[x] align third bar over blue scaler square
+[x] fill unselected green/blue scaler squares with green/blue
+
+    [] create fillSquare (or rect) function and replace wherever needed
+    [] symmetry draw - ensure other squares fill in
+    [] fill in COLORS demo squares
+    [] all other places to use fillSquare
 
     may further refine colors in GUI
+
+BASE APP FINISHED
+----------------------------------------------------
+    Additional Features
 
     FEATURE IDEA:
         Gradient toggle button, for two forms of gradient:
@@ -208,11 +214,6 @@ GRADIENTS:
     FEATURE IDEA:
         Gradient symmetry on holding LT && RT
         Will require major optimizations for circles 
-
-BASE APP FINISHED
-----------------------------------------------------
-    Additional Features
-
 [] Gradient symmetry
 [] Gradient toggle
 [] hexagon implementation
@@ -225,6 +226,8 @@ BASE APP FINISHED
 [] asm circle drawing?  fillCircle and drawCircle
 [] holding LT: preview gradient
 [] holding RT: preview symmetry?
+[] with improved cache restoriation, utilize larger cache for larger max brush size
+    [] calculate how much available space in VRAM mode 3
 
 BUGLOG:
 after refactoring handleBrush entirely to one function, may be an improper order of operations that only happens occasionally, sometimes big rectangular block of pixels gets shifted left by one pixel.
@@ -237,5 +240,4 @@ when reducing square size and unpausing, previous square size drawn on unpausing
 
 
 [x] on clearing screen, the current brush position gets drawn
-
 [x] no condition to unpause from COLORS mode

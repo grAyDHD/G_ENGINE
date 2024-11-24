@@ -38,7 +38,7 @@ void drawGradientsGUI(enum COLOR colorSelect, Brush brush) {
   } else {
     origin.x++;
     origin.y++;
-    drawRect(origin, 2, 2, RGB(31, 0, 0));
+    drawRect(origin, 2, 2, RGB(0, 31, 0));
     origin.x--;
     origin.y--;
   }
@@ -54,7 +54,7 @@ void drawGradientsGUI(enum COLOR colorSelect, Brush brush) {
   } else {
     origin.x++;
     origin.y++;
-    drawRect(origin, 2, 2, RGB(31, 0, 0));
+    drawRect(origin, 2, 2, RGB(0, 0, 31));
     origin.x--;
     origin.y--;
   }
@@ -63,7 +63,7 @@ void drawGradientsGUI(enum COLOR colorSelect, Brush brush) {
   origin.x = 12; // y = 56
   for (int x = 0; x < 4; x++) {
     origin.y -= 6;
-    if (brush.gradientScaleR >= x) {
+    if (brush.gradientScaleR > x) {
       drawRect(origin, 4, 2, 0);
     } else {
       drawRect(origin, 4, 2, RGB(20, 20, 30));
@@ -74,19 +74,18 @@ void drawGradientsGUI(enum COLOR colorSelect, Brush brush) {
   origin.y = 56; // y = 56
   for (int x = 0; x < 4; x++) {
     origin.y -= 6;
-    if (brush.gradientScaleG >= x) {
+    if (brush.gradientScaleG > x) {
       drawRect(origin, 4, 2, 0);
     } else {
       drawRect(origin, 4, 2, RGB(20, 20, 30));
     }
   }
-  origin.x += 12;
 
   origin.x += 12;
   origin.y = 56; // y = 56
   for (int x = 0; x < 4; x++) {
     origin.y -= 6;
-    if (brush.gradientScaleB >= x) {
+    if (brush.gradientScaleB > x) {
       drawRect(origin, 4, 2, 0);
     } else {
       drawRect(origin, 4, 2, RGB(20, 20, 30));
