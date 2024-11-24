@@ -4,7 +4,6 @@ These are the shapes:
   square/rectangle
   circle
   hexagon
-  triangle 
 I'll use asesprite to test draw various sizes for each of these.
 The player can choose between a solid and a gradient, as well as select color with RGB sliders ranging 0-31 each 
 In color selection mode, there is given a selection of gradients based upon the chosen RGB value
@@ -208,26 +207,36 @@ BASE APP FINISHED
     FEATURE IDEA:
         Gradient toggle button, for two forms of gradient:
         Smooth (current circle gradient scaling)
-        Harsh (current square gradient scaling)
+Harsh (current square gradient scaling)
         4th selector, is two way toggle, up or down
 
     FEATURE IDEA:
         Gradient symmetry on holding LT && RT
         Will require major optimizations for circles 
+
+    OPTIMIZATION IDEA:
+        Current brushCache is actually the canvas cache (will rename) 
+        Create brushCache in addition to canvas cache for gradients
+        This will ensure fewer operations per draw, set cache in GUI
+
+[] Gradient toggle (toggles how gradient scales)
+[] diagonal gradients (new GRADIENT case)
+[] reverse gradient directions (toggleable option in GRADIENTS)
 [] Gradient symmetry
-[] Gradient toggle
-[] hexagon implementation
-[] rotational symmetry?
-[] diagonal gradients
-[] reverse gradient directions
-[] assembly implementations for cache: memcopy32
+
+
 [] utilize VRAM_CACHE
-[] optimize square drawing
+[] assembly implementations for cache: memcopy32
 [] asm circle drawing?  fillCircle and drawCircle
-[] holding LT: preview gradient
-[] holding RT: preview symmetry?
-[] with improved cache restoriation, utilize larger cache for larger max brush size
+[] optimize square drawing
+
+[] holding LT: preview gradient - this should be straightforward
+[] holding RT: preview symmetry - this will require 3 additional canvas caches.
+
+[] with improved cache restoriation, utilize larger cache for larger max brush size?
     [] calculate how much available space in VRAM mode 3
+
+[] hexagon implementation
 
 BUGLOG:
 after refactoring handleBrush entirely to one function, may be an improper order of operations that only happens occasionally, sometimes big rectangular block of pixels gets shifted left by one pixel.
