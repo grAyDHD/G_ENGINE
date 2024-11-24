@@ -175,16 +175,18 @@ Step 7:
 Step 8: 
     finalize basic features/refine GUI
 DRAWING:
+[] create fillSquare (or rect) function and replace wherever needed
 [] symmetry draw - ensure other squares fill in
 
 COLORS:
-[] spread color bars out evenly
-[] fill in demo squares and align B/A between RGBpreview
-    preview to right
-[] change background color
+[x] spread color bars out evenly
+[] fill in demo squares
+[]  align B/A between RGB
+        preview to right
+[x] change background color (may refine further)
 
 SHAPES:
-[] change background color
+[x] change background color
 [] when changing to circle, erase square and draw circle
 [] erase circle to background color and redraw on resize
 [] erase circle when changing to square
@@ -194,7 +196,8 @@ GRADIENTS:
 [] ensure proper number of bars representing scaling
 [] align third bar over blue scaler square
 [] fill unselected green/blue scaler squares with green/blue
-[] have circles follow gradient scaling of squares
+
+    may further refine colors in GUI
 
     FEATURE IDEA:
         Gradient toggle button, for two forms of gradient:
@@ -220,12 +223,17 @@ BASE APP FINISHED
 [] utilize VRAM_CACHE
 [] optimize square drawing
 [] asm circle drawing?  fillCircle and drawCircle
+[] holding LT: preview gradient
+[] holding RT: preview symmetry?
 
 BUGLOG:
 after refactoring handleBrush entirely to one function, may be an improper order of operations that only happens occasionally, sometimes big rectangular block of pixels gets shifted left by one pixel.
 seems to happen when directions are held and A is tapped?
 
 some square sizes have single empty pixel, implement better squareFill function (due to odd dimensions not being divisible by 2)
+
+when reducing square size and unpausing, previous square size drawn on unpausing
+
 
 [x] on clearing screen, the current brush position gets drawn
 

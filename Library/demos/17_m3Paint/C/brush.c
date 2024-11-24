@@ -283,6 +283,7 @@ void symmetryPaint(Brush brush) {
 
   switch (brush.shape) {
   case SQUARE:
+    // todo: implement fillSquare instead of drawRect
     drawRect(brush.coordinates, brush.size, brush.size, brush.color);
     drawRect(flipX, brush.size, brush.size, brush.color);
     drawRect(flipY, brush.size, brush.size, brush.color);

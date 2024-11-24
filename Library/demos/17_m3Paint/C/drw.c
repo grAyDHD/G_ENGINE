@@ -144,24 +144,26 @@ void drawColorPreview(Brush brush, int color) {
   Coordinate origin;
 
   // draw demo eraser
-  origin.x = 10;
+  origin.x = 14;
   origin.y = 48;
-  drawRect(origin, 5, 5, brush.eraserColor);
+  // todo: fillRect rather than draw
+  drawRect(origin, 8, 8, brush.eraserColor);
 
   // draw demo brush
-  origin.x = 18;
-  drawRect(origin, 5, 5, brush.color);
+  origin.x = 32;
+  drawRect(origin, 8, 8, brush.color);
 
   // draw demo RGB value
-  origin.x = 40;
-  drawRect(origin, 5, 5, color);
+  origin.x = 51;
+  origin.y -= 16;
+  drawRect(origin, 8, 8, color);
 }
 
 void drawColorSliders(enum COLOR colorSelect, int red, int green, int blue) {
   Coordinate origin;
 
   // RED slider
-  origin.x = 8;
+  origin.x = 10;
   origin.y = 8;
   if (colorSelect == RED) {
     drawRect(origin, 8, 34, RGB(31, 31, 31));
@@ -173,7 +175,7 @@ void drawColorSliders(enum COLOR colorSelect, int red, int green, int blue) {
     drawRect(origin, 8, 34, RGB(0, 0, 0));
   }
 
-  origin.x = 9;
+  origin.x = 11;
   origin.y = 9;
   for (int x = 0; x < 32; x++) {
     drawRect(origin, 6, 1, RGB(x, 0, 0));
@@ -181,7 +183,7 @@ void drawColorSliders(enum COLOR colorSelect, int red, int green, int blue) {
   }
 
   // GREEN slider
-  origin.x = 20;
+  origin.x = 24;
   origin.y = 8;
   if (colorSelect == GREEN) {
     drawRect(origin, 8, 34, RGB(31, 31, 31));
@@ -193,7 +195,7 @@ void drawColorSliders(enum COLOR colorSelect, int red, int green, int blue) {
     drawRect(origin, 8, 34, RGB(0, 0, 0));
   }
 
-  origin.x = 21;
+  origin.x = 25;
   origin.y = 9;
   for (int x = 0; x < 32; x++) {
     drawRect(origin, 6, 1, RGB(0, x, 0));
@@ -201,7 +203,7 @@ void drawColorSliders(enum COLOR colorSelect, int red, int green, int blue) {
   }
 
   // BLUE slider
-  origin.x = 32;
+  origin.x = 38;
   origin.y = 8;
   if (colorSelect == BLUE) {
     drawRect(origin, 8, 34, RGB(31, 31, 31));
@@ -213,7 +215,7 @@ void drawColorSliders(enum COLOR colorSelect, int red, int green, int blue) {
     drawRect(origin, 8, 34, RGB(0, 0, 0));
   }
 
-  origin.x = 33;
+  origin.x = 39;
   origin.y = 9;
   for (int x = 0; x < 32; x++) {
     drawRect(origin, 6, 1, RGB(0, 0, x));

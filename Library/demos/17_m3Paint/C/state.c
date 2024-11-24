@@ -69,7 +69,7 @@ enum MODE changeState(enum MODE appState, Brush *brush) {
     origin.x = 0;
     origin.y = 0;
     for (int x = 32; x > 0; x--) {
-      drawRect(origin, 2 * x, 2 * x, RGB(10, 0, 12));
+      drawRect(origin, 2 * x, 2 * x, RGB(18, 18, 28));
       origin.x++;
       origin.y++;
     }
@@ -90,7 +90,6 @@ enum MODE changeState(enum MODE appState, Brush *brush) {
     break;
 
   case COLORS:
-    drawRect(origin, 64, 64, RGB(10, 0, 12));
     appState = COLORS;
     for (int x = 32; x > 0; x--) {
       drawRect(origin, 2 * x, 2 * x, RGB(10, 10, 5));
