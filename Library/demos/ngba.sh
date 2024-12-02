@@ -79,7 +79,7 @@ cat > "$PROJECT_MAIN_C" << EOL
 #include "gfx.h"
 
 int main() {
-    DSPC = PROJECT_VIDEO_MODE;
+    DSPC = ${VIDEO_MODE};
 
     return 0;
 }
