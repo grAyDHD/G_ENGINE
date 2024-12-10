@@ -43,7 +43,7 @@ int main() {
   DSPC = MODE3 | BG2;
 
   m3_Background(BedroomBitmap);
-  SpriteFrame32Bit(64, 64, 3, ChocoboJoyfulBitmap, 4);
+  SpriteFrame32Bit(64, 64, 0, ChocoboJoyfulBitmap, 4);
 
   // Start by drawing a background, with cache for each player.
   // decide upon sprites to use until making own
