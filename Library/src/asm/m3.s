@@ -28,3 +28,21 @@ fillScreen:
   bx lr
 
   .size fillScreen, .-fillScreen
+
+.global m3_Background
+.type m3_Background, %function
+@ m3_Background(const void *src)
+
+m3_Background: @r0 is image src, r1 dest
+  push {r3-r12}
+  ldr r1, =0x6000000 @vram base address
+  mov r2, #1920 @number of total writes to fill screen
+.Ldraw:
+  ldmia r0!, {r3-r12} @10 words loaded from src image
+  stmia r1!, {r3-r12} @writes 10 loaded words to vram
+  subs r2, r2, #1
+  bhi .Ldraw
+  pop {r3-r12}
+  bx lr
+
+  .size m3_Background, .-m3_Background

@@ -1,6 +1,18 @@
-#include "../includes/characterAnimator.h"
+#include "../build/Bedroom.h"
+
+#include "../build/ChocoboJoyful.h"
+#include "../build/ChocoboWalkingLeft.h"
+#include "../build/ChocoboWalkingRight.h"
+
+#include "../build/PkmnSlvrGirlWalkingDown.h"
+#include "../build/PkmnSlvrGirlWalkingLeft.h"
+#include "../build/PkmnSlvrGirlWalkingRight.h"
+#include "../build/PkmnSlvrGirlWalkingUp.h"
+
 #include "gfx.h"
 #include "typedefs.h"
+
+extern void m3_Background(const void *src);
 
 // NPC
 //  DIRECTION, Up or down when walking, with a check for position when to turn
@@ -24,8 +36,15 @@ typedef struct {
   Coordinate coordinate;
 } Character;
 
+extern void SpriteFrame32Bit(int x, int y, int frame, const void *image,
+                             int frameCount);
+
 int main() {
   DSPC = MODE3 | BG2;
+
+  m3_Background(BedroomBitmap);
+  SpriteFrame32Bit(64, 64, 3, ChocoboJoyfulBitmap, 4);
+
   // Start by drawing a background, with cache for each player.
   // decide upon sprites to use until making own
   // cfind asm func to draw animation frame, adapt to meet needs of this program
