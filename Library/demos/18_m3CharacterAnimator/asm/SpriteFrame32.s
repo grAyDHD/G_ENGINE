@@ -2,7 +2,7 @@
 .global SpriteFrame32Bit
 .type SpriteFrame32Bit, %function
 
-@ Currently handles 4 frame animations of 16x16 sprite size
+@ Currently handles 4 frame animations of 32x32 sprite size
 
 @ SpriteFrame32Bit(int x, int y, int frame, const void *image, int frameCount)
 @ r0 = x

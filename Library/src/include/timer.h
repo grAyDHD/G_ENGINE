@@ -27,4 +27,6 @@ typedef struct {
 // Pointer to timer array
 #define TIMER ((TMR *)0x04000100)
 
+void simpleWait(int delay);
+
 #endif
