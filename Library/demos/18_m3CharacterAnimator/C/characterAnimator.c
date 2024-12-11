@@ -20,17 +20,17 @@ int main() {
 
     VBLANK();
     SpriteFrame32Bit(64, 64, 1, ChocoboJoyfulBitmap, 4);
-    //  fillFrameBackground(64, 64, 32, BedroomBitmap);
+    fillFrameBackground(64, 64, 32, BedroomBitmap);
     simpleWait(100);
 
     VBLANK();
     SpriteFrame32Bit(64, 64, 2, ChocoboJoyfulBitmap, 4);
-    //  fillFrameBackground(64, 64, 32, BedroomBitmap);
+    fillFrameBackground(64, 64, 32, BedroomBitmap);
     simpleWait(100);
 
     VBLANK();
     SpriteFrame32Bit(64, 64, 3, ChocoboJoyfulBitmap, 4);
-    // fillFrameBackground(64, 64, 32, BedroomBitmap);
+    fillFrameBackground(64, 64, 32, BedroomBitmap);
     simpleWait(100);
   }
 
