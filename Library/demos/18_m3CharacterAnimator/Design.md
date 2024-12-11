@@ -13,15 +13,22 @@ Step 1:
 [x] draw background
 [x] adapt sprite frame function to handle 32 bit sprites
 [x] draw NPC
-[] implement function to refill sprite background
-[] move NPC on timer- down down up up
+[x] implement function to refill sprite background
+[] move NPC on timer- right right left left
 [] update NPC sprite direction on direction change
-[] animate NPC, 2 frames per single square of movement
 
 
 
 
-Step 1:
+
+
+Step 2:
+ Implement player character with movement
+[] draw player Character
+[] update position on d pad input
+[] update sprite direction to match
+
+Step 3:
     set up state machines for player character and NPC:
     Player animations- 4 direction (idle, move, jump, action).
     Npc animations- 2 directions up/down (move)
@@ -29,12 +36,7 @@ Step 1:
 [] set up NPC state machine
 [] set up didrection state machine
 
-
-Step 3:
- Implement player character with movement
-[] draw player Character
-[] update position on d pad input
-[] update sprite direction to match
+[] animate NPC, 2 frames per single square of movement
 [] animate player
 
 Step 4: 
