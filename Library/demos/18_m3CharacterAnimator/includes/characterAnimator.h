@@ -24,7 +24,7 @@ typedef struct {
 } CharacterSprites;
 
 typedef enum { UP, DOWN, LEFT, RIGHT } DIRECTION;
-typedef enum { IDLE, WALK, TALKING } STATE;
+typedef enum { IDLE, WALK, TALK } STATE;
 
 typedef struct {
   Coordinate coordinate;
@@ -52,13 +52,13 @@ const void *chocoboSprites[NUM_STATES][NUM_DIRECTIONS] = {
     [IDLE] = {0, 0, 0, 0},
     [WALK] =
         {
-            0, // up
+            0, // ChocoboWalkingUpBitmap
+            0, // ChocoboWalkingDownBitmap
             ChocoboWalkingLeftBitmap,
-            0, // down
             ChocoboWalkingRightBitmap,
         },
-    [TALKING] = {ChocoboJoyfulBitmap, ChocoboJoyfulBitmap, ChocoboJoyfulBitmap,
-                 ChocoboJoyfulBitmap}};
+    [TALK] = {ChocoboJoyfulBitmap, ChocoboJoyfulBitmap, ChocoboJoyfulBitmap,
+              ChocoboJoyfulBitmap}};
 
 extern void m3_Background(const void *src);
 extern void SpriteFrame32Bit(int x, int y, int frame, const void *image,

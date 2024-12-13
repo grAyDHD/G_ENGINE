@@ -15,9 +15,8 @@ Step 1:
 [x] draw NPC
 [x] implement function to refill sprite background
 [x] move NPC right
-[] update NPC sprite direction on direction change
-[] move NPC left
-
+[x] update NPC sprite direction on direction change
+[x] move NPC left
 
 Step 2:
 [x] set up Character structs that handle sprites
