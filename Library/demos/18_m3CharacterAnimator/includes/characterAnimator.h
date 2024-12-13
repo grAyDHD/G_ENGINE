@@ -27,9 +27,11 @@ typedef enum { UP, DOWN, LEFT, RIGHT } DIRECTION;
 typedef enum { IDLE, WALK, TALKING } STATE;
 
 typedef struct {
+  Coordinate coordinate;
+
   DIRECTION direction;
   STATE state;
-  Coordinate coordinate;
+
   CharacterSprites sprites;       // struct array of pointers
   const void *currentSpriteSheet; // pointer to active sprite
 } Character;
@@ -63,7 +65,7 @@ const void *chocoboSprites[NUM_STATES][NUM_DIRECTIONS] = {
 extern void m3_Background(const void *src);
 extern void SpriteFrame32Bit(int x, int y, int frame, const void *image,
                              int frameCount);
-extern void fillFrameBackground(int x, int y, int size, const void *image);
+extern void restoreFrameBackground(int x, int y, int size, const void *image);
 extern void clearSpriteFrame(int x, int y, int size, const void *image);
 
 #endif // CHARACTERANIMATOR_H

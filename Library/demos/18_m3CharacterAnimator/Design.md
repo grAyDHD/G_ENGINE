@@ -36,3 +36,5 @@ Step 4:
  implement interactions
 [] player npc collision handling
 [] press A to talk to NPC (NPC saves current direction to turn to player, turn back after dialogue)
+
+    ROADBLOCK: 

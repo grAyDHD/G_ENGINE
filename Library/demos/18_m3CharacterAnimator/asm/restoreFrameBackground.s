@@ -1,19 +1,19 @@
 .arm
-.global fillFrameBackground
-.type fillFrameBackground, %function
+.global restoreFrameBackground
+.type restoreFrameBackground, %function
 
   @ Steps: first, take x/y coordinates of parameters, calculate proper vram starting offset
   @ then loop row by row, any pixels of color value used for transparency layer-
   @ are set to mathing pixel from background image data
   @ but no vram offset used in that part of calculation
 
-@ fillFrameBackground(int x, int y, int size, const void *IMAGE)
+@ restoreFrameBackground(int x, int y, int size, const void *IMAGE)
 @ r0 = x
 @ r1 = y
 @ r2 = size
 @ r3 = image (pointer to sprite sheet)
 
-fillFrameBackground:
+restoreFrameBackground:
   push {r4-r11}  @ 8 registers, 32 bits or 4 bytes each = 32 bytes onto stack
 
   @ Step 1: calculate VRAM  and IMAGE offsets
@@ -71,7 +71,7 @@ SkipRestore:
   pop {r4-r11}
   bx lr
 
-.size fillFrameBackground, .-fillFrameBackground
+.size restoreFrameBackground, .-restoreFrameBackground
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 .global clearSpriteFrame
