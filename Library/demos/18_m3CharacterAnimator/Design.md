@@ -19,22 +19,15 @@ Step 1:
 
 
 
-
-
-
 Step 2:
+[x] set up Character structs that handle sprites
+
+Step 3:
  Implement player character with movement
 [] draw player Character
 [] update position on d pad input
 [] update sprite direction to match
 
-Step 3:
-    set up state machines for player character and NPC:
-    Player animations- 4 direction (idle, move, jump, action).
-    Npc animations- 2 directions up/down (move)
-[] set up PLAYER state machine
-[] set up NPC state machine
-[] set up didrection state machine
 
 [] animate NPC, 2 frames per single square of movement
 [] animate player
