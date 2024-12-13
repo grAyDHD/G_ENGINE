@@ -14,9 +14,9 @@ Step 1:
 [x] adapt sprite frame function to handle 32 bit sprites
 [x] draw NPC
 [x] implement function to refill sprite background
-[] move NPC on timer- right right left left
+[x] move NPC right
 [] update NPC sprite direction on direction change
-
+[] move NPC left
 
 
 Step 2:
