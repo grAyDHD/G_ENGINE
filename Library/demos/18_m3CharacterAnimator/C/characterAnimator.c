@@ -17,35 +17,6 @@ int main() {
 
   while (1) {
     VBLANK();
-
-    // SpriteFrame32Bit(chocoboX, chocoboY, 0, chocobo.currentSpriteSheet, 4);
-    // coordinate x,coordinate y,currentFrame(0indexed),
-    // currentSpriteSheet,framecount
-
-    // restoreFrameBackground(chocoboX, chocoboY, 32, BedroomBitmap);
-    // coordinate x, coordinate y, spriteSize(pxl dimensions), background image
-
-    // Create new function in assembly that merges restoreFrameBackground into
-    // SpriteFrame32Bit reduce number of needed arguments for functionality to
-    // minimize direct stack interaction x and y into Coordinates struct with x
-    // and y properties (how to access specific struct member in asm???) add
-    // frameNumber property to character struct? pass Character as argument,
-    // frameCount, and background image assume 32bit sprites only, will adapt
-    // later to accept a sprite size parameter avoiding sprite size initially
-    // when merging functions for simplicity. how to access various struct
-    // members? Character struct contains: Coordinate struct with x and y
-    // DIRECTION enum
-    // STATE enum
-    // CharacterSprites struct with array of pointers
-    // currentSpriteSheet pointer to currently active sprite sheet
-    // and potentially- int currentFrame, unless better way to track animation
-    // frames for a given spritesheet not sure how this would work with varied
-    // length sprites yet, some sprites have different amount of total frames
-    // maybe have certain types of animations (paired to state) can have
-    // designated frame counts. such as, walking always being 4 frames, attack
-    // being 8 frames, etc, can be per project or character new function should
-    // look like this: SpriteFrame32Bit(Character character, int size, int
-    // frameCount, void *backgroundImage)
   }
 
   return 0;
