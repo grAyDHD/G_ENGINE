@@ -1,45 +1,23 @@
 #include "../includes/characterAnimator.h"
 #include <stdio.h>
 
-extern void m3_Background(const void *src);
-
-extern void SpriteFrame32Bit(int x, int y, int frame, const void *image,
-                             int frameCount);
-
-extern void fillFrameBackground(int x, int y, int size, const void *image);
-extern void clearSpriteFrame(int x, int y, int size, const void *image);
-
 int main() {
   DSPC = MODE3 | BG2;
 
-  Character chocobo;
-  chocobo.state = WALK;
-  chocobo.direction = RIGHT;
-  chocobo.coordinate.x = 70;
-  chocobo.coordinate.y = 64;
-  Character player;
-  player.state = IDLE;
-  player.direction = DOWN;
-  player.coordinate.x = 120;
-  player.coordinate.y = 100;
-
+  m3_Background(BedroomBitmap);
   int stepCounter = 0;
 
-  m3_Background(BedroomBitmap);
+  Character chocobo = {
+      .direction = RIGHT,
+      .state = WALK,
+      .coordinate = {80, 75},
+  };
+  initializeCharacterSprites(&chocobo, chocoboSprites);
 
   while (1) {
     VBLANK();
-    // npc starts RIGHT and WALK, step counter = 0
-    //  start animation frame 0
     SpriteFrame32Bit(chocobo.coordinate.x, chocobo.coordinate.y, 0,
-                     ChocoboJoyfulBitmap, 4);
-    fillFrameBackground(chocobo.coordinate.x, chocobo.coordinate.y, 32,
-                        BedroomBitmap);
-    simpleWait(100);
-
-    clearSpriteFrame(chocobo.coordinate.x, chocobo.coordinate.y, 32,
-                     BedroomBitmap);
-    chocobo.coordinate.x += 4;
+                     chocobo.currentSpriteSheet, 4);
   }
 
   return 0;
