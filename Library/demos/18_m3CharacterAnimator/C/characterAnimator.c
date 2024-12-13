@@ -25,6 +25,33 @@ void setCharacterStateAndDirection(Character *character, STATE state,
   updateCurrentSpriteSheet(character);
 }
 
+void moveCharacter(Character *character) {
+  switch (character->direction) {
+  case RIGHT:
+    character->coordinate.x += 4;
+    break;
+  case LEFT:
+    character->coordinate.x -= 4;
+    break;
+  case UP:
+    character->coordinate.y -= 4;
+    break;
+  case DOWN:
+    character->coordinate.y += 4;
+    break;
+  }
+}
+
+void renderCharacter(Character *character, int frame, const void *background) {
+  VBLANK();
+  clearSpriteFrame(character->coordinate.x, character->coordinate.y, 32,
+                   background);
+  SpriteFrame32Bit(character->coordinate.x, character->coordinate.y, frame,
+                   character->currentSpriteSheet, 4);
+  restoreFrameBackground(character->coordinate.x, character->coordinate.y, 32,
+                         background);
+}
+
 int main() {
   DSPC = MODE3 | BG2;
 
@@ -37,89 +64,23 @@ int main() {
   };
 
   initializeCharacterSprites(&chocobo, chocoboSprites);
+  int chocoboStepCounter = 0;
 
   while (1) {
-    setCharacterDirection(&chocobo, RIGHT);
+    moveCharacter(&chocobo);
+    renderCharacter(&chocobo, chocoboStepCounter % 4, BedroomBitmap);
+    chocoboStepCounter++;
 
-    // draw chocobo frame 0
-    VBLANK();
-    SpriteFrame32Bit(chocoboX, chocoboY, 0, chocobo.currentSpriteSheet, 4);
-    restoreFrameBackground(chocoboX, chocoboY, 32, BedroomBitmap);
     simpleWait(100);
 
-    // step right draw frame 1
-    VBLANK();
-    clearSpriteFrame(chocoboX, chocoboY, 32, BedroomBitmap);
-    chocobo.coordinate.x += 4;
-    SpriteFrame32Bit(chocoboX, chocoboY, 1, chocobo.currentSpriteSheet, 4);
-    restoreFrameBackground(chocoboX, chocoboY, 32, BedroomBitmap);
-    simpleWait(100);
-
-    // step right draw frame 2
-    VBLANK();
-    clearSpriteFrame(chocoboX, chocoboY, 32, BedroomBitmap);
-    chocobo.coordinate.x += 4;
-    SpriteFrame32Bit(chocoboX, chocoboY, 2, chocobo.currentSpriteSheet, 4);
-    restoreFrameBackground(chocoboX, chocoboY, 32, BedroomBitmap);
-    simpleWait(100);
-
-    // step draw frame 3
-    VBLANK();
-    clearSpriteFrame(chocoboX, chocoboY, 32, BedroomBitmap);
-    chocobo.coordinate.x += 4;
-    SpriteFrame32Bit(chocoboX, chocoboY, 3, chocobo.currentSpriteSheet, 4);
-    restoreFrameBackground(chocoboX, chocoboY, 32, BedroomBitmap);
-    simpleWait(100);
-
-    // draw chocobo frame 0, last step first frame, before turnaround
-    VBLANK();
-    clearSpriteFrame(chocoboX, chocoboY, 32, BedroomBitmap);
-    chocobo.coordinate.x += 4;
-    SpriteFrame32Bit(chocoboX, chocoboY, 0, chocobo.currentSpriteSheet, 4);
-    restoreFrameBackground(chocoboX, chocoboY, 32, BedroomBitmap);
-    simpleWait(500);
-
-    // Turnaround
-    setCharacterDirection(&chocobo, LEFT);
-
-    VBLANK();
-    SpriteFrame32Bit(chocoboX, chocoboY, 0, chocobo.currentSpriteSheet, 4);
-    restoreFrameBackground(chocoboX, chocoboY, 32, BedroomBitmap);
-    simpleWait(100);
-
-    // step left draw frame 1
-    VBLANK();
-    clearSpriteFrame(chocoboX, chocoboY, 32, BedroomBitmap);
-    chocobo.coordinate.x -= 4;
-    SpriteFrame32Bit(chocoboX, chocoboY, 1, chocobo.currentSpriteSheet, 4);
-    restoreFrameBackground(chocoboX, chocoboY, 32, BedroomBitmap);
-    simpleWait(100);
-
-    // step left draw frame 2
-    VBLANK();
-    clearSpriteFrame(chocoboX, chocoboY, 32, BedroomBitmap);
-    chocobo.coordinate.x -= 4;
-    SpriteFrame32Bit(chocoboX, chocoboY, 2, chocobo.currentSpriteSheet, 4);
-    restoreFrameBackground(chocoboX, chocoboY, 32, BedroomBitmap);
-    simpleWait(100);
-
-    // step draw frame 3
-    VBLANK();
-    clearSpriteFrame(chocoboX, chocoboY, 32, BedroomBitmap);
-    chocobo.coordinate.x -= 4;
-    SpriteFrame32Bit(chocoboX, chocoboY, 3, chocobo.currentSpriteSheet, 4);
-    restoreFrameBackground(chocoboX, chocoboY, 32, BedroomBitmap);
-    simpleWait(100);
-
-    // draw chocobo frame 0, last step first frame, before turnaround
-    VBLANK();
-    clearSpriteFrame(chocoboX, chocoboY, 32, BedroomBitmap);
-    chocobo.coordinate.x -= 4;
-    SpriteFrame32Bit(chocoboX, chocoboY, 0, chocobo.currentSpriteSheet, 4);
-    restoreFrameBackground(chocoboX, chocoboY, 32, BedroomBitmap);
-    simpleWait(500);
-
-    // Turnaround
+    if (chocoboStepCounter >= 4) {
+      chocoboStepCounter = 0;
+      if (chocobo.direction == RIGHT) {
+        setCharacterDirection(&chocobo, LEFT);
+      } else {
+        setCharacterDirection(&chocobo, RIGHT);
+      }
+    }
   }
 
   return 0;
