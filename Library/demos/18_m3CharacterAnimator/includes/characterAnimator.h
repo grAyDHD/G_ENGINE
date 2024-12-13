@@ -28,10 +28,8 @@ typedef enum { IDLE, WALK, TALKING } STATE;
 
 typedef struct {
   Coordinate coordinate;
-
   DIRECTION direction;
   STATE state;
-
   CharacterSprites sprites;       // struct array of pointers
   const void *currentSpriteSheet; // pointer to active sprite
 } Character;
