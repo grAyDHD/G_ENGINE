@@ -1,5 +1,6 @@
 #include "../includes/characterAnimator.h"
 #include "in.h"
+#include "timer.h"
 
 #define chocoboX chocobo.coordinate.x
 #define chocoboY chocobo.coordinate.y
@@ -91,22 +92,35 @@ int main() {
   int playerStepCounter = 0;
 
   while (1) {
+
+    /*
+    if (keyDown(U)) {
+      setCharacterStateAndDirection(&player, WALK, UP);
+    } else if (keyDown(D)) {
+      setCharacterStateAndDirection(&player, WALK, UP);
+    } else if (keyDown(L)) {
+      setCharacterStateAndDirection(&player, WALK, UP);
+    } else if (keyDown(R)) {
+      setCharacterStateAndDirection(&player, WALK, UP);
+    }
+
+    if (keyReleased(U) | keyReleased(D) | keyReleased(L) | keyReleased(R)) {
+      setCharacterState(&player, IDLE);
+    }
+    */
+
+    // Render player
     renderCharacter(&player, 0, &BedroomBitmap);
-    if (player.state == WALK) {
-      moveCharacter(&player);
-    }
+    simpleWait(100);
+    renderCharacter(&player, 1, &BedroomBitmap);
+    simpleWait(100);
+    renderCharacter(&player, 2, &BedroomBitmap);
+    simpleWait(100);
+    renderCharacter(&player, 3, &BedroomBitmap);
+    simpleWait(100);
 
-    // existing input functions:
-    // keyWasUp (checks if key was up last frame whether up or down now)
-    // keyWasDown, inverse of keyWasUp
-    // keyUp
-    // keyDown
-    if (keyWasUp(U) && keyWasUp(D) && keyWasUp(L) && keyWasUp(R)) {
-      if (keyDown(U)) {
-      }
-    }
-
-    // update
+    /*
+    // Chocobo logic
     if (chocobo.state == WALK) {
       moveCharacter(&chocobo);
     }
@@ -124,7 +138,7 @@ int main() {
         setCharacterDirection(&chocobo, RIGHT);
       }
     }
+*/
   }
-
   return 0;
 }
