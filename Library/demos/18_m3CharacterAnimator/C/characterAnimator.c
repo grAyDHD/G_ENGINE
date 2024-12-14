@@ -61,16 +61,6 @@ void moveCharacter(Character *character) {
   }
 }
 
-void renderCharacter(Character *character, int frame, const void *background) {
-  VBLANK();
-  clearSpriteFrame(character->coordinate.x, character->coordinate.y, 32,
-                   background);
-  SpriteFrame32Bit(character->coordinate.x, character->coordinate.y, frame,
-                   character->currentSpriteSheet, 4);
-  restoreFrameBackground(character->coordinate.x, character->coordinate.y, 32,
-                         background);
-}
-
 int main() {
   DSPC = MODE3 | BG2;
 
@@ -121,30 +111,34 @@ int main() {
     if (keyReleased(U) | keyReleased(D) | keyReleased(L) | keyReleased(R)) {
       setCharacterState(&player, IDLE);
       playerStepCounter = 0;
-    } else {
+    } else if (player.state != IDLE) {
       playerStepCounter++;
     }
 
-    simpleWait(100);
-    /*
-        // Chocobo logic
-        if (chocobo.state == WALK) {
-          moveCharacter(&chocobo);
-        }
-        renderCharacter(&chocobo, chocoboStepCounter % 4, &BedroomBitmap);
-        chocoboStepCounter++;
+    // Chocobo logic
 
+    clearSpriteFrame(chocoboX, chocoboY, 32, BedroomBitmap);
+    if (chocobo.state == WALK) {
+      moveCharacter(&chocobo);
+    }
 
-        // handle chocobo direction change
-        if (chocoboStepCounter >= 4) {
-          chocoboStepCounter = 0;
-          if (chocobo.direction == RIGHT) {
-            setCharacterDirection(&chocobo, LEFT);
-          } else {
-            setCharacterDirection(&chocobo, RIGHT);
-          }
-        }
-        */
+    SpriteFrame32Bit(chocoboX, chocoboY, chocoboStepCounter % 4,
+                     chocobo.currentSpriteSheet, 4);
+
+    restoreFrameBackground(chocoboX, chocoboY, 32, BedroomBitmap);
+    chocoboStepCounter++;
+
+    // handle chocobo direction change
+    if (chocoboStepCounter >= 4) {
+      chocoboStepCounter = 0;
+      if (chocobo.direction == RIGHT) {
+        setCharacterDirection(&chocobo, LEFT);
+      } else {
+        setCharacterDirection(&chocobo, RIGHT);
+      }
+    }
+
+    simpleWait(50);
   }
 
   return 0;
