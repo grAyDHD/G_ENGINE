@@ -1,7 +1,22 @@
 #include "../includes/characterAnimator.h"
+#include "in.h"
 
 #define chocoboX chocobo.coordinate.x
 #define chocoboY chocobo.coordinate.y
+
+void initializeCharacterSprites(
+    Character *character,
+    const void *spriteSheets[NUM_STATES][NUM_DIRECTIONS]) {
+  for (int state = 0; state < NUM_STATES; state++) {
+    for (int direction = 0; direction < NUM_DIRECTIONS; direction++) {
+      character->sprites.spriteSheets[state][direction] =
+          spriteSheets[state][direction];
+    }
+  }
+
+  character->currentSpriteSheet =
+      character->sprites.spriteSheets[character->state][character->direction];
+};
 
 void updateCurrentSpriteSheet(Character *character) {
   character->currentSpriteSheet =
@@ -63,16 +78,44 @@ int main() {
       .coordinate = {80, 75},
   };
 
+  Character player = {
+      .direction = DOWN,
+      .state = IDLE,
+      .coordinate = {120, 120},
+  };
+
   initializeCharacterSprites(&chocobo, chocoboSprites);
+  initializeCharacterSprites(&player, silverGirlSprites);
+
   int chocoboStepCounter = 0;
+  int playerStepCounter = 0;
 
   while (1) {
-    moveCharacter(&chocobo);
-    renderCharacter(&chocobo, chocoboStepCounter % 4, BedroomBitmap);
+    renderCharacter(&player, 0, &BedroomBitmap);
+    if (player.state == WALK) {
+      moveCharacter(&player);
+    }
+
+    // existing input functions:
+    // keyWasUp (checks if key was up last frame whether up or down now)
+    // keyWasDown, inverse of keyWasUp
+    // keyUp
+    // keyDown
+    if (keyWasUp(U) && keyWasUp(D) && keyWasUp(L) && keyWasUp(R)) {
+      if (keyDown(U)) {
+      }
+    }
+
+    // update
+    if (chocobo.state == WALK) {
+      moveCharacter(&chocobo);
+    }
+    renderCharacter(&chocobo, chocoboStepCounter % 4, &BedroomBitmap);
     chocoboStepCounter++;
 
     simpleWait(100);
 
+    // handle chocobo direction change
     if (chocoboStepCounter >= 4) {
       chocoboStepCounter = 0;
       if (chocobo.direction == RIGHT) {

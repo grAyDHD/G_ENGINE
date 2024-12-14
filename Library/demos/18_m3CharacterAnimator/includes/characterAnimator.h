@@ -13,6 +13,7 @@
 #include "../build/PkmnSlvrGirlWalkingUp.h"
 
 #include "gfx.h"
+#include "in.h"
 #include "timer.h"
 #include "typedefs.h"
 
@@ -27,26 +28,13 @@ typedef enum { UP, DOWN, LEFT, RIGHT } DIRECTION;
 typedef enum { IDLE, WALK, TALK } STATE;
 
 typedef struct {
-  Coordinate coordinate;
-  DIRECTION direction;
-  STATE state;
-  CharacterSprites sprites;       // struct array of pointers
-  const void *currentSpriteSheet; // pointer to active sprite
+  Coordinate coordinate; // two ints, 8 bytes?
+  DIRECTION direction;   // 4 bytes if enum is int
+  STATE state;           // 4 bytes, another enum
+  CharacterSprites
+      sprites; // struct array of pointers. each pointer is 4 bytes.
+  const void *currentSpriteSheet; // pointer to active sprite 4 bytes
 } Character;
-
-void initializeCharacterSprites(
-    Character *character,
-    const void *spriteSheets[NUM_STATES][NUM_DIRECTIONS]) {
-  for (int state = 0; state < NUM_STATES; state++) {
-    for (int direction = 0; direction < NUM_DIRECTIONS; direction++) {
-      character->sprites.spriteSheets[state][direction] =
-          spriteSheets[state][direction];
-    }
-  }
-
-  character->currentSpriteSheet =
-      character->sprites.spriteSheets[character->state][character->direction];
-};
 
 const void *chocoboSprites[NUM_STATES][NUM_DIRECTIONS] = {
     [IDLE] = {0, 0, 0, 0},
@@ -59,6 +47,14 @@ const void *chocoboSprites[NUM_STATES][NUM_DIRECTIONS] = {
         },
     [TALK] = {ChocoboJoyfulBitmap, ChocoboJoyfulBitmap, ChocoboJoyfulBitmap,
               ChocoboJoyfulBitmap}};
+
+const void *silverGirlSprites[NUM_STATES][NUM_DIRECTIONS] = {
+    [IDLE] = {PkmnSlvrGirlWalkingUpBitmap, PkmnSlvrGirlWalkingDownBitmap,
+              PkmnSlvrGirlWalkingLeftBitmap, PkmnSlvrGirlWalkingRightBitmap},
+    [WALK] = {PkmnSlvrGirlWalkingUpBitmap, PkmnSlvrGirlWalkingDownBitmap,
+              PkmnSlvrGirlWalkingLeftBitmap, PkmnSlvrGirlWalkingRightBitmap},
+    [TALK] = {PkmnSlvrGirlWalkingUpBitmap, PkmnSlvrGirlWalkingDownBitmap,
+              PkmnSlvrGirlWalkingLeftBitmap, PkmnSlvrGirlWalkingRightBitmap}};
 
 extern void m3_Background(const void *src);
 extern void SpriteFrame32Bit(int x, int y, int frame, const void *image,

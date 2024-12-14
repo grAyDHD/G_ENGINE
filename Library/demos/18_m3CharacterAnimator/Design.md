@@ -4,11 +4,6 @@ Dialouge on A when facing NPC
 Step 1: 
     Start with background and npc for simplicity due to lack of input.
 
-    REQUIREMENTS:
-    move up animation
-    move down animation
-    2 frames per step, 4 frame animations. 
-    moving 2 squares in a row will cycle all 4 frames
 
 [x] draw background
 [x] adapt sprite frame function to handle 32 bit sprites
@@ -23,7 +18,7 @@ Step 2:
 
 Step 3:
  Implement player character with movement
-[] draw player Character
+[x] draw player Character
 [] update position on d pad input
 [] update sprite direction to match
 
