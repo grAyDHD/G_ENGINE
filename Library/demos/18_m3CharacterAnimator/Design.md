@@ -19,16 +19,21 @@ Step 2:
 Step 3:
  Implement player character with movement
 [x] draw player Character
-[] update position on d pad input
-[] update sprite direction to match
+[x] update position on d pad input
+[x] update sprite direction to match
+[] until idle animation is created, default to frame 0
 
-
-[] animate NPC, 2 frames per single square of movement
-[] animate player
+    ROADBLOCK:
+        when sprite regions overlap, background layer of last sprite drawn shows over sprite
+    Solution:
+        collision check with bounding box for edges of two sprite regions.
+        if overlap, callunique function checking transparency pixels in overlapped region
+        manage outer region (transparency pixels) and inner region (character)
 
 Step 4: 
  implement interactions
 [] player npc collision handling
 [] press A to talk to NPC (NPC saves current direction to turn to player, turn back after dialogue)
 
-    ROADBLOCK: 
+    OPTIMIZATIONS:  
+        Merge SpriteFrame3Bit with restoreFrameBackground

@@ -5,6 +5,8 @@
 
 #define chocoboX chocobo.coordinate.x
 #define chocoboY chocobo.coordinate.y
+#define playerX player.coordinate.x
+#define playerY player.coordinate.y
 
 void initializeCharacterSprites(
     Character *character,
@@ -94,60 +96,56 @@ int main() {
 
   while (1) {
     updateKeys();
-    /*
+    VBLANK();
+
+    clearSpriteFrame(playerX, playerY, 32, BedroomBitmap);
     if (keyDown(U)) {
       setCharacterStateAndDirection(&player, WALK, UP);
-    } else if (keyDown(D)) {
-      setCharacterStateAndDirection(&player, WALK, UP);
-    } else if (keyDown(L)) {
-      setCharacterStateAndDirection(&player, WALK, UP);
-    } else if (keyDown(R)) {
-      setCharacterStateAndDirection(&player, WALK, UP);
-    }
-
-    if (keyReleased(U) | keyReleased(D) | keyReleased(L) | keyReleased(R)) {
-      setCharacterState(&player, IDLE);
-    }
-    */
-
-    if (keyDown(A)) {
-      fillScreen(0);
-    }
-
-    if (keyDown(U)) {
       player.coordinate.y -= 4;
     } else if (keyDown(D)) {
+      setCharacterStateAndDirection(&player, WALK, DOWN);
       player.coordinate.y += 4;
     } else if (keyDown(L)) {
+      setCharacterStateAndDirection(&player, WALK, LEFT);
       player.coordinate.x -= 4;
     } else if (keyDown(R)) {
+      setCharacterStateAndDirection(&player, WALK, RIGHT);
       player.coordinate.x += 4;
     }
 
-    // Render player
-    renderCharacter(&player, 0, &BedroomBitmap);
-    simpleWait(100);
+    SpriteFrame32Bit(playerX, playerY, playerStepCounter % 4,
+                     player.currentSpriteSheet, 4);
 
+    restoreFrameBackground(playerX, playerY, 32, BedroomBitmap);
+
+    if (keyReleased(U) | keyReleased(D) | keyReleased(L) | keyReleased(R)) {
+      setCharacterState(&player, IDLE);
+      playerStepCounter = 0;
+    } else {
+      playerStepCounter++;
+    }
+
+    simpleWait(100);
     /*
-    // Chocobo logic
-    if (chocobo.state == WALK) {
-      moveCharacter(&chocobo);
-    }
-    renderCharacter(&chocobo, chocoboStepCounter % 4, &BedroomBitmap);
-    chocoboStepCounter++;
+        // Chocobo logic
+        if (chocobo.state == WALK) {
+          moveCharacter(&chocobo);
+        }
+        renderCharacter(&chocobo, chocoboStepCounter % 4, &BedroomBitmap);
+        chocoboStepCounter++;
 
-    simpleWait(100);
 
-    // handle chocobo direction change
-    if (chocoboStepCounter >= 4) {
-      chocoboStepCounter = 0;
-      if (chocobo.direction == RIGHT) {
-        setCharacterDirection(&chocobo, LEFT);
-      } else {
-        setCharacterDirection(&chocobo, RIGHT);
-      }
-    }
-*/
+        // handle chocobo direction change
+        if (chocoboStepCounter >= 4) {
+          chocoboStepCounter = 0;
+          if (chocobo.direction == RIGHT) {
+            setCharacterDirection(&chocobo, LEFT);
+          } else {
+            setCharacterDirection(&chocobo, RIGHT);
+          }
+        }
+        */
   }
+
   return 0;
 }
