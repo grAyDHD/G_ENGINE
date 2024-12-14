@@ -1,4 +1,5 @@
 #include "../includes/characterAnimator.h"
+#include "gfx.h"
 #include "in.h"
 #include "timer.h"
 
@@ -92,7 +93,7 @@ int main() {
   int playerStepCounter = 0;
 
   while (1) {
-
+    updateKeys();
     /*
     if (keyDown(U)) {
       setCharacterStateAndDirection(&player, WALK, UP);
@@ -109,14 +110,22 @@ int main() {
     }
     */
 
+    if (keyDown(A)) {
+      fillScreen(0);
+    }
+
+    if (keyDown(U)) {
+      player.coordinate.y -= 4;
+    } else if (keyDown(D)) {
+      player.coordinate.y += 4;
+    } else if (keyDown(L)) {
+      player.coordinate.x -= 4;
+    } else if (keyDown(R)) {
+      player.coordinate.x += 4;
+    }
+
     // Render player
     renderCharacter(&player, 0, &BedroomBitmap);
-    simpleWait(100);
-    renderCharacter(&player, 1, &BedroomBitmap);
-    simpleWait(100);
-    renderCharacter(&player, 2, &BedroomBitmap);
-    simpleWait(100);
-    renderCharacter(&player, 3, &BedroomBitmap);
     simpleWait(100);
 
     /*
