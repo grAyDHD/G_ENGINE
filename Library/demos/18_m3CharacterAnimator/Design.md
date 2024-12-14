@@ -2,9 +2,7 @@ Character animation demo, focused on player input/movement, npc mevement behavio
 Dialouge on A when facing NPC
 //layout of major steps, with checklists of substeps
 Step 1: 
-    Start with background and npc for simplicity due to lack of input.
-
-
+    Start with background and npc for simplicity
 [x] draw background
 [x] adapt sprite frame function to handle 32 bit sprites
 [x] draw NPC
@@ -21,7 +19,7 @@ Step 3:
 [x] draw player Character
 [x] update position on d pad input
 [x] update sprite direction to match
-[] until idle animation is created, default to frame 0
+[x] until idle animation is created, default to frame 0
 
     ROADBLOCK:
         when sprite regions overlap, background layer of last sprite drawn shows over sprite
@@ -30,7 +28,9 @@ Step 3:
         if overlap, callunique function checking transparency pixels in overlapped region
         manage outer region (transparency pixels) and inner region (character)
 
-Step 4: 
+Step 4: refactor sprite drawing funciton to handle restoreFrameBackground
+
+Step 5: 
  implement interactions
 [] player npc collision handling
 [] press A to talk to NPC (NPC saves current direction to turn to player, turn back after dialogue)
