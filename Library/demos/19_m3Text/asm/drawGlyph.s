@@ -17,56 +17,52 @@ copyGlyphToVRAM:
   push {r4-r11}
   @ Step 1: calculate VRAM offset
   mov r4, #240                           @ r4 = screen width
-  mul r5, r1, r4                         @ r5 = y * 240
-  add r5, r5, r0                         @ r5 = x + (y * 240)
-  add r5, r5, r5                         @ r5 doubled for byte offset 
-  ldr r6, =0x6000000
-  add r6, r6, r5
+  mul r1, r1, r4                         @ r1 = y * SW
+  add r1, r1, r0                         @ r1 = x + (y * SW)
+  add r1, r1, r1                         @ r1 doubled for byte offset 
+  ldr r0, =0x6000000
+  add r0, r0, r1
 
-  @ r0 = x (don't need anymore)
-  @ r1 = y (don't need anymore)
+  @ r0 = VRAM base offset (no glyph yOffset) 
+  @ r1 = VRAM byte offset (no longer needed) 
   @ r2 = glyphData struct pointer
-  @ r3 = image pointer  (need to increment by yOffset*803)
-  @ r4 = screen width pxls 
-  @ r5 = VRAM byte offset no longer needed 
-  @ r6 = VRAM base offset (still need to add yOffset*480 from glyph data)
+  @ r3 = image pointer  (need to increment by xOffset+yOffset*803)
+  @ r4 = screen width pxls (may still need)
 
   @ Step 2: calculate fontBitmap offset
-  ldr r7, [r2, #0]                      @ r7 = glyph.xOffset
-  ldr r8, [r2, #8]                      @ r8 = glyph.yOffset
-  ldr r9, [r2, #4]                      @ r9 = glyph.height
-  mul r5, r8, #803                      @ r5 = glyph row offset
-  add r5, r5, r7                        @ r5 = total glyph offset
-  add r3, r3, r5                        @ r3 = fontBitmap offset
+  ldr r5, [r2, #0]                      @ r7 = glyph.xOffset
+  ldr r6, [r2, #8]                      @ r8 = glyph.yOffset
+  ldr r7, [r2, #4]                      @ r9 = glyph.height
+  mul r1, r6, #803                      @ r1 = glyph row offset
+  add r1, r1, r5                        @ r1 = total glyph offset
+  add r3, r3, r1                        @ r3 = fontBitmap offset
 
-  @ r0 = x (don't need)
-  @ r1 = y (don't need)
-  @ r2 = struct (still need to load [r2, #4]) for glyph height
+  @ r0 = VRAM base offset (needs glyph yOffset added) 
+  @ r1 = glyph offset (no longer need)
+  @ r2 = struct (no longer need)
   @ r3 = image pointer glyph offset
-  @ r4 = 240
-  @ r5 = glyph offset (don't need)
-  @ r6 = VRAM base offset 
-  @ r7 = glyph.xOffset (don't need)
+  @ r4 = 240 (no longer need)
+  @ r5 = glyph.xOffset (no longer need)
+  @ r6 = glyph.yOffset (need for VRAM final offset) 
+  @ r7 = glyph.height 
   @ r8 = glyph.yOffset (need for final VRAM offset)
+   
+  @ Step 3: calculate final VRAM offset for drawing glyph
+  mul r1, r6, #480                     @ r1 =yOffset x screen width in bytes
+  add r0, r0, r1                       @ r0 = final VRAM offset
 
-  @ Step 3: add (yOffset * 240) * 2 to VRAM base offset for final glyph offset
-  mul r8, r8, r4                        @ r8 = yOffset * 240
-  add r8, r8, r8                        @ r8 = yOffset in bytes for VRAM 
-  add r6, r6, r8                        @ r6 = final VRAM offset
-
-  @ r0 = x (don't need)
-  @ r1 = y (don't need)
-  @ r2 = struct (don't need) 
+  @ r0 = VRAM final offset 
+  @ r1 = vram yOffset (no longer need)
+  @ r2 = struct (no longer need)
   @ r3 = image pointer glyph offset
-  @ r4 = 240 (don't need)
-  @ r5 = glyph offset (don't need)
-  @ r6 = VRAM base offset 
-  @ r7 = glyph.xOffset (don't need)
-  @ r8 = vram y byte offset (don't need)
-  @ r9 = glyph height pxls
+  @ r4 = 240 (no longer need)
+  @ r5 = glyph.xOffset (need for calculating row looping offset)
+  @ r6 = glyph.yOffset (no longer need) 
+  @ r7 = glyph.height 
+  @ r8 = glyph.yOffset  (no longer need)
 
-  @ Step 4:
-
+  @ Step 4: calculate vram row loop and image row loop offsets
+  @ I messed up the data structure, I need width AND xOffset
 
 
 
