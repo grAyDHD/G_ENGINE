@@ -13,9 +13,9 @@
 // add all prior xOffset to current manually as lookup table
 //
 typedef struct {
-  u8 height;
+  u16 height;
   u16 xOffset;
-  u8 yOffset;
+  u16 yOffset;
 } GlyphInfo;
 
 GlyphInfo fontData[94] = {
@@ -55,5 +55,6 @@ GlyphInfo fontData[94] = {
     {10, 815, 4}, {4, 821, 0},  {2, 830, 10}  // : ` _
 };
 
-extern void copyGlyphToVRAM();
+extern void copyGlyphToVRAM(int x, int y, GlyphInfo glyph,
+                            const void *fontBitmap);
 #endif // M3TEXT_H

@@ -97,5 +97,12 @@ void drawGlyph(u8 x, u8 y, char c) {
 int main() {
   DSPC = MODE3 | BG2;
 
+  // draw single glyphs to VRAM, print HELLO WORLD
+  int glyphIndex = getFontDataIndex('%');
+
+  copyGlyphToVRAM(20, 20, fontData[glyphIndex], &PeaberryBitmap);
+  //                      16xOff,8yOff,8height
+  //            r0-x, r1-y, r2-glyphData struct, r3-fontImage
+
   return 0;
 }
