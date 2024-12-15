@@ -27,7 +27,10 @@ Second:
 
 ### Step 2:
     Font Data Integration
-[x] Define a data structure for font glyphs (e.g., 8x8 pixel bitmaps).
+[x] Define a data structure for font glyphs (e.g., 8x8 pixel bitmaps)
+[ ] create function to map chars to fontData, getFontDataIndex
+[ ] create assembly function taking x, y, imageoffset, glyph w/h
+or... Coordinate, image pointer, glyph
 
     FUTURE IDEA: easy font importation function/glyph info
     What it would do:  read a table of glyph data, create c file defining each: 
@@ -39,7 +42,7 @@ Second:
 
 ### Step 3:
     Text Drawing Function
-[ ] Implement a `drawCharacter(x, y, char)` function.
+[ ] Implement a `drawGlyph(x, y, char)` function.
 - [ ] Draw a single character at specified coordinates.
 
 [ ] Implement a `drawText(x, y, *text)` function.

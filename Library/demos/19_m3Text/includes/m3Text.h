@@ -3,12 +3,19 @@
 
 #include "typedefs.h"
 
+// edit order to be width, height, yOffset
+// make width into xOffset
+// xOffset can be an int
+// this ensures alignment of 2 byte struct
+// final order of struct:
+// xOffset, yOffset, height
+// add all prior xOffset to current manually as lookup table
+//
 typedef struct {
   u8 height;
   u8 width;
   u8 yOffset;
 } GlyphInfo;
-
 GlyphInfo fontData[94] = {
     {12, 10, 2}, {12, 9, 2},  {12, 9, 2},  // A, B, C
     {12, 9, 2},  {12, 9, 2},  {12, 9, 2},  // D, E, F
