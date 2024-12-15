@@ -29,16 +29,9 @@ Second:
     Font Data Integration
 [x] Define a data structure for font glyphs (e.g., 8x8 pixel bitmaps)
 [x] create function to map chars to fontData, getFontInfoIndex
+[ ] create program to generate appropriate fontData structure from fontTable
 [ ] create assembly function taking x, y, imageoffset, glyph w/h
 or... Coordinate, image pointer, glyph
-
-    FUTURE IDEA: easy font importation function/glyph info
-    What it would do:  read a table of glyph data, create c file defining each: 
-    uppercaseAlphabet[26]
-    lowerCaseAlphabet[26]
-    numbers[10]
-    symbols[10]
-    This will allow easier creation of new compatible fonts
 
 ### Step 3:
     Text Drawing Function
