@@ -29,7 +29,7 @@
 | - | -- | -- |
 | C | HT | WD |
 | - | -- | -- |
-| a |  8 | 10 | Highest pixel down four
+| a |  8 | 10 | down 4
 | b | 11 |  9 | down 1
 | c |  8 |  8 | down 4
 | d | 11 |  9 | down 1

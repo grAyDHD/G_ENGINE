@@ -9,7 +9,7 @@ drawing that to the screen.
 
 First:
     give function an x,y coordinate and string 
-    for a given char, print at x, y, create temp x and increment it be font width + distance between chars
+    for a given char, print at x, y, create temp x and increment by glyph width each char
     on \n char, return to start x and increment y by (font height + distance between lines in pxls) * 240
 
 Second:
@@ -27,18 +27,24 @@ Second:
 
 ### Step 2:
     Font Data Integration
-- [ ] Define a data structure for font glyphs (e.g., 8x8 pixel bitmaps).
-- [ ] Implement a function to extract glyph data for a given character.
+[x] Define a data structure for font glyphs (e.g., 8x8 pixel bitmaps).
+
+    FUTURE IDEA: easy font importation function/glyph info
+    What it would do:  read a table of glyph data, create c file defining each: 
+    uppercaseAlphabet[26]
+    lowerCaseAlphabet[26]
+    numbers[10]
+    symbols[10]
+    This will allow easier creation of new compatible fonts
 
 ### Step 3:
     Text Drawing Function
-- [ ] Implement a `drawCharacter(x, y, char, color)` function.
-  - [ ] Draw a single character at specified coordinates.
-  - [ ] Use a single solid color for the character.
+[ ] Implement a `drawCharacter(x, y, char)` function.
+- [ ] Draw a single character at specified coordinates.
 
-- [ ] Implement a `drawText(x, y, *text, color)` function.
-  - [ ] Draw multiple characters as a single line of text.
-  - [ ] Verify correct spacing between characters.
+[ ] Implement a `drawText(x, y, *text)` function.
+- [ ] Draw multiple characters as a single line of text.
+- [ ] Verify correct spacing between characters.
 
 ### Step 4:
     Text Color and Background Handling
