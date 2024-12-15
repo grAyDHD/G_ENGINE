@@ -22,9 +22,9 @@ Second:
 
 ### Step 1:
     Print basic font as entire alphabet/number sequence
-[] Add bitmap font in .png format to graphics directory
+[x] Add bitmap font in .png format to graphics directory
 [] Print entire font bitmap to screen as one image
-[] Print entire font bitmap as individual characters
+
 
 ### Step 2:
     Font Data Integration
