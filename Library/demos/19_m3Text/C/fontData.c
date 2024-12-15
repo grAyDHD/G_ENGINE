@@ -1,11 +1,4 @@
-#include <stdint.h>
-
-typedef struct {
-  uint16_t xOffset;
-  uint16_t yOffset;
-  uint16_t width;
-  uint16_t height;
-} GlyphInfo;
+#include "../includes/fontData.h"
 
 GlyphInfo fontData[94] = {
     {0, 2, 10, 12},   // 'A'

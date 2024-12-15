@@ -1,5 +1,4 @@
-#include "../includes/m3Text.h"
-#include "draw.h"
+#include "../includes/fontData.h"
 #include "gfx.h"
 
 int getFontDataIndex(char c) {
@@ -101,7 +100,7 @@ int main() {
   int glyphIndex = getFontDataIndex('%');
 
   copyGlyphToVRAM(20, 20, fontData[glyphIndex], &PeaberryBitmap);
-  //                      16xOff,8yOff,8height
+  //                      16xOff,16yOff,16width,16height
   //            r0-x, r1-y, r2-glyphData struct, r3-fontImage
 
   return 0;
