@@ -23,7 +23,6 @@ Second:
 ### Step 1:
     Print basic font as entire alphabet/number sequence
 [x] Add bitmap font in .png format to graphics directory
-[] Print entire font bitmap to screen as one image
 
 
 ### Step 2:
