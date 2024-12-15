@@ -1,4 +1,5 @@
 #include "../includes/m3Text.h"
+#include "draw.h"
 #include "gfx.h"
 
 int getFontDataIndex(char c) {
@@ -6,7 +7,7 @@ int getFontDataIndex(char c) {
     return c - 'A';
   } else if (c >= 'a' && c <= 'z') {
     return c - 'a' + 26;
-  } else if (c >= '0' && c <= 9) {
+  } else if (c >= '0' && c <= '9') {
     return c - '0' + 52;
   } else {
     switch (c) {
@@ -79,6 +80,7 @@ int getFontDataIndex(char c) {
     }
   }
 }
+
 void drawGlyph(u8 x, u8 y, char c) {
   int index = getFontDataIndex(c);
   if (index < 0) {
