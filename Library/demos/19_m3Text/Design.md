@@ -28,7 +28,7 @@ Second:
 ### Step 2:
     Font Data Integration
 [x] Define a data structure for font glyphs (e.g., 8x8 pixel bitmaps)
-[ ] create function to map chars to fontData, getFontDataIndex
+[x] create function to map chars to fontData, getFontInfoIndex
 [ ] create assembly function taking x, y, imageoffset, glyph w/h
 or... Coordinate, image pointer, glyph
 
