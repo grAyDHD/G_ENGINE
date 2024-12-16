@@ -80,6 +80,7 @@ int getFontDataIndex(char c) {
   }
 }
 
+/*
 void drawGlyph(u8 x, u8 y, char c) {
   int index = getFontDataIndex(c);
   if (index < 0) {
@@ -92,12 +93,13 @@ void drawGlyph(u8 x, u8 y, char c) {
 
   //  copyGlyphToVRAM(x+xoffset, y+yoffset, glyphImagePtr, &glyph);
 }
+*/
 
 int main() {
   DSPC = MODE3 | BG2;
 
   // draw single glyphs to VRAM, print HELLO WORLD
-  int glyphIndex = getFontDataIndex('%');
+  int glyphIndex = getFontDataIndex('B');
 
   copyGlyphToVRAM(20, 20, fontData[glyphIndex], &PeaberryBitmap);
   //                      16xOff,16yOff,16width,16height
