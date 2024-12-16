@@ -9,7 +9,7 @@
 @ copyGlyphToVRAM(int x, int y, GlyphInfo glyphData, const void *fontBitmap);
 @ r0 = x
 @ r1 = y
-@ r2 = glyphData #0 = xOffset, #4 = height, #8 = yOffset
+@ r2 = glyphData #0 = xOffset, #4 = yOffset, #8 = width, #12 = height
 @ r3 = pointer to fontBitmap
 
 
@@ -24,25 +24,21 @@ copyGlyphToVRAM:
   add r0, r0, r1
 
   @ r0 = VRAM base offset (no glyph yOffset) 
-  @ r1 = VRAM byte offset (no longer needed) 
   @ r2 = glyphData struct pointer
   @ r3 = image pointer  (need to increment by xOffset+yOffset*803)
-  @ r4 = screen width pxls (may still need)
 
   @ Step 2: calculate fontBitmap offset
-  ldr r5, [r2, #0]                      @ r7 = glyph.xOffset
-  ldr r6, [r2, #8]                      @ r8 = glyph.yOffset
-  ldr r7, [r2, #4]                      @ r9 = glyph.height
+  ldr r5, [r2, #0]                      @ r5 = glyph.xOffset
+  ldr r6, [r2, #4]                      @ r6 = glyph.yOffset
+  ldr r7, [r2, #8]                      @ r7 = glyph.width
+  ldr r8, [r2, #12]                     @ r9 = glyph.height
+
   mul r1, r6, #803                      @ r1 = glyph row offset
   add r1, r1, r5                        @ r1 = total glyph offset
   add r3, r3, r1                        @ r3 = fontBitmap offset
 
   @ r0 = VRAM base offset (needs glyph yOffset added) 
-  @ r1 = glyph offset (no longer need)
-  @ r2 = struct (no longer need)
-  @ r3 = image pointer glyph offset
-  @ r4 = 240 (no longer need)
-  @ r5 = glyph.xOffset (no longer need)
+  @ r3 = image + glyph offset
   @ r6 = glyph.yOffset (need for VRAM final offset) 
   @ r7 = glyph.height 
   @ r8 = glyph.yOffset (need for final VRAM offset)
@@ -52,18 +48,21 @@ copyGlyphToVRAM:
   add r0, r0, r1                       @ r0 = final VRAM offset
 
   @ r0 = VRAM final offset 
-  @ r1 = vram yOffset (no longer need)
-  @ r2 = struct (no longer need)
   @ r3 = image pointer glyph offset
-  @ r4 = 240 (no longer need)
   @ r5 = glyph.xOffset (need for calculating row looping offset)
-  @ r6 = glyph.yOffset (no longer need) 
   @ r7 = glyph.height 
-  @ r8 = glyph.yOffset  (no longer need)
 
   @ Step 4: calculate vram row loop and image row loop offsets
-  @ I messed up the data structure, I need width AND xOffset
+  @ VRAM row loop offset = 480 - (glyph.width * 2)
+  @ image row loop offset = 803 - (glyph.width)
+  @ loop offset is added to VRAM and image at end of copying individual rows.
+  @ it jumps down exactly one row, then subtracts glyph.width to return to beginning of glyph position
+  mul r1, 
 
+  @ Step 5: set up row/col loops based on glyph.width and glyph.height
+  @ copying current fontImage position to VRAM and incrementing both
+
+  @ Done????
 
 
 
