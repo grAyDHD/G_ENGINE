@@ -101,7 +101,7 @@ int main() {
   // draw single glyphs to VRAM, print HELLO WORLD
   int glyphIndex = getFontDataIndex('B');
 
-  copyGlyphToVRAM(20, 20, fontData[glyphIndex], &PeaberryBitmap);
+  copyGlyphToVRAM(20, 20, &PeaberryBitmap);
   //                      16xOff,16yOff,16width,16height
   //            r0-x, r1-y, r2-glyphData struct, r3-fontImage
 
