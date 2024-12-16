@@ -17,20 +17,33 @@ copyGlyphToVRAM:
   ldr r1, =0x6000000  @ Base VRAM address
   add r1, r1, r0      @ VRAM address for the top-left corner of the sprite
 
-                  @ r0 = unused
                   @ r1 = VRAM xy address
                   @ r2 = image pointer
+  @ Initialize constants for character width and row offsets
+  mov r4, #10         @ Character width
+  mov r5, #460        @ VRAM row offset
+  mov r6, #22         @ image row offset
+
+  @ Initialize row counter
+  mov r7, #1
   
-@ Step 2: Copy each row of the 16x16 sprite into VRAM
-  mov r3, #16         @ Row counter (16 rows)
-  mov r4, #32         @ Row size in bytes (16 pixels * 2 bytes per pixel)
 
 .LoopRow:
-  ldmia r2!, {r5-r11} @ Load 7 words (28 bytes) from the image pointer
-  stmia r1!, {r5-r11} @ Store 7 words (28 bytes) into VRAM
-  ldr r5, [r2], #4    @ Load the last word (4 bytes) from the row and advance
-  str r5, [r1], #4    @ Store the last word into VRAM and advance
-  add r1, r1, #448    @ Move to the next line in VRAM (screen width in bytes)
+  ldr r2, [r2], #4    @ Load 2 pixels, increment image pointer
+  str r1, [r1], #4    @ Store 2 pixels, increment VRAM pointer
+  ldr r2, [r2], #4    @ Load 2 pixels, increment image pointer
+  str r1, [r1], #4    @ Store 2 pixels, increment VRAM pointer
+  ldr r2, [r2], #4    @ Load 2 pixels, increment image pointer
+  str r1, [r1], #4    @ Store 2 pixels, increment VRAM pointer
+  ldr r2, [r2], #4    @ Load 2 pixels, increment image pointer
+  str r1, [r1], #4    @ Store 2 pixels, increment VRAM pointer
+  ldr r2, [r2], #4    @ Load 2 pixels, increment image pointer
+  str r1, [r1], #4    @ Store 2 pixels, increment VRAM pointer
+
+@  add r2, r2, r5      @ Add VRAM row offset to VRAM pointer
+@  add r1, r1, r6      @ Add image row offset to image pointer
+   
+
   subs r3, r3, #1     @ Decrement row counter
   bne .LoopRow        @ Repeat until all 16 rows are processed
 

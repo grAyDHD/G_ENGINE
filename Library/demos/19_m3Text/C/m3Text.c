@@ -1,5 +1,8 @@
 #include "../includes/fontData.h"
+#include "draw.h"
 #include "gfx.h"
+
+#define dblClr(color) ((color) | (color << 16))
 
 int getFontDataIndex(char c) {
   if (c >= 'A' && c <= 'Z') {
@@ -97,6 +100,8 @@ void drawGlyph(u8 x, u8 y, char c) {
 
 int main() {
   DSPC = MODE3 | BG2;
+  int bgColor = dblClr(RGB(17, 13, 28));
+  fillScreen(bgColor);
 
   // draw single glyphs to VRAM, print HELLO WORLD
   int glyphIndex = getFontDataIndex('B');
@@ -105,5 +110,7 @@ int main() {
   //                      16xOff,16yOff,16width,16height
   //            r0-x, r1-y, r2-glyphData struct, r3-fontImage
 
+  while (1) {
+  }
   return 0;
 }
