@@ -1,10 +1,12 @@
 .global copyGlyphToVRAM
 .type copyGlyphToVRAM, %function
 
-@ copyGlyphToVRAM(int x, int y, const void *image)
+@ copyGlyphToVRAM(int x, int y, const void *image, GlyphInfo *fontDataIndex)
+
 @ r0 = x
 @ r1 = y
-@ r2 = image (pointer to sprite)
+@ r2 = image base address
+@ r3 = GlyphInfo struct address
 
 copyGlyphToVRAM:
   push {r4-r11}       @ Save registers on the stack
@@ -19,7 +21,8 @@ copyGlyphToVRAM:
 
   @ Initialize constants for character width and row offsets
   @ Character width
-  mov r4, #8          
+  @get glyph width from struct into r4
+  ldrh r4, [r3, #2]  
 
   @ VRAM row offset
   mov r5, #480        
@@ -45,15 +48,16 @@ copyGlyphToVRAM:
 
   @ A offset = 0, B=22,C=40 rest in font table
 
-  ldr r3, =1480                @ glyph offset
-  add r2, r2, r3              @ character offset for testing
+  @get xOffset from struct into r9
+  ldrh r9, [r3, #0]              @ glyph offset
+  add r2, r2, r9              @ image position + xOffset for glyph
 
 .LoopRow:
   mov r8, r4                  @ initialize width counter
 
 .LoopPixel:
-  ldrh r3, [r2], #2    @ Load 1 pixels, increment image address
-  strh r3, [r1], #2    @ Store 1 pixels, increment VRAM address
+  ldrh r9, [r2], #2    @ Load 1 pixels, increment image address
+  strh r9, [r1], #2    @ Store 1 pixels, increment VRAM address
   subs r8, r8, #1
   bne .LoopPixel
 

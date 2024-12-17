@@ -11,6 +11,7 @@ typedef struct {
 
 extern GlyphInfo fontData[94];
 
-extern void copyGlyphToVRAM(int x, int y, const void *fontBitmap);
+extern void copyGlyphToVRAM(int x, int y, const void *fontBitmap,
+                            GlyphInfo *fontDataIndex);
 
 #endif

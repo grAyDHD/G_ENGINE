@@ -82,6 +82,49 @@ int getFontDataIndex(char c) {
     }
   }
 }
+int main() {
+  DSPC = MODE3 | BG2;
+  int bgColor = dblClr(RGB(17, 13, 28));
+  fillScreen(bgColor);
+  int glyphIndex;
+
+  glyphIndex = getFontDataIndex('H');
+  copyGlyphToVRAM(20, 20, &PeaberryBitmap, &fontData[glyphIndex]);
+
+  glyphIndex = getFontDataIndex('e');
+  copyGlyphToVRAM(30, 20, &PeaberryBitmap, &fontData[glyphIndex]);
+
+  glyphIndex = getFontDataIndex('l');
+  copyGlyphToVRAM(40, 20, &PeaberryBitmap, &fontData[glyphIndex]);
+
+  glyphIndex = getFontDataIndex('l');
+  copyGlyphToVRAM(50, 20, &PeaberryBitmap, &fontData[glyphIndex]);
+
+  glyphIndex = getFontDataIndex('o');
+  copyGlyphToVRAM(60, 20, &PeaberryBitmap, &fontData[glyphIndex]);
+
+  glyphIndex = getFontDataIndex('W');
+  copyGlyphToVRAM(80, 20, &PeaberryBitmap, &fontData[glyphIndex]);
+
+  glyphIndex = getFontDataIndex('o');
+  copyGlyphToVRAM(90, 20, &PeaberryBitmap, &fontData[glyphIndex]);
+
+  glyphIndex = getFontDataIndex('r');
+  copyGlyphToVRAM(100, 20, &PeaberryBitmap, &fontData[glyphIndex]);
+
+  glyphIndex = getFontDataIndex('l');
+  copyGlyphToVRAM(110, 20, &PeaberryBitmap, &fontData[glyphIndex]);
+
+  glyphIndex = getFontDataIndex('d');
+  copyGlyphToVRAM(120, 20, &PeaberryBitmap, &fontData[glyphIndex]);
+
+  glyphIndex = getFontDataIndex('!');
+  copyGlyphToVRAM(130, 20, &PeaberryBitmap, &fontData[glyphIndex]);
+
+  while (1) {
+  }
+  return 0;
+}
 
 /*
 void drawGlyph(u8 x, u8 y, char c) {
@@ -97,20 +140,3 @@ void drawGlyph(u8 x, u8 y, char c) {
   //  copyGlyphToVRAM(x+xoffset, y+yoffset, glyphImagePtr, &glyph);
 }
 */
-
-int main() {
-  DSPC = MODE3 | BG2;
-  int bgColor = dblClr(RGB(17, 13, 28));
-  fillScreen(bgColor);
-
-  // draw single glyphs to VRAM, print HELLO WORLD
-  int glyphIndex = getFontDataIndex('B');
-
-  copyGlyphToVRAM(20, 20, &PeaberryBitmap);
-  //                      16xOff,16yOff,16width,16height
-  //            r0-x, r1-y, r2-glyphData struct, r3-fontImage
-
-  while (1) {
-  }
-  return 0;
-}
