@@ -29,8 +29,6 @@ Second:
     Font Data Integration
 [x] Define a data structure for font glyphs (e.g., 8x8 pixel bitmaps)
 [x] create function to map chars to fontData, getFontInfoIndex
-[ ] create program to generate appropriate fontData structure from fontTable
-    too buggy right now
 [x] create assembly function taking x, y, imageoffset, glyph w/h
 or... Coordinate, image pointer, glyph
 
@@ -39,12 +37,13 @@ or... Coordinate, image pointer, glyph
 [x] Implement a `drawText(x, y, *text)` function.
 - [x] Draw multiple characters as a single line of text.
 - [x] Verify correct spacing between characters.
+- []  Refactor to actual function, in main right now
 
 ### Step 4:
     Text Color and Background Handling
-- [ ] Add support for customizable text colors (16-bit RGB15).
+- [ ] Add support for customizable text colors (16-bit RGB15). 
 - [ ] Implement a background color option for text rendering.
-- [ ] Ensure background does not overwrite other screen content.
+- [x] Ensure background does not overwrite other screen content.
 
 
 ### Step 5: 
@@ -63,7 +62,7 @@ or... Coordinate, image pointer, glyph
 - [ ] Implement text scaling (e.g., 2x or 4x size).
 - [ ] Add gradient text coloring options.
 - [ ] Create a text shadow/outline effect.
-- [ ] Support dynamic text updates (e.g., real-time counters).
+- [ ] Support dynamic text updates (e.g., real-time counters).backgroundbackground
 - [ ] Enable smooth scrolling for long text strings.
 
 ### Step 7:
