@@ -86,57 +86,27 @@ int main() {
   DSPC = MODE3 | BG2;
   int bgColor = dblClr(RGB(17, 13, 28));
   fillScreen(bgColor);
+
+  const char *text = "Hello World!";
+  int x = 20;
+  int y = 20;
   int glyphIndex;
 
-  glyphIndex = getFontDataIndex('H');
-  copyGlyphToVRAM(20, 20, &PeaberryBitmap, &fontData[glyphIndex]);
+  for (int i = 0; text[i] != '\0'; i++) {
+    char c = text[i];
 
-  glyphIndex = getFontDataIndex('e');
-  copyGlyphToVRAM(30, 20, &PeaberryBitmap, &fontData[glyphIndex]);
-
-  glyphIndex = getFontDataIndex('l');
-  copyGlyphToVRAM(40, 20, &PeaberryBitmap, &fontData[glyphIndex]);
-
-  glyphIndex = getFontDataIndex('l');
-  copyGlyphToVRAM(50, 20, &PeaberryBitmap, &fontData[glyphIndex]);
-
-  glyphIndex = getFontDataIndex('o');
-  copyGlyphToVRAM(60, 20, &PeaberryBitmap, &fontData[glyphIndex]);
-
-  glyphIndex = getFontDataIndex('W');
-  copyGlyphToVRAM(80, 20, &PeaberryBitmap, &fontData[glyphIndex]);
-
-  glyphIndex = getFontDataIndex('o');
-  copyGlyphToVRAM(90, 20, &PeaberryBitmap, &fontData[glyphIndex]);
-
-  glyphIndex = getFontDataIndex('r');
-  copyGlyphToVRAM(100, 20, &PeaberryBitmap, &fontData[glyphIndex]);
-
-  glyphIndex = getFontDataIndex('l');
-  copyGlyphToVRAM(110, 20, &PeaberryBitmap, &fontData[glyphIndex]);
-
-  glyphIndex = getFontDataIndex('d');
-  copyGlyphToVRAM(120, 20, &PeaberryBitmap, &fontData[glyphIndex]);
-
-  glyphIndex = getFontDataIndex('!');
-  copyGlyphToVRAM(130, 20, &PeaberryBitmap, &fontData[glyphIndex]);
+    if (c == ' ') {
+      x += 5;
+      continue;
+    }
+    glyphIndex = getFontDataIndex(c);
+    if (glyphIndex >= 0) {
+      copyGlyphToVRAM(x, y, &PeaberryBitmap, &fontData[glyphIndex]);
+      x += fontData[glyphIndex].width + 1;
+    }
+  }
 
   while (1) {
   }
   return 0;
 }
-
-/*
-void drawGlyph(u8 x, u8 y, char c) {
-  int index = getFontDataIndex(c);
-  if (index < 0) {
-    return;
-  }
-
-  GlyphInfo glyph = fontData[index];
-  int glyphOffset = glyph.xOffset + (glyph.yOffset * 803);
-  //   void *glyphImagePtr = &PeaberryBitmap[glyphOffset];
-
-  //  copyGlyphToVRAM(x+xoffset, y+yoffset, glyphImagePtr, &glyph);
-}
-*/

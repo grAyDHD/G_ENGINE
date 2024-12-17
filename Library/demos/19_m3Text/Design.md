@@ -30,17 +30,15 @@ Second:
 [x] Define a data structure for font glyphs (e.g., 8x8 pixel bitmaps)
 [x] create function to map chars to fontData, getFontInfoIndex
 [ ] create program to generate appropriate fontData structure from fontTable
-[ ] create assembly function taking x, y, imageoffset, glyph w/h
+    too buggy right now
+[x] create assembly function taking x, y, imageoffset, glyph w/h
 or... Coordinate, image pointer, glyph
 
 ### Step 3:
     Text Drawing Function
-[ ] Implement a `drawGlyph(x, y, char)` function.
-- [ ] Draw a single character at specified coordinates.
-
-[ ] Implement a `drawText(x, y, *text)` function.
-- [ ] Draw multiple characters as a single line of text.
-- [ ] Verify correct spacing between characters.
+[x] Implement a `drawText(x, y, *text)` function.
+- [x] Draw multiple characters as a single line of text.
+- [x] Verify correct spacing between characters.
 
 ### Step 4:
     Text Color and Background Handling
