@@ -18,11 +18,16 @@ copyGlyphToVRAM:
   add r1, r1, r0      @ VRAM address for the top-left corner of the sprite
 
   @ Initialize constants for character width and row offsets
-  mov r4, #8          @ Character width
-  mov r5, #480        @ VRAM row offset
+  @ Character width
+  mov r4, #8          
+
+  @ VRAM row offset
+  mov r5, #480        
   sub r5, r5, r4
-  sub r5, r5, r4
-  mov r6, #128         @ image row offset
+  sub r5, r5, r4 
+
+  @ image row offset
+  ldr r6, =2048       
   sub r6, r6, r4
   sub r6, r6, r4
 
@@ -35,13 +40,13 @@ copyGlyphToVRAM:
                   @ r5 = VRAM row offset
                   @ r6 = image row offset
 
-  @ Initialize row counter
-  mov r7, #16
+  @ Initialize row counter, ultimately set as char height
+  mov r7, #16 
 
-  @ A offset = 0, B offset = 22, C offset = 40
-  @ D offset = 58, E offset = 76, F offset = 94, G offset = 112
+  @ A offset = 0, B=22,C=40 rest in font table
 
-  add r2, r2, #58             @ character offset for testing
+  ldr r3, =482                @ Z offset
+  add r2, r2, r3              @ character offset for testing
 
 .LoopRow:
   mov r8, r4                  @ initialize width counter
