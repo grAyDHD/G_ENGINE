@@ -45,7 +45,7 @@ copyGlyphToVRAM:
 
   @ A offset = 0, B=22,C=40 rest in font table
 
-  ldr r3, =482                @ Z offset
+  ldr r3, =1480                @ glyph offset
   add r2, r2, r3              @ character offset for testing
 
 .LoopRow:

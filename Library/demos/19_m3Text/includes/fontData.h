@@ -6,9 +6,7 @@
 
 typedef struct {
   u16 xOffset;
-  u16 yOffset;
   u16 width;
-  u16 height;
 } GlyphInfo;
 
 extern GlyphInfo fontData[94];
