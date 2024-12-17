@@ -4,6 +4,7 @@
 #include "typedefs.h"
 
 #define RGB(r, g, b) (((r) & 0x1F) | ((g) & 0x1F) << 5 | ((b) & 0x1F) << 10)
+#define dblClr(color) ((color) | (color << 16))
 
 void plotPixel(int x, int y, unsigned short color);
 void drawLine(Coordinate start, Coordinate end, unsigned short color);

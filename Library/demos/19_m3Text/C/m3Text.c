@@ -2,7 +2,36 @@
 #include "draw.h"
 #include "gfx.h"
 
-#define dblClr(color) ((color) | (color << 16))
+int getFontDataIndex(char c);
+
+int main() {
+  DSPC = MODE3 | BG2;
+  int bgColor = dblClr(RGB(17, 13, 28));
+  fillScreen(bgColor);
+
+  const char *text = "Hello World!";
+  int x = 20;
+  int y = 20;
+  int glyphIndex;
+
+  for (int i = 0; text[i] != '\0'; i++) {
+    char c = text[i];
+
+    if (c == ' ') {
+      x += 5;
+      continue;
+    }
+    glyphIndex = getFontDataIndex(c);
+    if (glyphIndex >= 0) {
+      copyGlyphToVRAM(x, y, &PeaberryBitmap, &fontData[glyphIndex]);
+      x += fontData[glyphIndex].width + 1;
+    }
+  }
+
+  while (1) {
+  }
+  return 0;
+}
 
 int getFontDataIndex(char c) {
   if (c >= 'A' && c <= 'Z') {
@@ -81,32 +110,4 @@ int getFontDataIndex(char c) {
       return -1;
     }
   }
-}
-int main() {
-  DSPC = MODE3 | BG2;
-  int bgColor = dblClr(RGB(17, 13, 28));
-  fillScreen(bgColor);
-
-  const char *text = "Hello World!";
-  int x = 20;
-  int y = 20;
-  int glyphIndex;
-
-  for (int i = 0; text[i] != '\0'; i++) {
-    char c = text[i];
-
-    if (c == ' ') {
-      x += 5;
-      continue;
-    }
-    glyphIndex = getFontDataIndex(c);
-    if (glyphIndex >= 0) {
-      copyGlyphToVRAM(x, y, &PeaberryBitmap, &fontData[glyphIndex]);
-      x += fontData[glyphIndex].width + 1;
-    }
-  }
-
-  while (1) {
-  }
-  return 0;
 }

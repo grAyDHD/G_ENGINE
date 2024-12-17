@@ -33,41 +33,58 @@ copyGlyphToVRAM:
   ldr r6, =2048       
   sub r6, r6, r4
   sub r6, r6, r4
+ 
 
-  
-                  @ r0 = vram byte offset amount (not needed)
-                  @ r1 = VRAM xy address
-                  @ r2 = image pointer
-                  @ r3 = empty
-                  @ r4 = character width
-                  @ r5 = VRAM row offset
-                  @ r6 = image row offset
-
+  @ Load transparency value
+  ldr r10, =0x7C1F    @ Magenta color (RGB(31,0,31))
   @ Initialize row counter, ultimately set as char height
   mov r7, #16 
 
-  @ A offset = 0, B=22,C=40 rest in font table
-
-  @get xOffset from struct into r9
-  ldrh r9, [r3, #0]              @ glyph offset
-  add r2, r2, r9              @ image position + xOffset for glyph
+  @ Get xOffset from struct into r9
+  ldrh r9, [r3, #0]                                 @ glyph xOffset
+  add r2, r2, r9                                    @ image position + xOffset for glyph
 
 .LoopRow:
-  mov r8, r4                  @ initialize width counter
+  mov r8, r4                                        @ initialize width/column counter, resets every row
 
 .LoopPixel:
   ldrh r9, [r2], #2    @ Load 1 pixels, increment image address
+  cmp r9, r10
+  beq .SkipPixel
+
   strh r9, [r1], #2    @ Store 1 pixels, increment VRAM address
   subs r8, r8, #1
   bne .LoopPixel
+  b .NewRow
+  
 
+.SkipPixel: 
+  subs r8, r8, #1
+  add r1, r1, #2
+  bne .LoopPixel      @ Only continue at end of row
+
+.NewRow:
   add r1, r1, r5      @ Add VRAM row offset to VRAM address
   add r2, r2, r6      @ Add image row offset to image address  
 
   subs r7, r7, #1     @ Decrement row counter
   bne .LoopRow        @ Repeat until all 16 rows are processed
 
+
+.Done:
   pop {r4-r11}        @ Restore registers
   bx lr               @ Return
+
+                  @ r0 = vram byte offset amount (not needed)
+                  @ r1 = VRAM xy address
+                  @ r2 = image pointer
+                  @ r3 = GlyphInfo
+                  @ r4 = character width
+                  @ r5 = VRAM row offset
+                  @ r6 = image row offset
+                  @ r7 = row counter (height)
+                  @ r8 = column counter (width)
+                  @ r9 = pixel to write
+                  @r10 = transparency value
 
 .size copyGlyphToVRAM, .-copyGlyphToVRAM
