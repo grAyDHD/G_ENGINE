@@ -37,12 +37,11 @@ or... Coordinate, image pointer, glyph
 [x] Implement a `drawText(x, y, *text)` function.
 - [x] Draw multiple characters as a single line of text.
 - [x] Verify correct spacing between characters.
-- []  Refactor to actual function, in main right now
+- [x]  Refactor to actual function, in main right now
 
 ### Step 4:
     Text Color and Background Handling
 - [ ] Add support for customizable text colors (16-bit RGB15). 
-- [ ] Implement a background color option for text rendering.
 - [x] Ensure background does not overwrite other screen content.
 
 
@@ -57,27 +56,6 @@ or... Coordinate, image pointer, glyph
 - [ ] Verify rendering correctness for multiple lines with varied lengths.
 
 
-### Step 6:
-    Advanced Features
-- [ ] Implement text scaling (e.g., 2x or 4x size).
-- [ ] Add gradient text coloring options.
-- [ ] Create a text shadow/outline effect.
-- [ ] Support dynamic text updates (e.g., real-time counters).backgroundbackground
-- [ ] Enable smooth scrolling for long text strings.
-
-### Step 7:
-    Testing and Debugging
-- [ ] Develop test cases for each function.
-- [ ] Ensure rendering correctness for all edge cases (e.g., extreme alignments, overlapping lines).
-- [ ] Test program stability with rapid text updates.
-- [ ] Verify compatibility with other Mode 3 features (e.g., images).
-
-### Step 8:
-    Documentation and Finalization
-- [ ] Document all public functions and their usage.
-- [ ] Create example programs demonstrating text rendering features.
-- [ ] Write a README explaining the library's features and limitations.
-- [ ] Perform final code review and cleanup.
 
 ---
 
@@ -89,10 +67,12 @@ or... Coordinate, image pointer, glyph
 - [ ] Implement text positioning relative to a bounding box.
 - [ ] Test all alignment combinations with multi-line text.
 
----
+    Advanced Features
+- [ ] Implement printf
+- [ ] Implement text scaling (e.g., 2x or 4x size).
+- [ ] Add gradient text coloring options.
+- [ ] Create a text shadow/outline effect.
+- [ ] Support dynamic text updates (e.g., real-time counters).backgroundbackground
+- [ ] Enable smooth scrolling for long text strings.
+- [ ] Finish program to take bitmap input and generate valid font data table/array
 
-## Memory and Performance Considerations
-
-- Mode 3 uses 240x160 pixels and requires careful VRAM management.
-- Font data and rendering functions will prioritize minimal memory usage.
-- Rendering operations will be aligned with VBLANK to avoid tearing or flickering.

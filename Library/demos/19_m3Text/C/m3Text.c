@@ -3,6 +3,7 @@
 #include "gfx.h"
 
 int getFontDataIndex(char c);
+void printString(int x, int y, const char *text);
 
 int main() {
   DSPC = MODE3 | BG2;
@@ -12,6 +13,13 @@ int main() {
   const char *text = "Hello World!";
   int x = 20;
   int y = 20;
+  printString(x, y, text);
+  while (1) {
+  }
+  return 0;
+}
+
+void printString(int x, int y, const char *text) {
   int glyphIndex;
 
   for (int i = 0; text[i] != '\0'; i++) {
@@ -27,11 +35,7 @@ int main() {
       x += fontData[glyphIndex].width + 1;
     }
   }
-
-  while (1) {
-  }
-  return 0;
-}
+};
 
 int getFontDataIndex(char c) {
   if (c >= 'A' && c <= 'Z') {
@@ -110,4 +114,5 @@ int getFontDataIndex(char c) {
       return -1;
     }
   }
+  void printString(int x, int y, const char *text);
 }
