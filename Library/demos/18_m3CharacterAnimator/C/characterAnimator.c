@@ -84,6 +84,7 @@ int main() {
   int chocoboStepCounter = 0;
   int playerStepCounter = 0;
 
+  GREEN_SWAP = 1;
   while (1) {
     updateKeys();
     VBLANK();

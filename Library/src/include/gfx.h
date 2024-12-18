@@ -11,6 +11,7 @@
 //---Video buffer---
 #define VRAM (u16 *)0x6000000
 
+#define GREEN_SWAP *(u16 *)0x4000002
 //---Modes---//
 #define MODE0 0x0000
 #define MODE1 0x0001
