@@ -3,22 +3,22 @@
 #include "gfx.h"
 
 int getFontDataIndex(char c);
-
 void printString(int x, int y, const char *text);
-void printDebug(int x, int y, const char *format, int arg1, int arg2);
+
 void itoh(int number, char *buffer);
+void printDebug(int x, int y, const char *format, int arg1, int arg2);
 
 int main() {
   DSPC = MODE3 | BG2;
   int bgColor = dblClr(RGB(17, 13, 28));
   fillScreen(bgColor);
 
-  // const char *text = "Hello World!";
+  const char *text = "1234567890";
   int x = 20;
   int y = 20;
-  //  printString(x, y, text);
+  printString(x, y, text);
 
-  printDebug(x, y, "pba = 0x%08x", (unsigned int)&PeaberryBitmap, 0);
+  //  printDebug(x, y, "pba = 0xx", (unsigned int)&PeaberryBitmap, 0);
   while (1) {
   }
   return 0;
@@ -47,10 +47,30 @@ int getFontDataIndex(char c) {
     return c - 'A';
   } else if (c >= 'a' && c <= 'z') {
     return c - 'a' + 26;
-  } else if (c >= '0' && c <= '9') {
-    return c - '0' + 52;
+    // } else if (c >= '0' && c <= '9') {
+    //   return c - '0' + 52;
   } else {
     switch (c) {
+    case '1':
+      return 52;
+    case '2':
+      return 53;
+    case '3':
+      return 54;
+    case '4':
+      return 55;
+    case '5':
+      return 56;
+    case '6':
+      return 57;
+    case '7':
+      return 58;
+    case '8':
+      return 59;
+    case '9':
+      return 60;
+    case '0':
+      return 61;
     case '{':
       return 62;
     case '}':
