@@ -3,7 +3,9 @@
 #include "gfx.h"
 
 int getFontDataIndex(char c);
+
 void printString(int x, int y, const char *text);
+void printDebug(int x, int y, char *text, u16 val1, u16 val2);
 
 int main() {
   DSPC = MODE3 | BG2;
@@ -35,6 +37,12 @@ void printString(int x, int y, const char *text) {
       x += fontData[glyphIndex].width + 1;
     }
   }
+};
+
+void printDebug(int x, int y, char *text, u16 val1, u16 val2) {
+  char stringOutput[64];
+
+  printString(x, y, stringOutput);
 };
 
 int getFontDataIndex(char c) {
@@ -114,5 +122,4 @@ int getFontDataIndex(char c) {
       return -1;
     }
   }
-  void printString(int x, int y, const char *text);
 }
