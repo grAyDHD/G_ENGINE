@@ -5,6 +5,7 @@
 int getFontDataIndex(char c);
 void printString(int x, int y, const char *text);
 
+// don't understand itoh logic at all
 void itoh(int number, char *buffer);
 void printDebug(int x, int y, const char *format, int arg1, int arg2);
 
@@ -13,12 +14,12 @@ int main() {
   int bgColor = dblClr(RGB(17, 13, 28));
   fillScreen(bgColor);
 
-  const char *text = "1234567890";
+  // const char *text = "1234567890";
   int x = 20;
   int y = 20;
-  printString(x, y, text);
+  // printString(x, y, text);
 
-  //  printDebug(x, y, "pba = 0xx", (unsigned int)&PeaberryBitmap, 0);
+  printDebug(x, y, "pba = 0x%x", DSPC, 0);
   while (1) {
   }
   return 0;
