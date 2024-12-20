@@ -56,6 +56,7 @@ Pressing A when text speed selected will highlight selected speed
 
 ### Phase 1: 
     Base Game Environment
+[ ] Decide on assets to use
 [ ] Implement player sprite
 [ ] 4 directional movement/animation
 [ ] Static NPC
