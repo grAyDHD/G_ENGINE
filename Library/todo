@@ -1,4 +1,0 @@
-06_rect get to compile with assembly/asm (asdf)
-
-update input.h to move away from tonc implementation in in.h
-fix sierpinski in projects
