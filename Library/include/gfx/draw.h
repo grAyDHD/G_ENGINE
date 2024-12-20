@@ -1,7 +1,7 @@
 #ifndef DRAW_H
 #define DRAW_H
 
-#include "typedefs.h"
+#include "core/typedefs.h"
 
 #define RGB(r, g, b) (((r) & 0x1F) | ((g) & 0x1F) << 5 | ((b) & 0x1F) << 10)
 #define dblClr(color) ((color) | (color << 16))

@@ -1,7 +1,7 @@
 #ifndef GFX_H
 #define GFX_H
 
-#include "typedefs.h"
+#include "core/typedefs.h"
 
 #define SW 240
 #define SH 160

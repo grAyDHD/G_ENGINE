@@ -1,7 +1,7 @@
 #ifndef PAGEFLIP_H
 #define PAGEFLIP_H
 
-#include "typedefs.h"
+#include "core/typedefs.h"
 
 #define PALETTE ((volatile u16 *)0x5000000)
 #define PAGE_OFFSET 0xA000

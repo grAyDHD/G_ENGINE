@@ -1,7 +1,7 @@
 #ifndef DMG_H
 #define DMG_H
 
-#include "typedefs.h"
+#include "core/typedefs.h"
 // FEDC BA08 7654 3210
 // Master sound enable and dmg 1-4 play status
 #define SOUND_SYSTEM *(volatile u16 *)0x04000084

@@ -1,5 +1,5 @@
-#include "dmg.h"
-#include "typedefs.h"
+#include "audio/dmg.h"
+#include "core/typedefs.h"
 
 void initSoundSystem() {
   ENABLE_SOUND();

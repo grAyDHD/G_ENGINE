@@ -3,36 +3,47 @@ $(error "Please set DEVKITARM in your environment. export DEVKITARM=<path to>dev
 endif
 include $(DEVKITARM)/gba_rules
 
+# Directories
 SRC_DIR := src
-C_SRC_DIR := src/C
-ASM_SRC_DIR := src/asm
+C_SRC_DIR := $(SRC_DIR)/C
+ASM_SRC_DIR := $(SRC_DIR)/asm
 BUILD_DIR := build
-INCLUDE_DIR := src/include $(C_SRC_DIR)
+INCLUDE_DIR := include $(C_SRC_DIR)
 
 # Library target
 LIBRARY := $(BUILD_DIR)/g_engine.a
 
+# Tools
 CC := arm-none-eabi-gcc
 AS := arm-none-eabi-as
 AR := arm-none-eabi-ar
+
+# Flags
 CFLAGS := -mthumb -mthumb-interwork -O2 -Wall -fno-strict-aliasing $(foreach dir, $(INCLUDE_DIR), -I$(dir))
 
-C_SOURCES := $(wildcard $(C_SRC_DIR)/**/*.c) $(wildcard $(C_SRC_DIR)/*.c)
-ASM_SOURCES := $(wildcard $(ASM_SRC_DIR)/**/*.s) $(wildcard $(ASM_SRC_DIR)/*.s)
-OBJ_FILES := $(C_SOURCES:$(C_SRC_DIR)/%.c=$(BUILD_DIR)/%.o) $(ASM_SOURCES:$(ASM_SRC_DIR)/%.s=$(BUILD_DIR)/%.o)
+# Source files
+C_SOURCES := $(shell find $(C_SRC_DIR) -type f -name '*.c')
+ASM_SOURCES := $(shell find $(ASM_SRC_DIR) -type f -name '*.s')
+
+# Object files (mirror source structure in build directory)
+OBJ_FILES := $(C_SOURCES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o) \
+             $(ASM_SOURCES:$(SRC_DIR)/%.s=$(BUILD_DIR)/%.o)
 
 all: $(LIBRARY)
 
+# Archive library
 $(LIBRARY): $(OBJ_FILES)
 	@[ -d $(BUILD_DIR) ] || mkdir -p $(BUILD_DIR)
 	$(AR) rcs $@ $^
 
-$(BUILD_DIR)/%.o: $(C_SRC_DIR)/%.c
-	@[ -d $(BUILD_DIR)/$(dir $*) ] || mkdir -p $(BUILD_DIR)/$(dir $*)
+# Rule for C source files
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
+	@[ -d $(dir $@) ] || mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/%.o: $(ASM_SRC_DIR)/%.s
-	@[ -d $(BUILD_DIR)/$(dir $*) ] || mkdir -p $(BUILD_DIR)/$(dir $*)
+# Rule for ASM source files
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.s
+	@[ -d $(dir $@) ] || mkdir -p $(dir $@)
 	$(AS) -o $@ $<
 
 clean:

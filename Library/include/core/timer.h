@@ -1,6 +1,6 @@
 #ifndef TIMER_H
 #define TIMER_H
-#include "typedefs.h"
+#include "core/typedefs.h"
 
 #define TIMER_DATA(timer) *(volatile u16 *)(0x04000100 + (timer << 2))
 #define TIMER_CONTROL(timer) *(volatile u16 *)(0x04000102 + (timer << 2))

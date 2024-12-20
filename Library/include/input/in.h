@@ -1,6 +1,6 @@
 #ifndef TONC_INPUT
 #define TONC_INPUT
-#include "typedefs.h"
+#include "core/typedefs.h"
 
 #define KEYS *(volatile u16 *)(0x4000000 + 0x0130)
 #define INLINE inline

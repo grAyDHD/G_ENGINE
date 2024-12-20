@@ -1,6 +1,6 @@
-#include "draw.h"
-#include "gfx.h"
-#include "typedefs.h"
+#include "gfx/draw.h"
+#include "core/typedefs.h"
+#include "gfx/gfx.h"
 
 void plotPixel(int x, int y, u16 clr) { ((u16 *)VRAM)[y * SW + x] = clr; }
 
