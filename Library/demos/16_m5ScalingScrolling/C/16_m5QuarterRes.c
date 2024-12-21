@@ -1,5 +1,6 @@
 #include "graphics/draw.h"
 #include "graphics/video.h"
+// #include "graphics/effects"
 
 int main() {
   DSPC = MODE5 | BG2;
