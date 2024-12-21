@@ -2,7 +2,13 @@
 #include "core/typedefs.h"
 #include "graphics/video.h"
 
-void plotPixel(int x, int y, u16 clr) { ((u16 *)VRAM)[y * SW + x] = clr; }
+void plotPixel(int x, int y, u16 clr) {
+  ((u16 *)VRAM)[y * SW + x] = clr;
+} // mode 3
+
+void m5_plotPixel(int x, int y, u16 clr) {
+  ((u16 *)VRAM)[y * 160 + x] = clr;
+} // mode 5
 
 void drawCircle(int x, int y, int radius, unsigned short color) {
   int r = radius;
