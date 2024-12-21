@@ -1,5 +1,5 @@
 #include "physics/phys.h"
-#include "gfx/gfx.h"
+#include "graphics/video.h"
 
 int gravityDirection = 1;
 void applyGravity(struct Object *obj) { obj->ay = GRAVITY * gravityDirection; }

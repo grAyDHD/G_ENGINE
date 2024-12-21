@@ -1,6 +1,6 @@
-#include "gfx/draw.h"
+#include "graphics/draw.h"
 #include "core/typedefs.h"
-#include "gfx/gfx.h"
+#include "graphics/video.h"
 
 void plotPixel(int x, int y, u16 clr) { ((u16 *)VRAM)[y * SW + x] = clr; }
 
@@ -21,6 +21,17 @@ void drawCircle(int x, int y, int radius, unsigned short color) {
     plotPixel(x - s, y - r, color); // Octant 6
     plotPixel(x + s, y - r, color); // Octant 7
     plotPixel(x + r, y - s, color); // Octant 8
+
+    /*  ALTERNATIVE COLORING METHOD (make into new function?)
+    plotPixel(x + r, y + s, COLOR(r, 0, 0)); // Octant 1
+    plotPixel(x + s, y + r, COLOR(r, r, 0)); // Octant 2
+    plotPixel(x - s, y + r, COLOR(r, 0, r)); // Octant 3
+    plotPixel(x - r, y + s, COLOR(0, r, 0)); // Octant 4
+    plotPixel(x - r, y - s, COLOR(0, 0, r)); // Octant 5
+    plotPixel(x - s, y - r, COLOR(0, r, r)); // Octant 6
+    plotPixel(x + s, y - r, COLOR(0, 0, r)); // Octant 7
+    plotPixel(x + r, y - s, COLOR(r, r, r)); // Octant 8
+     */
 
     s++;
     if (decisionOver2 <= 0) {

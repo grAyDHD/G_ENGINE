@@ -1,6 +1,6 @@
 #include "input/in.h"
 #include "core/typedefs.h"
-#include "gfx/gfx.h"
+#include "graphics/video.h"
 
 #define ALIGN4 __attribute__((aligned(4)))
 #define KEY_MASK 0x03FF

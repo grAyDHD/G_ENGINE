@@ -1,6 +1,5 @@
-// #include "engine.h"
-#define u16 unsigned short
-#define u32 unsigned long
+#include "gfx/draw.h"
+#include "gfx/gfx.h"
 
 #define COLOR(r, g, b) (((r) & 0x1F) << 10 | ((g) & 0x1F) << 5 | ((b) & 0x1F))
 
@@ -13,10 +12,8 @@
 #define VRAM (u16 *)0x6000000
 
 //---Modes---//
-#define MODE3 (u16)0x400
-#define BG2 (u16)0x003
 
-void plotPixel(int x, int y, u16 clr) { ((u16 *)VRAM)[y * SW + x] = clr; }
+// void plotPixel(int x, int y, u16 clr) { ((u16 *)VRAM)[y * SW + x] = clr; }
 
 void drawCircle(int x, int y, int radius, unsigned short color) {
   int r = radius;
@@ -25,8 +22,8 @@ void drawCircle(int x, int y, int radius, unsigned short color) {
       1 - r; // Decision criterion divided by 2 evaluated at r=r, s=0
 
   while (r >= s) {
-    for (volatile int z = 0; z < 1000; z++)
-      ;
+    //    for (volatile int z = 0; z < 1000; z++)
+    //    ;
 
     // Draw the eight octants
     plotPixel(x + r, y + s, color); // Octant 1
@@ -48,10 +45,8 @@ void drawCircle(int x, int y, int radius, unsigned short color) {
     plotPixel(x - s, y - r, COLOR(0, r, r)); // Octant 6
     plotPixel(x + s, y - r, COLOR(0, 0, r)); // Octant 7
     plotPixel(x + r, y - s, COLOR(r, r, r)); // Octant 8
-
-
-
      */
+
     s++;
     if (decisionOver2 <= 0) {
       decisionOver2 += 2 * s + 1; // Move down in y-direction

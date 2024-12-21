@@ -4,9 +4,9 @@
 // Include standard typedefs, macros, and global defines
 #include "audio/dmg.h"
 #include "core/typedefs.h"
-#include "gfx/draw.h"
-#include "gfx/gfx.h"
-#include "gfx/pageFlip.h"
+#include "graphics/draw.h"
+#include "graphics/pageFlip.h"
+#include "graphics/video.h"
 #include "input/in.h"
 #include "physics/phys.h"
 #include "timer.h"

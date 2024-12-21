@@ -1,5 +1,5 @@
 #include "core/typedefs.h"
-#include "gfx/gfx.h"
+#include "graphics/video.h"
 
 #define PALETTE ((volatile u16 *)0x5000000)
 #define PAGE_OFFSET 0xA000

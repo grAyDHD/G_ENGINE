@@ -1,5 +1,5 @@
-#include "draw.h"
-#include "gfx.h"
+#include "gfx/draw.h"
+#include "gfx/gfx.h"
 
 int main() {
   DSPC = (MODE3 | BG2);

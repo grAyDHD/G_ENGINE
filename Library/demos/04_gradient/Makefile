@@ -18,7 +18,12 @@ BUILD := build
 SOURCES := C asm
 
 #include and asset directories
-INCLUDES := $(LIBRARY_DIR)/src/include 
+INCLUDES := $(LIBRARY_DIR)/include \
+						$(LIBRARY_DIR)/core \
+						$(LIBRARY_DIR)/gfx \
+						$(LIBRARY_DIR)/audio \
+						$(LIBRARY_DIR)/input \
+						$(LIBRARY_DIR)/physics \
 DATA := 
 MUSIC := 
 GRAPHICS := graphics

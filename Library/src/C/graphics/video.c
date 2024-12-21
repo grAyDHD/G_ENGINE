@@ -1,4 +1,4 @@
-#include "gfx/gfx.h"
+#include "graphics/video.h"
 
 void VBLANK() {
   while (VCOUNT >= 160)

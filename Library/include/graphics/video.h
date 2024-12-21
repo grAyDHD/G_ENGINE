@@ -1,5 +1,5 @@
-#ifndef GFX_H
-#define GFX_H
+#ifndef VIDEO_H
+#define VIDEO_H
 
 #include "core/typedefs.h"
 
@@ -27,8 +27,6 @@
 #define OBJ 0x1000
 
 #define VCOUNT (*(volatile unsigned short *)0x04000006)
-
-#define dblClr(color) ((color) | (color << 16))
 
 extern void fillScreen(u32 clr);
 void VBLANK();
