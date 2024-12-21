@@ -9,9 +9,8 @@
 // theory, share graphics. However, mode 4 uses 8 BPP images.
 
 #include "../build/MockSnek.h"
-#include "gfx.h"
-// extern void memCopy32(void *dst, const void *src, u32 wdn);
-extern void m3_Background(const void *src);
+#include "graphics/draw.h"
+#include "graphics/video.h"
 
 int main() {
   DSPC = MODE3 | BG2;

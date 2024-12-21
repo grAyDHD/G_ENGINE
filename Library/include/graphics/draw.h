@@ -15,5 +15,8 @@ void fillCircle(int x, int y, int radius, unsigned short color);
 void drawRect(Coordinate start, int width, int height, unsigned short color);
 
 extern void fillScreen(u32 clr);
+extern void m3_Background(const void *src);
+extern void SpriteFrame(int x, int y, int frame, const void *image,
+                        int frameCount);
 
 #endif

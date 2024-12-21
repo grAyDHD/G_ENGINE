@@ -47,6 +47,9 @@ m3_Background: @r0 is image src, r1 dest
 
   .size m3_Background, .-m3_Background
 
+
+
+.arm
 .global SpriteFrame
 .type SpriteFrame, %function
 
@@ -96,9 +99,6 @@ SpriteFrame:
   add r0, r0, r3                        @ move image offset to beginning of frame next row (currently only works for 4 frame animations)
   add r1,  #448                         @ jump to next line VRAM, 480 - 32 to jump to next line at the beginning of the frame row
 
-@ need to chart registers here, instead of adding 448 to r1, add 480 (screen width in bytes)
-@ then, subtract frame size
-
   subs r2, #1
   bne .LoopRow
 
@@ -106,3 +106,6 @@ SpriteFrame:
   bx lr 
 
 .size SpriteFrame, .-SpriteFrame
+
+
+

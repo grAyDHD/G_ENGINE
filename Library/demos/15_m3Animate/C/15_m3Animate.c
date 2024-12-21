@@ -1,8 +1,7 @@
 #include "../build/lil_guy.h"
-#include "engine.h"
-
-extern void SpriteFrame(int x, int y, int frame, const void *image,
-                        int frameCount);
+#include "core/timer.h"
+#include "graphics/draw.h"
+#include "graphics/video.h"
 
 void animation(int x, int y, int frame, const void *image) {
   for (int w = 0; w < 15; w++) {
@@ -20,19 +19,16 @@ int main() {
 
   while (1) {
     VBLANK();
-    for (volatile int z = 0; z < 30000; z++)
-      ;
+    simpleWait(100);
     animation(0, 0, 0, lil_guyBitmap);
 
-    for (volatile int z = 0; z < 30000; z++)
-      ;
+    simpleWait(100);
     animation(0, 0, 1, lil_guyBitmap);
-    for (volatile int z = 0; z < 30000; z++)
-      ;
+
+    simpleWait(100);
     animation(0, 0, 2, lil_guyBitmap);
 
-    for (volatile int z = 0; z < 30000; z++)
-      ;
+    simpleWait(100);
     animation(0, 0, 3, lil_guyBitmap);
   }
 

@@ -1,4 +1,7 @@
-#include "engine.h"
+#include "core/timer.h"
+#include "graphics/draw.h"
+#include "graphics/pageFlip.h"
+#include "graphics/video.h"
 
 int main() {
   // initialize display
@@ -31,10 +34,8 @@ int main() {
 
   while (1) {
     VBLANK();
-    for (volatile int i = 0; i <= 1000000; i++)
-      ;
-
     pageFlip();
+    simpleWait(100);
   }
   return 0;
 }

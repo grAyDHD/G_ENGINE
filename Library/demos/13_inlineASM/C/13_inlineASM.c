@@ -1,6 +1,7 @@
-#include "engine.h"
+#include "graphics/draw.h"
+#include "graphics/video.h"
+#include "input/in.h"
 
-u16 keyCache = 0;
 typedef struct {
   int size;              // 4 byte
   u16 color;             // 2 byte
@@ -30,14 +31,14 @@ int main() {
   Square square = {10, colors[0], {120, 80}};
 
   while (1) {
-    key_poll();
-    if (key_hit(B)) {
+    updateKeys();
+    if (keyTapped(B)) {
       drawRect(square.coordinate, square.size, square.size, 0x0000);
       decreaseSquareSize(&square);
-    } else if (key_hit(A)) {
+    } else if (keyTapped(A)) {
       drawRect(square.coordinate, square.size, square.size, 0x0000);
       increaseSquareSize(&square);
-    } else if (key_hit(RT | LT)) {
+    } else if (keyTapped(RT | LT)) {
       changeSquareSize(&square);
     }
     drawRect(square.coordinate, square.size, square.size, square.color);
