@@ -8,6 +8,8 @@
 #define playerX player.coordinate.x
 #define playerY player.coordinate.y
 
+typedef enum { false = 0, true = !false } bool;
+
 void initializeCharacterSprites(
     Character *character, const void *spriteSheets[NUM_STATES][NUM_DIRECTIONS]);
 
@@ -55,16 +57,36 @@ int main() {
     // Handle player input
     if (keyDown(U)) {
       setCharacterStateAndDirection(&player, WALK, UP);
-      player.coordinate.y -= 4;
+
+      // Prevent player from moving into the collision box from the bottom
+      if (!(playerX + 32 > 80 && playerX < 128 && playerY - 4 < 107 &&
+            playerY >= 107)) {
+        moveCharacter(&player);
+      }
     } else if (keyDown(D)) {
       setCharacterStateAndDirection(&player, WALK, DOWN);
-      player.coordinate.y += 4;
+
+      // Prevent player from moving into the collision box from the top
+      if (!(playerX + 32 > 80 && playerX < 128 && playerY + 4 + 32 > 75 &&
+            playerY + 32 <= 75)) {
+        moveCharacter(&player);
+      }
     } else if (keyDown(L)) {
       setCharacterStateAndDirection(&player, WALK, LEFT);
-      player.coordinate.x -= 4;
+
+      // Prevent player from moving into the collision box from the right
+      if (!(playerX - 4 < 128 && playerX >= 128 && playerY + 32 > 75 &&
+            playerY < 107)) {
+        moveCharacter(&player);
+      }
     } else if (keyDown(R)) {
       setCharacterStateAndDirection(&player, WALK, RIGHT);
-      player.coordinate.x += 4;
+
+      // Prevent player from moving into the collision box from the left
+      if (!(playerX + 4 + 32 > 80 && playerX + 32 <= 80 && playerY + 32 > 75 &&
+            playerY < 107)) {
+        moveCharacter(&player);
+      }
     }
 
     SpriteFrame32Bit(playerX, playerY, playerStepCounter % 4,
@@ -85,7 +107,7 @@ int main() {
       moveCharacter(&chocobo);
     }
 
-    SpriteFrame32Bit(chocoboX, chocoboY, chocoboStepCounter % 4,
+    SpriteFrame32Bit(chocoboX, chocoboY, chocoboStepCounter,
                      chocobo.currentSpriteSheet, 4);
 
     restoreFrameBackground(chocoboX, chocoboY, 32, BedroomBitmap);
@@ -101,11 +123,15 @@ int main() {
       }
     }
 
-    simpleWait(50);
+    simpleWait(30);
   }
 
   return 0;
 }
+
+//  chocobo starts facing right, x = 80 y = 75
+//  4 steps 4 pixels each, 16 + 32 = 48 pixel wide box, 32 tall
+//  player can not enter box (80,75), (80, 107), (128,75), (128,107)
 
 void initializeCharacterSprites(
     Character *character,
@@ -144,7 +170,6 @@ void setCharacterStateAndDirection(Character *character, STATE state,
 }
 
 void moveCharacter(Character *character) {
-  // only if it wont cause collision with chocobo
   switch (character->direction) {
   case RIGHT:
     character->coordinate.x += 4;
