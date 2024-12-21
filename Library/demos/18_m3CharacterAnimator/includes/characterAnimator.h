@@ -31,6 +31,9 @@ typedef struct {
   CharacterSprites
       sprites; // struct array of pointers. each pointer is 4 bytes.
   const void *currentSpriteSheet; // pointer to active sprite 4 bytes
+
+  int height;
+  int width;
 } Character;
 
 const void *chocoboSprites[NUM_STATES][NUM_DIRECTIONS] = {

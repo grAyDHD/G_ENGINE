@@ -9,57 +9,18 @@
 #define playerY player.coordinate.y
 
 void initializeCharacterSprites(
-    Character *character,
-    const void *spriteSheets[NUM_STATES][NUM_DIRECTIONS]) {
-  for (int state = 0; state < NUM_STATES; state++) {
-    for (int direction = 0; direction < NUM_DIRECTIONS; direction++) {
-      character->sprites.spriteSheets[state][direction] =
-          spriteSheets[state][direction];
-    }
-  }
+    Character *character, const void *spriteSheets[NUM_STATES][NUM_DIRECTIONS]);
 
-  character->currentSpriteSheet =
-      character->sprites.spriteSheets[character->state][character->direction];
-};
+void updateCurrentSpriteSheet(Character *character);
 
-void updateCurrentSpriteSheet(Character *character) {
-  character->currentSpriteSheet =
-      character->sprites.spriteSheets[character->state][character->direction];
-}
+void setCharacterState(Character *character, STATE state);
 
-void setCharacterState(Character *character, STATE state) {
-  character->state = state;
-  updateCurrentSpriteSheet(character);
-}
-
-void setCharacterDirection(Character *character, DIRECTION direction) {
-  character->direction = direction;
-  updateCurrentSpriteSheet(character);
-}
+void setCharacterDirection(Character *character, DIRECTION direction);
 
 void setCharacterStateAndDirection(Character *character, STATE state,
-                                   DIRECTION direction) {
-  character->state = state;
-  character->direction = direction;
-  updateCurrentSpriteSheet(character);
-}
+                                   DIRECTION direction);
 
-void moveCharacter(Character *character) {
-  switch (character->direction) {
-  case RIGHT:
-    character->coordinate.x += 4;
-    break;
-  case LEFT:
-    character->coordinate.x -= 4;
-    break;
-  case UP:
-    character->coordinate.y -= 4;
-    break;
-  case DOWN:
-    character->coordinate.y += 4;
-    break;
-  }
-}
+void moveCharacter(Character *character);
 
 int main() {
   DSPC = MODE3 | BG2;
@@ -88,7 +49,10 @@ int main() {
     updateKeys();
     VBLANK();
 
+    // Start by erasing sprite
     clearSpriteFrame(playerX, playerY, 32, BedroomBitmap);
+
+    // Handle player input
     if (keyDown(U)) {
       setCharacterStateAndDirection(&player, WALK, UP);
       player.coordinate.y -= 4;
@@ -105,7 +69,6 @@ int main() {
 
     SpriteFrame32Bit(playerX, playerY, playerStepCounter % 4,
                      player.currentSpriteSheet, 4);
-
     restoreFrameBackground(playerX, playerY, 32, BedroomBitmap);
 
     if (keyReleased(U) | keyReleased(D) | keyReleased(L) | keyReleased(R)) {
@@ -142,4 +105,58 @@ int main() {
   }
 
   return 0;
+}
+
+void initializeCharacterSprites(
+    Character *character,
+    const void *spriteSheets[NUM_STATES][NUM_DIRECTIONS]) {
+  for (int state = 0; state < NUM_STATES; state++) {
+    for (int direction = 0; direction < NUM_DIRECTIONS; direction++) {
+      character->sprites.spriteSheets[state][direction] =
+          spriteSheets[state][direction];
+    }
+  }
+
+  character->currentSpriteSheet =
+      character->sprites.spriteSheets[character->state][character->direction];
+};
+
+void updateCurrentSpriteSheet(Character *character) {
+  character->currentSpriteSheet =
+      character->sprites.spriteSheets[character->state][character->direction];
+}
+
+void setCharacterState(Character *character, STATE state) {
+  character->state = state;
+  updateCurrentSpriteSheet(character);
+}
+
+void setCharacterDirection(Character *character, DIRECTION direction) {
+  character->direction = direction;
+  updateCurrentSpriteSheet(character);
+}
+
+void setCharacterStateAndDirection(Character *character, STATE state,
+                                   DIRECTION direction) {
+  character->state = state;
+  character->direction = direction;
+  updateCurrentSpriteSheet(character);
+}
+
+void moveCharacter(Character *character) {
+  // only if it wont cause collision with chocobo
+  switch (character->direction) {
+  case RIGHT:
+    character->coordinate.x += 4;
+    break;
+  case LEFT:
+    character->coordinate.x -= 4;
+    break;
+  case UP:
+    character->coordinate.y -= 4;
+    break;
+  case DOWN:
+    character->coordinate.y += 4;
+    break;
+  }
 }

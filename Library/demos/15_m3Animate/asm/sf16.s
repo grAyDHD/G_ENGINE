@@ -1,16 +1,18 @@
 .arm
-.global SpriteFrame
-.type SpriteFrame, %function
+.global SpriteFrame16
+.type SpriteFrame16, %function
 
 @ Currently handles 4 frame animations of 16x16 sprite size
 
-@ SpriteFrame(int x, int y, int frame, const void *image, int frameCount)
+@ Change to structs.  Sprite struct has image *, animation count, xy
+
+@ SpriteFrame16(int x, int y, int frame, const void *image, int frameCount)
 @ r0 = x
 @ r1 = y
 @ r2 = frame
 @ r3 = image (pointer to sprite sheet)
 
-SpriteFrame:
+SpriteFrame16:
   push {r4-r11}  @8x4 = 32 bytes, lr on stack so 36 bytes + 4 for alignment
   
 @ Step 1: calculate VRAM xy offset address
@@ -39,6 +41,7 @@ SpriteFrame:
 
 @ Step 3: Loop through each row of the sprite (16 rows)
   ldr r2, [sp, #32]                     @ load 5th argument from stack 
+  ldr r2, [sp, #32]                     @ load 5th argument from stack 
   mul r3, r2, r4                        @ frame count * 32
   mov r2, #16                           @ set row counter (16 rows)
 
@@ -54,7 +57,4 @@ SpriteFrame:
   pop {r4-r11}
   bx lr 
 
-.size SpriteFrame, .-SpriteFrame
-
-
-
+.size SpriteFrame16, .-SpriteFrame16
