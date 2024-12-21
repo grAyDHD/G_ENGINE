@@ -8,6 +8,7 @@
 #include "graphics/pageFlip.h"
 #include "graphics/video.h"
 #include "input/in.h"
+#include "memory.h"
 #include "physics/phys.h"
 #include "timer.h"
 

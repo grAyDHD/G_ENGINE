@@ -15,7 +15,7 @@ void drawRect(Coordinate start, int width, int height, unsigned short color);
 extern void fillScreen(u32 clr);
 extern void m3_Background(const void *src);
 extern void SpriteFrame(int x, int y, int frame, const void *image,
-                        int frameCount);
+                        int frameCount); // project 15 implementation
 
 // #define BG2_X_ROTATION *(volatile u16 *)0x4000022 // Skewing/rotation in X
 // #define BG2_Y_ROTATION *(volatile u16 *)0x4000024 // Skewing/rotation in Y

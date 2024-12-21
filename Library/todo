@@ -1,5 +1,3 @@
-integrate memcopy32 into library, test on project 14
-
 fix SpriteFrame drawing in project 15
 
 move bgscaling/rotation etc to new header- graphics/effects?
