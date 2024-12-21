@@ -2,7 +2,7 @@
 #define TYPE_H
 
 // Enumerations for modes, colors, and shapes
-#include "typedefs.h"
+#include "core/typedefs.h"
 
 #define VRAM_SCREEN_END 0x06012C00
 #define CURSOR_CACHE ((u16)VRAM_SCREEN_END)

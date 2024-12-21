@@ -1,6 +1,7 @@
+#include "../build/Peaberry.h"
 #include "../includes/fontData.h"
-#include "draw.h"
-#include "gfx.h"
+#include "graphics/draw.h"
+#include "graphics/video.h"
 
 int getFontDataIndex(char c);
 void printString(int x, int y, const char *text);

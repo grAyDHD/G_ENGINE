@@ -1,7 +1,7 @@
 #include "../includes/characterAnimator.h"
-#include "gfx.h"
-#include "in.h"
-#include "timer.h"
+#include "core/timer.h"
+#include "graphics/video.h"
+#include "input/in.h"
 
 #define chocoboX chocobo.coordinate.x
 #define chocoboY chocobo.coordinate.y
@@ -84,7 +84,6 @@ int main() {
   int chocoboStepCounter = 0;
   int playerStepCounter = 0;
 
-  GREEN_SWAP = 1;
   while (1) {
     updateKeys();
     VBLANK();

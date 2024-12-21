@@ -1,8 +1,7 @@
 #ifndef FONT_DATA_H
 #define FONT_DATA_H
 
-#include "../build/Peaberry.h"
-#include "typedefs.h"
+#include "core/typedefs.h"
 
 typedef struct {
   u16 xOffset;

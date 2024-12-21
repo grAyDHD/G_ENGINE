@@ -5,3 +5,5 @@ fix SpriteFrame drawing in project 15
 move bgscaling/rotation etc to new header- graphics/effects?
 current use only in project 16
 add GREEN_SWAP to effects
+  GREEN_SWAP = 1;
+  GREEN_SWAP = 0;

@@ -1,5 +1,5 @@
-#ifndef DRW_H
-#define DRW_H
+#ifndef PAINT_H
+#define PAINT_H
 
 #include "types.h"
 
@@ -17,4 +17,4 @@ void fillCircle(int x, int y, int radius, unsigned short color);
 void drawHorizontalLine(int x_start, int x_end, int y, unsigned short color);
 void drawVerticalLine(int y_start, int y_end, int x, unsigned short color);
 
-#endif // !DRW_H
+#endif // !PAINT

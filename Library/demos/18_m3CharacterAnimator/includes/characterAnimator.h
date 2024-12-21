@@ -12,10 +12,7 @@
 #include "../build/PkmnSlvrGirlWalkingRight.h"
 #include "../build/PkmnSlvrGirlWalkingUp.h"
 
-#include "gfx.h"
-#include "in.h"
-#include "timer.h"
-#include "typedefs.h"
+#include "core/typedefs.h"
 
 #define NUM_STATES 3
 #define NUM_DIRECTIONS 4

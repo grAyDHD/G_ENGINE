@@ -1,8 +1,8 @@
-#include "../include/drw.h"
+#include "../include/paint.h"
 #include "../include/state.h"
 #include "../include/types.h"
-#include "draw.h"
-#include "gfx.h"
+#include "graphics/draw.h"
+#include "graphics/video.h"
 
 void clearScreen(Brush brush) {
   fillScreen(dblClr(brush.eraserColor));

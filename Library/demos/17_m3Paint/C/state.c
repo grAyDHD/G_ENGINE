@@ -1,10 +1,10 @@
 #include "../include/state.h"
-#include "../include/drw.h"
+#include "../include/paint.h"
 #include "../include/types.h"
-#include "draw.h"
-#include "gfx.h"
-#include "in.h"
-#include "typedefs.h"
+#include "core/typedefs.h"
+#include "graphics/draw.h"
+#include "graphics/video.h"
+#include "input/in.h"
 
 static u16 pixelCache[32][32];
 static u16 guiCache[64][64];
