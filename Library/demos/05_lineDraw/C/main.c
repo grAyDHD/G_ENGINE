@@ -1,4 +1,5 @@
-#include "engine.h"
+#include "graphics/draw.h"
+#include "graphics/video.h"
 
 int main() {
   DSPC = (MODE3 | BG2);

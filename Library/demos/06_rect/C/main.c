@@ -1,8 +1,9 @@
-#include "engine.h"
+#include "graphics/draw.h"
+#include "graphics/video.h"
 
 int main() {
   DSPC = (MODE3 | BG2);
-  unsigned short green = 0x03E0;
+  u16 green = 0x03E0;
 
   Coordinate start = {20, 20};
 

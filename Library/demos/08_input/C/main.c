@@ -1,6 +1,7 @@
-#include "engine.h"
+#include "graphics/draw.h"
+#include "graphics/video.h"
+#include "input/in.h"
 
-u16 keyCache;
 int main() {
   DSPC = MODE3 | BG2;
 
@@ -15,38 +16,41 @@ int main() {
   int cI = 0;
   unsigned short COLOR = colors[cI];
   while (1) {
+    updateKeys();
+    VBLANK();
     drawRect(start, rWidth, rHeight, 0x0000);
-    key_poll();
 
-    if (key_held(A)) {
+    if (keyDown(A)) {
       start.x = 50;
       start.y = 60;
       rWidth = 20;
       rHeight = 20;
     }
-    if (key_held(UP)) {
+
+    if (keyDown(U)) {
       start.y--;
     }
-    if (key_held(DN)) {
+
+    if (keyDown(D)) {
       start.y++;
     }
-    if (key_held(L)) {
+    if (keyDown(L)) {
       start.x--;
     }
-    if (key_held(R)) {
+    if (keyDown(R)) {
       start.x++;
     }
-    if (key_held(SL)) {
+    if (keyDown(SL)) {
       rWidth = 20;
       rHeight = 20;
-    } else if (key_held(LT)) {
+    } else if (keyDown(LT)) {
       rWidth++;
-    } else if (key_held(RT)) {
+    } else if (keyDown(RT)) {
       rHeight++;
     }
 
     // Change color if START button is pressed
-    if (key_held(ST)) {
+    if (keyDown(ST)) {
       if (cI >= 14) {
         cI = 0;
       } else {
@@ -55,7 +59,6 @@ int main() {
       COLOR = colors[cI];
     }
     drawRect(start, rWidth, rHeight, COLOR);
-    VBLANK();
   }
   return 0;
 }

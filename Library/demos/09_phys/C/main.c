@@ -1,18 +1,21 @@
-#include "engine.h"
+#include "graphics/draw.h"
+#include "graphics/video.h"
+#include "input/in.h"
+#include "physics/phys.h"
 
 void checkInput(struct Object *ball) {
 
-  if (key_held(A)) {
+  if (keyDown(A)) {
     ball->vy = -SHOOT_VEL * gravityDirection;
   }
 
-  if (key_held(B)) {
+  if (keyDown(B)) {
     gravityDirection = -1;
   } else {
     gravityDirection = 1;
   }
 
-  if (key_held(SL)) {
+  if (keyDown(SL)) {
     ball->vx = 0;
     ball->vy = 0;
     ball->ax = 0;
@@ -20,18 +23,18 @@ void checkInput(struct Object *ball) {
   } else {
 
     applyGravity(ball);
-    if (key_held(L)) {
+    if (keyDown(L)) {
       ball->vx = -MOVE_SPEED;
-    } else if (key_held(R)) {
+    } else if (keyDown(R)) {
       ball->vx = MOVE_SPEED;
     } else {
       ball->vx = 0;
     }
 
-    if (key_held(LT)) {
+    if (keyDown(LT)) {
       ball->vx = -SHOOT_VEL;
       ball->vy = -SHOOT_VEL;
-    } else if (key_held(RT)) {
+    } else if (keyDown(RT)) {
       ball->vx = SHOOT_VEL;
       ball->vy = -SHOOT_VEL;
     }
@@ -42,28 +45,25 @@ int BALL_SIZE = 20;
 
 int main() {
   DSPC = MODE3 | BG2;
-  initSoundSystem();
-  defaultCH1Sound();
-  TIMED();
 
   struct Object ball = {120, 80, 0, 0, 0, 0};
-  Coordinate prevCrnr = {ball.x, ball.y}; // Track the previous position
-  Coordinate crnr = {ball.x, ball.y};
+  Coordinate previousCorner = {ball.x, ball.y}; // Track the previous position
+  Coordinate corner = {ball.x, ball.y};
 
   while (1) {
-    key_poll();
+    updateKeys();
+    VBLANK();
     // erase current position
-    drawRect(prevCrnr, BALL_SIZE, BALL_SIZE, 0x0000);
+    drawRect(previousCorner, BALL_SIZE, BALL_SIZE, 0x0000);
     checkInput(&ball);
     // update position based on input/physics
     updateMovement(&ball);
     handleCollisions(&ball, BALL_SIZE);
-    crnr.x = ball.x;
-    crnr.y = ball.y;
+    corner.x = ball.x;
+    corner.y = ball.y;
     // draw in new position
-    drawRect(crnr, BALL_SIZE, BALL_SIZE, 0x03E0);
-    prevCrnr = crnr;
-    VBLANK();
+    drawRect(corner, BALL_SIZE, BALL_SIZE, 0x03E0);
+    previousCorner = corner;
   }
   return 0;
 }
