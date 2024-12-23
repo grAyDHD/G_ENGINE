@@ -4,7 +4,7 @@
 #include "graphics/video.h"
 
 void animation(int x, int y, int frame, const void *image);
-
+// handles 4 frames
 extern void SpriteFrame16(int x, int y, int frame, const void *image,
                           int frameCount);
 
@@ -14,7 +14,7 @@ int main() {
   int animationFrame = 0;
   while (1) {
     VBLANK();
-    SpriteFrame(32, 32, animationFrame % 4, lil_guyBitmap, 4);
+    SpriteFrame16(32, 32, animationFrame % 4, lil_guyBitmap, 3);
     animationFrame++;
     simpleWait(100);
   }

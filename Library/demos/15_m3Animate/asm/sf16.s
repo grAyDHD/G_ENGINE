@@ -11,10 +11,21 @@
 @ r1 = y
 @ r2 = frame
 @ r3 = image (pointer to sprite sheet)
+  
+@ copies 2 pixels at a time  
+@ will add transparency handling
+@ edge cases:  both pixels transparent, left, right, neither
+@ 0x7C1F7C1F 0x7C1F____ 0x____7C1F 0x________
+@ don't batch sequences of copies, must check every 4 byte chunk
+@ if both transparent, copy neither and move ahead
+@ if neither transparent, copy both and move ahead
+@ if only one is transparent, copy single vram pixel over transparency value in intermediate register
+@ store 4 byte chunk to vram and move ahead
+
 
 SpriteFrame16:
   push {r4-r11}  @8x4 = 32 bytes, lr on stack so 36 bytes + 4 for alignment
-  
+
 @ Step 1: calculate VRAM xy offset address
   mov r5, #240                           @ y base offset value
   mul r6, r1, r5                         @ y * 240
