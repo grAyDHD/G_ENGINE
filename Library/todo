@@ -1,4 +1,5 @@
-fix SpriteFrame drawing in project 15
+add transparency layer to SpriteFrame16 in project 15
+consolidate 4 way movement into one sprite sheet
 
 move bgscaling/rotation etc to new header- graphics/effects?
 current use only in project 16
