@@ -36,6 +36,8 @@ typedef struct {
   int width;
 } Character;
 
+//
+
 const void *chocoboSprites[NUM_STATES][NUM_DIRECTIONS] = {
     [IDLE] = {0, 0, 0, 0},
     [WALK] =

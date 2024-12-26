@@ -32,8 +32,17 @@ Step 4: refactor sprite drawing funciton to handle restoreFrameBackground
 
 Step 5: 
  implement interactions
-[] player npc collision handling
+[x] player npc collision handling
+[] refine collision bounds
 [] press A to talk to NPC (NPC saves current direction to turn to player, turn back after dialogue)
+
+Step 6:
+    Move to Entity Component System
+[ ] create entity struct, component list struct, and relevant component structs
+[ ] update assembly function
+[ ] update sprite sheets with all states
+[ ] final update for assembly function
+
 
     OPTIMIZATIONS:  
         Merge SpriteFrame3Bit with restoreFrameBackground
