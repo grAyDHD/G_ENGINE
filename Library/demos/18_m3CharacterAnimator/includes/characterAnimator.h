@@ -38,7 +38,7 @@ typedef struct {
 } SpriteComponent;
 
 typedef struct {
-  int frameCount;
+  int frameNumber;
   STATE state;
   DIRECTION direction;
 } AnimationComponent;
@@ -61,8 +61,13 @@ typedef struct {
 } ComponentManager;
 
 extern void m3_Background(const void *src);
-extern void SpriteFrame32Bit(int x, int y, int frame, const void *image,
-                             int frameCount);
+
+// extern void SpriteFrame32Bit(int x, int y, int frame, const void *image,
+//                             int frameCount);
+extern void SpriteFrame32Bit(PositionComponent positionData,
+                             AnimationComponent(animationData),
+                             const void *image);
+
 // extern void restoreFrameBackground(int x, int y, int size, const void
 // *image);
 extern void clearSpriteFrame(int x, int y, int size, const void *image);

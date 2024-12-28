@@ -31,23 +31,16 @@ int createPlayer(const void *spriteSheet) {
   int playerId = createEntity(PLAYER_ENTITY);
 
   components.animation[playerId] =
-      (AnimationComponent){.frameCount = 0, .state = IDLE, .direction = DOWN};
+      (AnimationComponent){.frameNumber = 0, .state = IDLE, .direction = DOWN};
   components.sprite[playerId] =
-      (SpriteComponent){.spriteSheet = &spriteSheet, .width = 32, .height = 32};
+      (SpriteComponent){.spriteSheet = spriteSheet, .width = 32, .height = 32};
 
   return playerId;
 }
 
-void renderingSystem(ComponentManager components) {
-  for (int i = 0; i < nextEntityId; i++) {
-    SpriteFrame32Bit(components.position[i].x, components.position[i].y,
-                     components.animation[i].frameCount,
-                     components.sprite[i].spriteSheet, 3);
-  }
-}
-
-void playerInputSystem() {
-  // check for user input and update player entity
+void renderPlayer(int playerId, ComponentManager *world) {
+  SpriteFrame32Bit(world->position[playerId], world->animation[playerId],
+                   world->sprite[playerId].spriteSheet);
 }
 
 int main() {
@@ -55,6 +48,8 @@ int main() {
   int playerId = createPlayer(&PkmnSlvrGirlWalkingBitmap);
 
   m3_Background(BedroomBitmap);
+  renderPlayer(playerId, &components);
+
   while (1) {
   }
   return 0;
