@@ -1,5 +1,6 @@
 #include "../includes/characterAnimator.h"
 #include "Bedroom.h"
+#include "Robo.h"
 #include "graphics/video.h"
 
 static ComponentManager components;
@@ -31,7 +32,7 @@ int createPlayer(const void *spriteSheet) {
   int playerId = createEntity(PLAYER_ENTITY);
 
   components.animation[playerId] =
-      (AnimationComponent){.frameNumber = 0, .state = IDLE, .direction = DOWN};
+      (AnimationComponent){.frameNumber = 0, .direction = DOWN, .state = IDLE};
   components.sprite[playerId] =
       (SpriteComponent){.spriteSheet = spriteSheet, .width = 32, .height = 32};
 
@@ -45,7 +46,7 @@ void renderPlayer(int playerId, ComponentManager *world) {
 
 int main() {
   DSPC = MODE3 | BG2;
-  int playerId = createPlayer(&PkmnSlvrGirlWalkingBitmap);
+  int playerId = createPlayer(&RoboBitmap);
 
   m3_Background(BedroomBitmap);
   renderPlayer(playerId, &components);
@@ -54,35 +55,3 @@ int main() {
   }
   return 0;
 }
-
-/*
-
-HOUSE BINGO
-their liver is failing
-house called an ass
-house hits with cane
-patient fakeout opening scene
-house eats wilson's food
-sarcoidosis
-vasculitis
-stop unnecessary procedure at last second
-lumbara puncture
-std in the clinic
-everyone gives house different advice
-lupus
-blood coming frome somewhere it shouldn't
-breaking and entering
-the patient is crashing
-cameron eye roll
-house proven wrong
-introspective house
-hose has his idea face
-all pagers go off at same time
-inside body animation
-drill into patients brain
-house takes vicodin
-patient freaks out in mri
-intubation
-stroke
-house playing with cane
-*/

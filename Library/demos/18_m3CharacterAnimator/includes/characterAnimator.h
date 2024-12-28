@@ -2,8 +2,7 @@
 #define CHARACTERANIMATOR_H
 
 #include "../build/Bedroom.h"
-#include "../build/Chocobo.h"
-#include "../build/PkmnSlvrGirlWalking.h"
+#include "../build/Robo.h"
 #include "core/typedefs.h"
 
 #define NUM_STATES 3
@@ -21,8 +20,8 @@
   (COMPONENT_POSITION | COMPONENT_VELOCITY | COMPONENT_ANIMATION |             \
    COMPONENT_SPRITE)
 
-typedef enum { UP, DOWN, LEFT, RIGHT } DIRECTION;
-typedef enum { IDLE, WALK, TALK } STATE;
+typedef enum { DOWN = 0, UP, LEFT, RIGHT } DIRECTION;
+typedef enum { IDLE = 0, WALK, TALK, RUN } STATE;
 
 typedef struct {
   int entityID;
@@ -39,8 +38,8 @@ typedef struct {
 
 typedef struct {
   int frameNumber;
-  STATE state;
   DIRECTION direction;
+  STATE state;
 } AnimationComponent;
 
 typedef struct {
@@ -68,8 +67,6 @@ extern void SpriteFrame32Bit(PositionComponent positionData,
                              AnimationComponent(animationData),
                              const void *image);
 
-// extern void restoreFrameBackground(int x, int y, int size, const void
-// *image);
 extern void clearSpriteFrame(int x, int y, int size, const void *image);
 
 // to create player character:
