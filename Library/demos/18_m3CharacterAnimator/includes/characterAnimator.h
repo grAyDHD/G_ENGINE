@@ -2,66 +2,70 @@
 #define CHARACTERANIMATOR_H
 
 #include "../build/Bedroom.h"
-
-#include "../build/ChocoboJoyful.h"
-#include "../build/ChocoboWalkingLeft.h"
-#include "../build/ChocoboWalkingRight.h"
-
-#include "../build/PkmnSlvrGirlWalkingDown.h"
-#include "../build/PkmnSlvrGirlWalkingLeft.h"
-#include "../build/PkmnSlvrGirlWalkingRight.h"
-#include "../build/PkmnSlvrGirlWalkingUp.h"
-
+#include "../build/Chocobo.h"
+#include "../build/PkmnSlvrGirlWalking.h"
 #include "core/typedefs.h"
 
 #define NUM_STATES 3
 #define NUM_DIRECTIONS 4
+#define MAX_ENTITIES 10
 
-typedef struct {
-  const void *spriteSheets[NUM_STATES][NUM_DIRECTIONS];
-} CharacterSprites;
+#define COMPONENT_PLAYER (1 << 0)
+#define COMPONENT_POSITION (1 << 1)
+#define COMPONENT_VELOCITY (1 << 2)
+#define COMPONENT_ANIMATION (1 << 3)
+#define COMPONENT_SPRITE (1 << 4)
+
+// define PLAYER_ENTITY ENEMY_ENTITY INTERACTABLE_ENTITY
+#define PLAYER_ENTITY                                                          \
+  (COMPONENT_POSITION | COMPONENT_VELOCITY | COMPONENT_ANIMATION |             \
+   COMPONENT_SPRITE)
 
 typedef enum { UP, DOWN, LEFT, RIGHT } DIRECTION;
 typedef enum { IDLE, WALK, TALK } STATE;
 
 typedef struct {
-  Coordinate coordinate; // two ints, 8 bytes?
-  DIRECTION direction;   // 4 bytes if enum is int
-  STATE state;           // 4 bytes, another enum
-  CharacterSprites
-      sprites; // struct array of pointers. each pointer is 4 bytes.
-  const void *currentSpriteSheet; // pointer to active sprite 4 bytes
+  int entityID;
+  int componentMask;
+} Entity;
 
+typedef struct {
+  const void *spriteSheet; // pointer to active sprite 4 bytes
   int height;
   int width;
-} Character;
 
-//
+  // other parameters?  offset table or something similar?
+} SpriteComponent;
 
-const void *chocoboSprites[NUM_STATES][NUM_DIRECTIONS] = {
-    [IDLE] = {0, 0, 0, 0},
-    [WALK] =
-        {
-            0, // ChocoboWalkingUpBitmap
-            0, // ChocoboWalkingDownBitmap
-            ChocoboWalkingLeftBitmap,
-            ChocoboWalkingRightBitmap,
-        },
-    [TALK] = {ChocoboJoyfulBitmap, ChocoboJoyfulBitmap, ChocoboJoyfulBitmap,
-              ChocoboJoyfulBitmap}};
+typedef struct {
+  int frameCount;
+  STATE state;
+  DIRECTION direction;
+} AnimationComponent;
 
-const void *silverGirlSprites[NUM_STATES][NUM_DIRECTIONS] = {
-    [IDLE] = {PkmnSlvrGirlWalkingUpBitmap, PkmnSlvrGirlWalkingDownBitmap,
-              PkmnSlvrGirlWalkingLeftBitmap, PkmnSlvrGirlWalkingRightBitmap},
-    [WALK] = {PkmnSlvrGirlWalkingUpBitmap, PkmnSlvrGirlWalkingDownBitmap,
-              PkmnSlvrGirlWalkingLeftBitmap, PkmnSlvrGirlWalkingRightBitmap},
-    [TALK] = {PkmnSlvrGirlWalkingUpBitmap, PkmnSlvrGirlWalkingDownBitmap,
-              PkmnSlvrGirlWalkingLeftBitmap, PkmnSlvrGirlWalkingRightBitmap}};
+typedef struct {
+  int x;
+  int y;
+} PositionComponent;
+
+typedef struct {
+  int dx;
+  int dy;
+} VelocityComponent;
+
+typedef struct {
+  PositionComponent position[MAX_ENTITIES];
+  VelocityComponent velocity[MAX_ENTITIES];
+  AnimationComponent animation[MAX_ENTITIES];
+  SpriteComponent sprite[MAX_ENTITIES];
+} ComponentManager;
 
 extern void m3_Background(const void *src);
 extern void SpriteFrame32Bit(int x, int y, int frame, const void *image,
                              int frameCount);
-extern void restoreFrameBackground(int x, int y, int size, const void *image);
+// extern void restoreFrameBackground(int x, int y, int size, const void
+// *image);
 extern void clearSpriteFrame(int x, int y, int size, const void *image);
 
+// to create player character:
 #endif // CHARACTERANIMATOR_H
