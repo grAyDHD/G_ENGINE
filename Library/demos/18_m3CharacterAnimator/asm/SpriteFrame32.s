@@ -13,8 +13,8 @@ SpriteFrame32Bit:
   push {r4-r11}  @8x4 = 32 bytes?
   
 @ Step 1: calculate VRAM xy offset address
-  ldr r3, [0]    @load x value into register
-  ldr r4, [0, #4] @load  y value into register 
+  ldr r3, [r0]    @load x value into register
+  ldr r4, [r0, #4] @load  y value into register 
    
   mov r5, #240                           @ r5 = y base offset value
   mul r7, r4, r5                         @ r7 = y * 240
@@ -28,20 +28,20 @@ SpriteFrame32Bit:
   @ r2 = image
 
 @ Step 2: Calculate frame offset
-  ldr r3 [r1]                            @ r3 = frameNumber
+  ldr r3, [r1]                            @ r3 = frameNumber
   mov r4, #64                            @ r4 = frame width in bytes, 32 * 2
   mul r5, r3, r4                         @ r5 = frameOffset
   add r2, r2, r5                         @ r2 = image frame offset
 
   @ Calculate direction offset
-  ldr r3 [r1, #4]                         @ r3 = direction, 0 = down, 1 = up, 2 = left, 3 = right 
+  ldr r3, [r1, #4]                         @ r3 = direction, 0 = down, 1 = up, 2 = left, 3 = right 
   ldr r6, =256                            @ r6 = pixel column offset for new direction frame
   mul r5, r3, r6                          @ r5 = direction * column offset
   mul r7, r5, r4                          @ r7 = final direction offset, r5 * 64 (r4)
   add r2, r2, r7                          @ r2 = image frame+direction offset
  
   @ Calculate state offset for IDLE and WALK
-  ldr r3 [r1, #8]                     @ r3 = state
+  ldr r3, [r1, #8]                     @ r3 = state
   cmp r3, #0                          @ if r3 = 0
   beq Continue                        @ no more offset needed
 
