@@ -1,9 +1,8 @@
 #include "../includes/characterAnimator.h"
 #include "Bedroom.h"
-#include "Robo.h"
 #include "graphics/video.h"
 
-static ComponentManager components;
+static ComponentManager world;
 static Entity entities[MAX_ENTITIES];
 static int nextEntityId = 0;
 
@@ -17,11 +16,11 @@ int createEntity(int componentMask) {
   entity->componentMask = componentMask;
 
   if (componentMask & COMPONENT_POSITION) {
-    components.position[nextEntityId] = (PositionComponent){120, 120};
+    world.position[nextEntityId] = (PositionComponent){120, 120};
   }
 
   if (componentMask & COMPONENT_VELOCITY) {
-    components.velocity[nextEntityId] = (VelocityComponent){0, 0};
+    world.velocity[nextEntityId] = (VelocityComponent){0, 0};
   }
 
   return nextEntityId++;
@@ -31,27 +30,29 @@ int createPlayer(const void *spriteSheet) {
 
   int playerId = createEntity(PLAYER_ENTITY);
 
-  components.animation[playerId] =
+  world.animation[playerId] =
       (AnimationComponent){.frameNumber = 0, .direction = DOWN, .state = IDLE};
-  components.sprite[playerId] =
-      (SpriteComponent){.spriteSheet = spriteSheet, .width = 32, .height = 32};
+  world.sprite[playerId] = (SpriteComponent){.spriteSheet = spriteSheet};
 
   return playerId;
 }
 
 void renderPlayer(int playerId, ComponentManager *world) {
-  SpriteFrame32Bit(world->position[playerId], world->animation[playerId],
-                   world->sprite[playerId].spriteSheet);
+  // SpriteFrame32Bit(world->position[playerId], world->animation[playerId],
+  //                world->sprite[playerId].spriteSheet);
+  SpriteFrame32Bit(world->position[playerId].x, world->position[playerId].y, 0,
+                   world->sprite[playerId].spriteSheet, 8);
 }
 
 int main() {
   DSPC = MODE3 | BG2;
-  int playerId = createPlayer(&RoboBitmap);
+  int playerId = createPlayer(&RoboSmallBitmap);
 
-  m3_Background(BedroomBitmap);
-  renderPlayer(playerId, &components);
+  //  m3_Background(BedroomBitmap);
 
   while (1) {
+    VBLANK();
+    renderPlayer(playerId, &world);
   }
   return 0;
 }

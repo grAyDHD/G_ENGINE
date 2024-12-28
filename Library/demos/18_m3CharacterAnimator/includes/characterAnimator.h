@@ -3,6 +3,7 @@
 
 #include "../build/Bedroom.h"
 #include "../build/Robo.h"
+#include "../build/RoboSmall.h"
 #include "core/typedefs.h"
 
 #define NUM_STATES 3
@@ -30,10 +31,6 @@ typedef struct {
 
 typedef struct {
   const void *spriteSheet; // pointer to active sprite 4 bytes
-  int height;
-  int width;
-
-  // other parameters?  offset table or something similar?
 } SpriteComponent;
 
 typedef struct {
@@ -61,11 +58,11 @@ typedef struct {
 
 extern void m3_Background(const void *src);
 
-// extern void SpriteFrame32Bit(int x, int y, int frame, const void *image,
-//                             int frameCount);
-extern void SpriteFrame32Bit(PositionComponent positionData,
-                             AnimationComponent(animationData),
-                             const void *image);
+extern void SpriteFrame32Bit(int x, int y, int frame, const void *image,
+                             int frameCount);
+// extern void SpriteFrame32Bit(PositionComponent positionData,
+//                             AnimationComponent(animationData),
+//                            const void *image);
 
 extern void clearSpriteFrame(int x, int y, int size, const void *image);
 
