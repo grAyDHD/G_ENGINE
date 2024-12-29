@@ -1,5 +1,5 @@
-#ifndef CHARACTERANIMATOR_H
-#define CHARACTERANIMATOR_H
+#ifndef ECS_H
+#define ECS_H
 
 #include "../build/Bedroom.h"
 #include "../build/Robo.h"
@@ -57,16 +57,27 @@ typedef struct {
   SpriteComponent sprite[MAX_ENTITIES];
 } ComponentManager;
 
-extern void m3_Background(const void *src);
+typedef struct {
+  ComponentManager *world;
+  Entity *entities;
+  int nextEntityId;
+  int maxEntities;
+} EntitySystem;
 
-// extern void SpriteFrame32Bit(PositionComponent positionA,
-//                             PositionComponent positionB, int frame,
-//                             const void *image, int frameCount);
+extern void m3_Background(const void *src);
 extern void SpriteFrame32Bit(PositionComponent *positionData,
                              AnimationComponent *animationData,
                              const void *image);
-
 extern void clearSpriteFrame(int x, int y, int size, const void *image);
 
-// to create player character:
-#endif // CHARACTERANIMATOR_H
+int initEntitySystem(EntitySystem *system, ComponentManager *world,
+                     Entity *entities, int maxEntities);
+int createEntity(EntitySystem *system, int componentMask);
+int createPlayer(EntitySystem *system, const void *spriteSheet);
+void renderPlayer(EntitySystem *system, int playerId);
+
+// int createEntity(int componentMask);
+// int createPlayer(const void *spriteSheet);
+// void renderPlayer(int playerId, ComponentManager *world);
+//
+#endif // ECS_H
