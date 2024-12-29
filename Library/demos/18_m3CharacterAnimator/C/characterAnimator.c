@@ -38,17 +38,13 @@ int createPlayer(const void *spriteSheet) {
 }
 
 void renderPlayer(int playerId, ComponentManager *world) {
-  // SpriteFrame32Bit(world->position[playerId], world->animation[playerId],
-  //                world->sprite[playerId].spriteSheet);
-  SpriteFrame32Bit(world->position[playerId].x, world->position[playerId].y, 0,
-                   world->sprite[playerId].spriteSheet, 8);
+  SpriteFrame32Bit(&world->position[playerId], &world->animation[playerId],
+                   world->sprite[playerId].spriteSheet);
 }
 
 int main() {
   DSPC = MODE3 | BG2;
   int playerId = createPlayer(&RoboSmallBitmap);
-
-  //  m3_Background(BedroomBitmap);
 
   while (1) {
     VBLANK();

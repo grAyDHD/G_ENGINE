@@ -58,11 +58,12 @@ typedef struct {
 
 extern void m3_Background(const void *src);
 
-extern void SpriteFrame32Bit(int x, int y, int frame, const void *image,
-                             int frameCount);
-// extern void SpriteFrame32Bit(PositionComponent positionData,
-//                             AnimationComponent(animationData),
-//                            const void *image);
+// extern void SpriteFrame32Bit(PositionComponent positionA,
+//                             PositionComponent positionB, int frame,
+//                             const void *image, int frameCount);
+extern void SpriteFrame32Bit(PositionComponent *positionData,
+                             AnimationComponent *animationData,
+                             const void *image);
 
 extern void clearSpriteFrame(int x, int y, int size, const void *image);
 
