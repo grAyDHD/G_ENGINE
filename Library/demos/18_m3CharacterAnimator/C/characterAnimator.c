@@ -16,14 +16,12 @@ int main() {
     updateKeys();
     VBLANK();
 
-    //   clearSpriteFrame(world.position[playerId].x,
-    //   world.position[playerId].y, 32,
-    //                  BedroomBitmap);
+    clearSpriteFrame(world.position[playerId].x, world.position[playerId].y, 32,
+                     BedroomBitmap);
 
     // set state/direction
     //  check for collision, if none move position
 
-    /*
     if (keyDown(U)) {
       world.position[playerId].y -= 1;
       world.animation[playerId].state = WALK;
@@ -41,7 +39,6 @@ int main() {
       world.animation[playerId].state = WALK;
       world.animation[playerId].direction = RIGHT;
     }
-    */
 
     renderPlayer(&entitySystem, playerId);
 
