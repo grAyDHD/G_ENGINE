@@ -21,8 +21,9 @@
   (COMPONENT_POSITION | COMPONENT_VELOCITY | COMPONENT_ANIMATION |             \
    COMPONENT_SPRITE)
 
-typedef enum { DOWN = 0, UP, LEFT, RIGHT } DIRECTION;
-typedef enum { IDLE = 0, WALK, TALK, RUN } STATE;
+typedef enum : int { DOWN = 0, UP, LEFT, RIGHT } DIRECTION;
+
+typedef enum : int { IDLE = 0, WALK, TALK, RUN } STATE;
 
 typedef struct {
   int entityID;

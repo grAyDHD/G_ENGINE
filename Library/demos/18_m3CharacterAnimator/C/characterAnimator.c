@@ -31,7 +31,7 @@ int createPlayer(const void *spriteSheet) {
   int playerId = createEntity(PLAYER_ENTITY);
 
   world.animation[playerId] =
-      (AnimationComponent){.frameNumber = 0, .direction = DOWN, .state = IDLE};
+      (AnimationComponent){.frameNumber = 1, .direction = LEFT, .state = WALK};
   world.sprite[playerId] = (SpriteComponent){.spriteSheet = spriteSheet};
 
   return playerId;
@@ -44,7 +44,7 @@ void renderPlayer(int playerId, ComponentManager *world) {
 
 int main() {
   DSPC = MODE3 | BG2;
-  int playerId = createPlayer(&RoboSmallBitmap);
+  int playerId = createPlayer(&RoboBitmap);
 
   while (1) {
     VBLANK();
