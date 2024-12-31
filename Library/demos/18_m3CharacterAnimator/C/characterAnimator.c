@@ -1,6 +1,7 @@
 #include "../includes/characterAnimator.h"
 #include "../build/Robo.h"
 #include "Bedroom.h"
+#include "core/timer.h"
 #include "graphics/video.h"
 #include "input/in.h"
 
@@ -16,10 +17,15 @@ int main() {
   m3_Background(BedroomBitmap);
   while (1) {
     VBLANK();
+
     clearSpriteFrame(world.position[playerId].x, world.position[playerId].y, 32,
                      BedroomBitmap);
     updateInputSystem(&entitySystem, &world);
     renderPlayer(&entitySystem, playerId);
+    restoreFrameBackground(world.position[playerId].x,
+                           world.position[playerId].y, 32, BedroomBitmap);
+
+    simpleWait(10);
   }
 
   return 0;

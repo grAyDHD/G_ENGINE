@@ -32,6 +32,8 @@ int createEntity(EntitySystem *system, int componentMask) {
 }
 
 void playerInputHandler(EntitySystem *system, int entityId) {
+  AnimationComponent *animation = &system->world->animation[entityId];
+
   if (keyDown(U)) {
     system->world->position[entityId].y -= 1;
     system->world->animation[entityId].state = WALK;
@@ -49,13 +51,33 @@ void playerInputHandler(EntitySystem *system, int entityId) {
     system->world->animation[entityId].state = WALK;
     system->world->animation[entityId].direction = RIGHT;
   }
+
+  if (keyReleased(U) | keyReleased(D) | keyReleased(L) | keyReleased(R)) {
+    animation->frameNumber = 0;
+    animation->state = IDLE;
+    animation->keyframe = 0;
+  } else {
+    animation->keyframe++;
+    if (animation->keyframe >= animation->keyframeInterval) {
+      animation->keyframe = 0;
+      animation->frameNumber++;
+
+      if (animation->frameNumber == 4) {
+        animation->frameNumber = 0;
+      }
+    }
+  }
 }
 
 int createPlayer(EntitySystem *system, const void *spriteSheet) {
   int playerId = createEntity(system, PLAYER_ENTITY);
 
   system->world->animation[playerId] =
-      (AnimationComponent){.frameNumber = 1, .direction = LEFT, .state = WALK};
+      (AnimationComponent){.frameNumber = 0,
+                           .direction = LEFT,
+                           .state = WALK,
+                           .keyframe = 0,
+                           .keyframeInterval = 8};
   system->world->sprite[playerId] =
       (SpriteComponent){.spriteSheet = spriteSheet};
 
@@ -69,9 +91,6 @@ void inline renderPlayer(EntitySystem *system, int playerId) {
   SpriteFrame32Bit(&system->world->position[playerId],
                    &system->world->animation[playerId],
                    system->world->sprite[playerId].spriteSheet);
-  restoreFrameBackground(system->world->position[playerId].x,
-                         system->world->position[playerId].y, 32,
-                         BedroomBitmap);
 }
 
 void updateInputSystem(EntitySystem *system, ComponentManager *world) {
@@ -84,15 +103,3 @@ void updateInputSystem(EntitySystem *system, ComponentManager *world) {
     }
   }
 }
-
-/*
-    updateKeys();
-
-  handlePlayerInput() {
-    */
-
-//   if (keyReleased(U) | keyReleased(D) | keyReleased(L) | keyReleased(R))
-//   {
-//    world.animation[playerId].frameNumber = 0;
-//    world.animation[playerId].state = IDLE;
-// }

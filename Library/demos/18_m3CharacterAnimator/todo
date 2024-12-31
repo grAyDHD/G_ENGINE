@@ -1,0 +1,4 @@
+steps left to implement:
+integrate transparency into SpriteFrame32
+handle animations, IDLE and WALK (more to be introduced as needed, run/talk?)
+add npc, with collisions, and uniqe animation on interaction

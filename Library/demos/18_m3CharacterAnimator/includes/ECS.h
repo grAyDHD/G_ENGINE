@@ -30,6 +30,8 @@ typedef struct {
   int frameNumber;
   DIRECTION direction;
   STATE state;
+  int keyframe;
+  int keyframeInterval;
 } AnimationComponent;
 
 typedef struct {
