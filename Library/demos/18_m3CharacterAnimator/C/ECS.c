@@ -1,11 +1,11 @@
 #include "../includes/ECS.h"
+#include "../includes/characterAnimator.h" // later update to pull from library
+#include "input/in.h"
 
-int initEntitySystem(EntitySystem *system, ComponentManager *world,
-                     Entity *entities, int maxEntities) {
+int initEntitySystem(EntitySystem *system, ComponentManager *world) {
   system->world = world;
-  system->entities = entities;
   system->nextEntityId = 0;
-  system->maxEntities = maxEntities;
+  system->maxEntities = MAX_ENTITIES;
   return 0;
 }
 
@@ -30,6 +30,26 @@ int createEntity(EntitySystem *system, int componentMask) {
   return system->nextEntityId++;
 }
 
+void playerInputHandler(EntitySystem *system, int entityId) {
+  if (keyDown(U)) {
+    system->world->position[entityId].y -= 1;
+    system->world->animation[entityId].state = WALK;
+    system->world->animation[entityId].direction = UP;
+  } else if (keyDown(D)) {
+    system->world->position[entityId].y += 1;
+    system->world->animation[entityId].state = WALK;
+    system->world->animation[entityId].direction = DOWN;
+  } else if (keyDown(L)) {
+    system->world->position[entityId].x -= 1;
+    system->world->animation[entityId].state = WALK;
+    system->world->animation[entityId].direction = LEFT;
+  } else if (keyDown(R)) {
+    system->world->position[entityId].x += 1;
+    system->world->animation[entityId].state = WALK;
+    system->world->animation[entityId].direction = RIGHT;
+  }
+}
+
 int createPlayer(EntitySystem *system, const void *spriteSheet) {
   int playerId = createEntity(system, PLAYER_ENTITY);
 
@@ -38,49 +58,36 @@ int createPlayer(EntitySystem *system, const void *spriteSheet) {
   system->world->sprite[playerId] =
       (SpriteComponent){.spriteSheet = spriteSheet};
 
+  system->world->input[playerId].handleInput = playerInputHandler;
+
+  system->inputEntities[system->inputEntityCount++] = playerId;
   return playerId;
 }
 
-void renderPlayer(EntitySystem *system, int playerId) {
+void inline renderPlayer(EntitySystem *system, int playerId) {
   SpriteFrame32Bit(&system->world->position[playerId],
                    &system->world->animation[playerId],
                    system->world->sprite[playerId].spriteSheet);
 }
 
+void updateInputSystem(EntitySystem *system, ComponentManager *world) {
+  for (int i = 0; i < system->inputEntityCount; i++) {
+    int entityId = system->inputEntities[i];
+
+    if (system->entities[i].componentMask & ENABLE_INPUT) {
+      world->input[entityId].handleInput(system, entityId);
+    }
+  }
+}
+
 /*
-int createEntity(int componentMask) {
-  if (nextEntityId >= MAX_ENTITIES) {
-    return -1;
-  }
+    updateKeys();
 
-  Entity *entity = &entities[nextEntityId];
-  entity->entityID = nextEntityId;
-  entity->componentMask = componentMask;
+  handlePlayerInput() {
+    */
 
-  if (componentMask & COMPONENT_POSITION) {
-    world.position[nextEntityId] = (PositionComponent){120, 120};
-  }
-
-  if (componentMask & COMPONENT_VELOCITY) {
-    world.velocity[nextEntityId] = (VelocityComponent){0, 0};
-  }
-
-  return nextEntityId++;
-}
-
-int createPlayer(const void *spriteSheet) {
-
-  int playerId = createEntity(PLAYER_ENTITY);
-
-  world.animation[playerId] =
-      (AnimationComponent){.frameNumber = 1, .direction = LEFT, .state = WALK};
-  world.sprite[playerId] = (SpriteComponent){.spriteSheet = spriteSheet};
-
-  return playerId;
-}
-
-void renderPlayer(int playerId, ComponentManager *world) {
-  SpriteFrame32Bit(&world->position[playerId], &world->animation[playerId],
-                   world->sprite[playerId].spriteSheet);
-}
-*/
+//   if (keyReleased(U) | keyReleased(D) | keyReleased(L) | keyReleased(R))
+//   {
+//    world.animation[playerId].frameNumber = 0;
+//    world.animation[playerId].state = IDLE;
+// }
