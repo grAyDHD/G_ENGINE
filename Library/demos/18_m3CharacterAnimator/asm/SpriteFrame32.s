@@ -7,8 +7,7 @@
 @ SpriteFrame32Bit(*image);
 @ r0 = PositionComponent struct {int x, int y}
 @ r1 = AnimationComponent struct {frame, direction, state}
-@ r2 = image (pointer to sprite sheet)
-  
+@ r2 = image (pointer to sprite sheet) 
 
 SpriteFrame32Bit:
   push {r4-r11}  @8x4 = 32 bytes?
@@ -59,23 +58,76 @@ SpriteFrame32Bit:
   @ r6 = sprite sheet row length (pixels), also width and/or height of state offset in bytes
   @ TODO: calculate remaining state offsets
 
+  @ r0 = VRAM offset
+  @ r2 = image offset
 
+@ Step 3: copy image to vram (not transparency pixels)
+  mov r1, #32           @ Set up row counter
+  ldr r3, =0x7C1F7C1F   @ both transparent 
+  ldr r4, =0x00007C1F   @ left pixel trans mask
+  ldr r5, =0x7C1F0000   @ right pixel trans mask
+  ldr r6, =0x0000FFFF   @ clear right pixel mask 
+  ldr r7, =0xFFFF0000   @ clear left pixel mask
 
-
-  @ Draw one row of sprite frame
-  mov r3, #32                           @ Set up row counter
 .LoopRow:
-  ldmia r2!, {r4-r11}                   @ load pixels from image
-  stmia r0!, {r4-r11}                   @ write pixels vram
-  ldmia r2!, {r4-r11}                   @ load pixels from image
-  stmia r0!, {r4-r11}                   @ write pixels vram
+  mov r11, #16
+.PixelLoop:
+  ldr r8, [r2], #4          @ r8 = image pixels
+  cmp r8, r3                @ if both are tranparency color, skip storing anything to vram 
+  beq .NextPixel
 
+  ldr r9, [r0]  // save copy of vram in r9
+  @ check right pixel
+  and r10, r8, r7  // copy of image pixels with left cleared
+  cmp r10, r5
+  moveq r10, r9  //overwrite with vram
+  and r10, r10, r7  // final value for right pixel regardless of image or vram
+
+  @ check left pixel
+  and r12, r8, r6 // copy of img pixels with right cleared
+  cmp r12, r4 // compare left pixel to transparency value
+  moveq r12, r9 //overwite with vram if left is transparent
+  and r12, r12, r6 //clear right pixel, whether image or vram
+
+  @ combine left and right pixels
+  orr r9, r10, r12 // combine saved left and right final pixels
+  str r9, [r0]  //store combined pixels in vram
+
+.NextPixel:
+  add r0, #4 @increment vram pointer
+  subs r11, #1 @decrement pixel pair counter
+  bne .PixelLoop
+  
   add r2, #448                          @ move image offset to beginning of frame next row
   add r0, #416                          @ jump to beginning of next line VRAM, 480 - 64
-  subs r3, #1                           @ decrement counter
+
+  subs r1, #1                           @ decrement counter
   bne .LoopRow                          @ return to LoopRow until r3 = 1
 
   pop {r4-r11}
   bx lr 
 
 .size SpriteFrame32Bit, .-SpriteFrame32Bit
+
+  //now, need to check if either both or neither pixel is transparent.
+@             10 11 12 13 14 15
+@  0123456789 a  b  c  d  e  f
+
+@     0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15
+@  0000 0001 0010 0011 0100 0101 0110 0111 1000 1001 1010 1011 1100 1101 1110 1111
+  
+@x    7    C    1    F       7    C    1    F
+@  0111 1100 0001 1111    0111 1100 0001 1111
+
+@x    7    C    1    F       0    0    0    0
+@  0111 1100 0001 1111    0000 0000 0000 0000
+
+@x    0    0    0    0       7    C    1    F
+@  0000 0000 0000 0000    0111 1100 0001 1111
+
+
+  //ldmia r2!, {r4-r11}                   @ load pixels from image
+  //stmia r0!, {r4-r11}                   @ write pixels vram
+  //ldmia r2!, {r4-r11}                   @ load pixels from image
+  //stmia r0!, {r4-r11}                   @ write pixels vram
+

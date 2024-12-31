@@ -22,8 +22,6 @@ int main() {
                      BedroomBitmap);
     updateInputSystem(&entitySystem, &world);
     renderPlayer(&entitySystem, playerId);
-    restoreFrameBackground(world.position[playerId].x,
-                           world.position[playerId].y, 32, BedroomBitmap);
 
     simpleWait(10);
   }
