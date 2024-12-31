@@ -1,5 +1,6 @@
 #include "../includes/ECS.h"
 #include "../includes/characterAnimator.h" // later update to pull from library
+#include "Bedroom.h"
 #include "input/in.h"
 
 int initEntitySystem(EntitySystem *system, ComponentManager *world) {
@@ -68,9 +69,13 @@ void inline renderPlayer(EntitySystem *system, int playerId) {
   SpriteFrame32Bit(&system->world->position[playerId],
                    &system->world->animation[playerId],
                    system->world->sprite[playerId].spriteSheet);
+  restoreFrameBackground(system->world->position[playerId].x,
+                         system->world->position[playerId].y, 32,
+                         BedroomBitmap);
 }
 
 void updateInputSystem(EntitySystem *system, ComponentManager *world) {
+  updateKeys();
   for (int i = 0; i < system->inputEntityCount; i++) {
     int entityId = system->inputEntities[i];
 

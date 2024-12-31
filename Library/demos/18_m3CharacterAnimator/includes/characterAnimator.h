@@ -8,5 +8,6 @@ extern void SpriteFrame32Bit(PositionComponent *positionData,
                              AnimationComponent *animationData,
                              const void *image);
 extern void clearSpriteFrame(int x, int y, int size, const void *image);
+extern void restoreFrameBackground(int x, int y, int size, const void *image);
 
 #endif // ECS_H

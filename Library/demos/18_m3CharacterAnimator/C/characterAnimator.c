@@ -13,13 +13,12 @@ int main() {
   initEntitySystem(&entitySystem, &world);
   int playerId = createPlayer(&entitySystem, &RoboBitmap);
 
+  m3_Background(BedroomBitmap);
   while (1) {
     VBLANK();
-    updateKeys();
-
-    updateInputSystem(&entitySystem, &world);
     clearSpriteFrame(world.position[playerId].x, world.position[playerId].y, 32,
                      BedroomBitmap);
+    updateInputSystem(&entitySystem, &world);
     renderPlayer(&entitySystem, playerId);
   }
 
