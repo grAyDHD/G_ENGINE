@@ -13,6 +13,7 @@ int main() {
   DSPC = MODE3 | BG2;
   initEntitySystem(&entitySystem, &world);
   int playerId = createPlayer(&entitySystem, &RoboBitmap);
+  createNPC(&entitySystem, &RoboBitmap);
 
   m3_Background(BedroomBitmap);
   while (1) {
@@ -20,8 +21,12 @@ int main() {
 
     clearSpriteFrame(world.position[playerId].x, world.position[playerId].y, 32,
                      BedroomBitmap);
+    clearSpriteFrame(world.position[playerId + 1].x, world.position[playerId + 1].y, 32, BedroomBitmap);
     updateInputSystem(&entitySystem, &world);
-    renderPlayer(&entitySystem, playerId);
+    updateBehaviorSystem(&entitySystem, &world);
+
+    
+    updateRenderSystem(&entitySystem, &world);
 
     simpleWait(10);
   }

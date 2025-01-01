@@ -10,6 +10,7 @@
 #define COMPONENT_ANIMATION (1 << 3)
 #define COMPONENT_SPRITE (1 << 4)
 #define COMPONENT_INPUT (1 << 5)
+#define COMPONENT_AI (1 << 6)
 
 #define ENABLE_INPUT (1 << 16)
 
@@ -17,6 +18,8 @@
 #define PLAYER_ENTITY                                                          \
   (COMPONENT_POSITION | COMPONENT_VELOCITY | COMPONENT_ANIMATION |             \
    COMPONENT_SPRITE | COMPONENT_INPUT | ENABLE_INPUT)
+
+#define NPC_ENTITY (COMPONENT_POSITION | COMPONENT_VELOCITY | COMPONENT_ANIMATION | COMPONENT_SPRITE | COMPONENT_AI)
 
 typedef enum : int { DOWN = 0, UP, LEFT, RIGHT } DIRECTION;
 
@@ -51,11 +54,18 @@ typedef struct {
 } InputComponent;
 
 typedef struct {
+  void (*aiBehavior)(EntitySystem *system, int entityId); // Custom behavior
+  int param1;
+  int param2;
+} AIComponent;
+
+typedef struct {
   PositionComponent position[MAX_ENTITIES];
   VelocityComponent velocity[MAX_ENTITIES];
   AnimationComponent animation[MAX_ENTITIES];
   SpriteComponent sprite[MAX_ENTITIES];
   InputComponent input[MAX_INPUT_ENTITIES];
+  AIComponent ai[MAX_ENTITIES];
 } ComponentManager;
 
 typedef struct {
@@ -74,10 +84,22 @@ struct EntitySystem {
 };
 
 int initEntitySystem(EntitySystem *system, ComponentManager *world);
+
 int createEntity(EntitySystem *system, int componentMask);
 int createPlayer(EntitySystem *system, const void *spriteSheet);
+int createNPC(EntitySystem *system, const void *spriteSheet);
+
+void renderEntity(EntitySystem *system, int entityId);
 void playerInputHandler(EntitySystem *system, int entityId);
-void renderPlayer(EntitySystem *system, int playerId);
+
+// this will be a behavior for an entity, walk left for severalssteps, walk right back to starting point, and loop this behavior
+void patrolBehavior(EntitySystem *system, int entityId);
 void updateInputSystem(EntitySystem *system, ComponentManager *world);
+
+// this will update all entities with an AI comonent
+void updateBehaviorSystem(EntitySystem *system, ComponentManager *world);
+
+// all onscreen entities with an onscreen and or visible flag on will be rendered by this function
+void updateRenderSystem(EntitySystem *system, ComponentManager *world);
 
 #endif // ECS_H

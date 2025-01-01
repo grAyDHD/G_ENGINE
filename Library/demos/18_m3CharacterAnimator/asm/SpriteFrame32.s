@@ -44,17 +44,18 @@ SpriteFrame32Bit:
   add r2, r2, r7                          @ r2 = image frame+direction offset
  
 @ Calculate state offset for IDLE and WALK
-@  ldr r3, [r1, #8]                     @ r3 = state
-@  cmp r3, #0                          @ if r3 = 0
-@  beq Continue                        @ no more offset needed
+  ldr r3, [r1, #8]                     @ r3 = state
+  cmp r3, #0                          @ if r3 = 0
+  beq .Continue                        @ no more offset needed
 
-@  cmp r3, #1                          @ if r3 = 1
-@  bne Continue                        @ temporary break 
-@  add r2, r2, r6                      @ add 128 pixel offset for walk state
+  cmp r3, #1                          @ if r3 = 1
+  bne .Continue                        @ temporary break 
+  add r2, r2, r6                      @ add 128 pixel offset for walk state
 
   @ r0 = VRAM position offset
   @ r2 = image frame+direction+state offset
   @ TODO: calculate remaining state offsets
+.Continue:
 
 @ Step 3: copy image to vram (not transparency pixels)
   mov r1, #32           @ Set up row counter
