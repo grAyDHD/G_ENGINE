@@ -105,25 +105,60 @@ SpriteFrame32Bit:
 
 .size SpriteFrame32Bit, .-SpriteFrame32Bit
 
-  //now, need to check if either both or neither pixel is transparent.
-@             10 11 12 13 14 15
-@  0123456789 a  b  c  d  e  f
-
-@     0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15
-@  0000 0001 0010 0011 0100 0101 0110 0111 1000 1001 1010 1011 1100 1101 1110 1111
+.global clearSpriteFrame
+.type clearSpriteFrame, %function
   
-@x    7    C    1    F       7    C    1    F
-@  0111 1100 0001 1111    0111 1100 0001 1111
+@ clearSpriteFrame(int x, int y, int size, const void *IMAGE)
+@ r0 = x
+@ r1 = y
+@ r2 = size
+@ r3 = image (pointer to sprite sheet)
 
-@x    7    C    1    F       0    0    0    0
-@  0111 1100 0001 1111    0000 0000 0000 0000
+clearSpriteFrame:
+  push {r4-r11}
 
-@x    0    0    0    0       7    C    1    F
-@  0000 0000 0000 0000    0111 1100 0001 1111
+  @ Step 1: calculate VRAM and IMAGE byte offsets
+  mov r4, #240
+  mul r5, r1, r4                         @ r5 = y * 240
+  add r5, r5, r0                         @ r5 = x + (y * 240)
+  add r5, r5, r5                         @ r5 doubled for byte offset 
 
 
-  //ldmia r2!, {r4-r11}                   @ load pixels from image
-  //stmia r0!, {r4-r11}                   @ write pixels vram
-  //ldmia r2!, {r4-r11}                   @ load pixels from image
-  //stmia r0!, {r4-r11}                   @ write pixels vram
+  ldr r1, =0x6000000                     @ r1 = start of VRAM
+  add r0, r3, r5                         @ r0 = image offset
+  add r1, r1, r5                         @ r1 = vram offset 
+
+  mov r3, #480                           @ screen width in bytes
+  sub r3, r3, r2
+  sub r3, r3, r2                         @ subtract size times 2 by subbing twice
+
+  lsr r4, r2, #3                         @shift size right 3, or divide by 8
+  
+@ row counter = size, as height = size
+                  @ r0 = image offset
+                  @ r1 = vram offset
+                  @ r2 = size in pixels, row counter
+                  @ r3 = next row offset
+                  @ r4 = number of 8-pixel chunks per row
+                  @ r5 = chunk counter
+RowsLoop:
+  mov r5, r4
+  
+ChunkLoop:
+  ldmia r0!, {r6-r9} @10 words loaded from src image
+  stmia r1!, {r6-r9} @writes 10 loaded words to vram
+  subs r5, r5, #1
+  bne ChunkLoop
+
+  @ Move to next row
+  add r0, r0, r3
+  add r1, r1, r3
+
+  subs r2, r2, #1
+  bne RowsLoop
+
+  pop {r4-r11}
+  bx lr
+
+.size clearSpriteFrame, .-clearSpriteFrame
 
