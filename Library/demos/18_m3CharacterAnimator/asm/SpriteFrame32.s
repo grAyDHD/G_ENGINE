@@ -54,12 +54,7 @@ SpriteFrame32Bit:
 
   @ r0 = VRAM position offset
   @ r2 = image frame+direction+state offset
-  @ r4 = frame byte width
-  @ r6 = sprite sheet row length (pixels), also width and/or height of state offset in bytes
   @ TODO: calculate remaining state offsets
-
-  @ r0 = VRAM offset
-  @ r2 = image offset
 
 @ Step 3: copy image to vram (not transparency pixels)
   mov r1, #32           @ Set up row counter
