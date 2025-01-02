@@ -19,7 +19,9 @@
   (COMPONENT_POSITION | COMPONENT_VELOCITY | COMPONENT_ANIMATION |             \
    COMPONENT_SPRITE | COMPONENT_INPUT | ENABLE_INPUT)
 
-#define NPC_ENTITY (COMPONENT_POSITION | COMPONENT_VELOCITY | COMPONENT_ANIMATION | COMPONENT_SPRITE | COMPONENT_AI)
+#define NPC_ENTITY                                                             \
+  (COMPONENT_POSITION | COMPONENT_VELOCITY | COMPONENT_ANIMATION |             \
+   COMPONENT_SPRITE | COMPONENT_AI)
 
 typedef enum : int { DOWN = 0, UP, LEFT, RIGHT } DIRECTION;
 
@@ -92,14 +94,16 @@ int createNPC(EntitySystem *system, const void *spriteSheet);
 void renderEntity(EntitySystem *system, int entityId);
 void playerInputHandler(EntitySystem *system, int entityId);
 
-// this will be a behavior for an entity, walk left for severalssteps, walk right back to starting point, and loop this behavior
+// this will be a behavior for an entity, walk left for severalssteps, walk
+// right back to starting point, and loop this behavior
 void patrolBehavior(EntitySystem *system, int entityId);
 void updateInputSystem(EntitySystem *system, ComponentManager *world);
 
 // this will update all entities with an AI comonent
 void updateBehaviorSystem(EntitySystem *system, ComponentManager *world);
 
-// all onscreen entities with an onscreen and or visible flag on will be rendered by this function
+// all onscreen entities with an onscreen and or visible flag on will be
+// rendered by this function
 void updateRenderSystem(EntitySystem *system, ComponentManager *world);
 
 #endif // ECS_H

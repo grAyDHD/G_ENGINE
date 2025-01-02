@@ -24,9 +24,7 @@ int initEntitySystem(ECS *ecs, ComponentStorage *components) {
 }
 
 void inline renderEntity(ECS *ecs, int playerId) {
-  /*
   SpriteFrame32Bit(&ecs->components->position[playerId],
                    &ecs->components->animation[playerId],
                    ecs->components->sprite[playerId].spriteSheet);
-  */
 }

@@ -25,7 +25,11 @@ struct ECS {
   int entityCount;
 };
 
-void renderEntity(ECS *ecs, int entityId);
+extern void clearSpriteFrame(int x, int y, int size, const void *image);
+extern void SpriteFrame32Bit(PositionComponent *positionData,
+                             AnimationComponent *animationData,
+                             const void *image);
 int initEntitySystem(ECS *ecs, ComponentStorage *world);
+void renderEntity(ECS *ecs, int entityId);
 
 #endif // ECS_H

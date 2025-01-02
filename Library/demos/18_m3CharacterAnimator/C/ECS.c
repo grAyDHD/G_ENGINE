@@ -166,5 +166,3 @@ void playerInputHandler(EntitySystem *system, int entityId) {
     }
   }
 }
-
-void fungus();

@@ -33,7 +33,6 @@ int main() {
     updateBehaviorSystem(&entitySystem, &world); // updates entities with AI
     //  should collisions be checked in player input function, and ai behavior
     //  functions?
-    // hitboxes?
     // updateMovementSystem(&entitySystem);
 
     updateRenderSystem(&entitySystem, &world);
