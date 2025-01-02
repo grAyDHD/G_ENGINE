@@ -23,6 +23,7 @@ struct ECS {
   int inputEntityId[MAX_INPUT_ENTITIES];
   int nextEntityId;
   int entityCount;
+  int inputEntityCount;
 };
 
 extern void clearSpriteFrame(int x, int y, int size, const void *image);
@@ -31,5 +32,7 @@ extern void SpriteFrame32Bit(PositionComponent *positionData,
                              const void *image);
 int initEntitySystem(ECS *ecs, ComponentStorage *world);
 void renderEntity(ECS *ecs, int entityId);
+
+void clearSpriteFrames(ECS *system, ComponentStorage *world, const void *image);
 
 #endif // ECS_H

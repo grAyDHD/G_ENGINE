@@ -19,6 +19,10 @@ int createEntity(ECS *ecs, int flag) {
     ecs->components->velocity[ecs->nextEntityId] = (VelocityComponent){0, 0};
   }
 
+  if (flag & COMPONENT_INPUT) {
+    ecs->inputEntityCount++;
+  }
+
   return ecs->nextEntityId++;
 }
 
@@ -51,7 +55,7 @@ int createPlayer(ECS *ecs, const void *spriteSheet) {
       (SpriteComponent){.spriteSheet = spriteSheet};
 
   ecs->components->input[playerId].handleInput = playerInputHandler;
-  //  ecs->inputEntities[ecs->inputEntityCount++] = playerId;
+  ecs->inputEntityId[ecs->inputEntityCount++] = playerId;
   //  instead, iterate through id array, set if > -1
   //  else, reintroduce inputEntityCount
   return playerId;

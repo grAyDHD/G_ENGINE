@@ -1,6 +1,0 @@
-steps left to implement:
-handle animations, IDLE and WALK (more to be introduced as needed, run/talk?)
-
-npc added with back and forth behavior.
-implement variable movement speed with velocity
-add collisions, position and size of hit box placement relative to sprite
