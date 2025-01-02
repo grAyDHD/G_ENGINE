@@ -1,0 +1,4 @@
+fix create player last lines in entities.c
+match solution to ecs.s initEntitySystem
+simplify components.c, reduce dereferencing
+

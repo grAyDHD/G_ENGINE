@@ -1,0 +1,75 @@
+#include "../../include/ecs/ecs.h"
+#include "../../include/input/in.h"
+
+// These are included as potential component behaviors,
+// Likely to further categorize as library expands
+void playerInputHandler(ECS *ecs, int entityId) {
+  AnimationComponent *animation = &ecs->components->animation[entityId];
+
+  if (keyDown(U)) {
+    ecs->components->position[entityId].y -= 1;
+    ecs->components->animation[entityId].direction = UP;
+    animation->state = WALK;
+  } else if (keyDown(D)) {
+    ecs->components->position[entityId].y += 1;
+    ecs->components->animation[entityId].direction = DOWN;
+    animation->state = WALK;
+  } else if (keyDown(L)) {
+    ecs->components->position[entityId].x -= 1;
+    ecs->components->animation[entityId].direction = LEFT;
+    animation->state = WALK;
+  } else if (keyDown(R)) {
+    ecs->components->position[entityId].x += 1;
+    ecs->components->animation[entityId].direction = RIGHT;
+    animation->state = WALK;
+  }
+
+  if (keyReleased(U | D | L | R)) {
+    animation->frameNumber = 0;
+    animation->state = IDLE;
+    animation->keyframe = 0;
+  }
+
+  animation->keyframe++;
+  if (animation->keyframe >= animation->keyframeInterval) {
+    animation->keyframe = 0;
+    animation->frameNumber++;
+    if (animation->frameNumber == 4) {
+      animation->frameNumber = 0;
+    }
+  }
+}
+
+void patrolBehavior(ECS *ecs, int entityId) {
+  // this should be a walking back and forth animagion.
+  AIComponent *ai = &ecs->components->ai[entityId];
+  PositionComponent *position = &ecs->components->position[entityId];
+  AnimationComponent *animation = &ecs->components->animation[entityId];
+  // p2 = distance
+  ai->param2 = 20;
+
+  if (animation->direction == LEFT) {
+    position->x--;
+    ai->param1++;
+    if (ai->param1 >= ai->param2) {
+      ai->param1 = 0;
+      animation->direction = RIGHT;
+    }
+  } else { // RIGHT
+    position->x++;
+    ai->param1++;
+    if (ai->param1 >= ai->param2) {
+      ai->param1 = 0;
+      animation->direction = LEFT;
+    }
+  }
+
+  animation->keyframe++;
+  if (animation->keyframe >= animation->keyframeInterval) {
+    animation->keyframe = 0;
+    animation->frameNumber++;
+    if (animation->frameNumber == 4) {
+      animation->frameNumber = 0;
+    }
+  }
+};

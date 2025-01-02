@@ -1,0 +1,8 @@
+Kinematics.
+4 things:
+position   where object is located m
+velocity   how position changes over time m/s
+acceleration how velocity changes over time m/s^2
+time   time elapsed since object started
+
+x = 1/2aDt^2 + vDt +x   Dt is deltatime
