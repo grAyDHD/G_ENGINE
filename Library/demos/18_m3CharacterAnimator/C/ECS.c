@@ -4,20 +4,21 @@
 #include "input/in.h"
 
 void patrolBehavior(EntitySystem *system, int entityId) {
-//this should be a walking back and forth animagion.
+  // this should be a walking back and forth animagion.
   AIComponent *ai = &system->world->ai[entityId];
   PositionComponent *position = &system->world->position[entityId];
   AnimationComponent *animation = &system->world->animation[entityId];
-  ai->param2 = 8;
-  
+  // p2 = distance
+  ai->param2 = 20;
+
   if (animation->direction == LEFT) {
     position->x--;
     ai->param1++;
     if (ai->param1 >= ai->param2) {
       ai->param1 = 0;
       animation->direction = RIGHT;
-   }
-  } else {  // RIGHT
+    }
+  } else { // RIGHT
     position->x++;
     ai->param1++;
     if (ai->param1 >= ai->param2) {
@@ -25,21 +26,21 @@ void patrolBehavior(EntitySystem *system, int entityId) {
       animation->direction = LEFT;
     }
   }
-  
+
   animation->keyframe++;
   if (animation->keyframe >= animation->keyframeInterval) {
     animation->keyframe = 0;
     animation->frameNumber++;
     if (animation->frameNumber == 4) {
-      animation->frameNumber = 0; 
-    }  
+      animation->frameNumber = 0;
+    }
   }
 };
 
 void updateBehaviorSystem(EntitySystem *system, ComponentManager *world) {
   for (int i = 0; i < MAX_ENTITIES; i++) {
     if (system->entities[i].componentMask & COMPONENT_AI) {
-    system->world->ai[i].aiBehavior(system, i);
+      system->world->ai[i].aiBehavior(system, i);
     }
   }
 };
@@ -83,12 +84,11 @@ int createEntity(EntitySystem *system, int componentMask) {
 int createNPC(EntitySystem *system, const void *spriteSheet) {
   int npcId = createEntity(system, NPC_ENTITY);
 
-  system->world->animation[npcId] = 
-      (AnimationComponent){.frameNumber = 0, 
-                           .direction = RIGHT,
-                           .state = WALK,
-                           .keyframe = 0, 
-                           .keyframeInterval = 8};
+  system->world->animation[npcId] = (AnimationComponent){.frameNumber = 0,
+                                                         .direction = RIGHT,
+                                                         .state = WALK,
+                                                         .keyframe = 0,
+                                                         .keyframeInterval = 8};
   system->world->sprite[npcId] = (SpriteComponent){.spriteSheet = spriteSheet};
   system->world->ai[npcId].aiBehavior = patrolBehavior;
 
@@ -113,7 +113,6 @@ int createPlayer(EntitySystem *system, const void *spriteSheet) {
   return playerId;
 }
 
-
 void inline renderEntity(EntitySystem *system, int playerId) {
   SpriteFrame32Bit(&system->world->position[playerId],
                    &system->world->animation[playerId],
@@ -133,7 +132,7 @@ void updateInputSystem(EntitySystem *system, ComponentManager *world) {
 
 void playerInputHandler(EntitySystem *system, int entityId) {
   AnimationComponent *animation = &system->world->animation[entityId];
-  
+
   if (keyDown(U)) {
     system->world->position[entityId].y -= 1;
     system->world->animation[entityId].direction = UP;
@@ -163,10 +162,9 @@ void playerInputHandler(EntitySystem *system, int entityId) {
     animation->keyframe = 0;
     animation->frameNumber++;
     if (animation->frameNumber == 4) {
-      animation->frameNumber = 0; 
-    }  
+      animation->frameNumber = 0;
+    }
   }
-
 }
 
 void fungus();
