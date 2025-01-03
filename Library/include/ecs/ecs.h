@@ -11,6 +11,8 @@
 struct ComponentStorage {
   PositionComponent position[MAX_ENTITIES];
   VelocityComponent velocity[MAX_ENTITIES];
+  AccelerationComponent acceleration[MAX_ENTITIES];
+  HitboxComponent hitbox[MAX_ENTITIES];
   AnimationComponent animation[MAX_ENTITIES];
   SpriteComponent sprite[MAX_ENTITIES];
   InputComponent input[MAX_INPUT_ENTITIES];

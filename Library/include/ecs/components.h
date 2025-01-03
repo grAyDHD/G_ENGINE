@@ -19,6 +19,17 @@ typedef struct {
   int dy;
 } VelocityComponent;
 
+typedef struct {
+  int ax;
+  int ay;
+} AccelerationComponent;
+
+typedef struct {
+  int width;
+  int height;
+  int offset; // y * image pixel width * 2 + x
+} HitboxComponent;
+
 typedef enum : int { DOWN = 0, UP, LEFT, RIGHT } DIRECTION;
 typedef enum : int { IDLE = 0, WALK, TALK, RUN } STATE;
 typedef struct {
