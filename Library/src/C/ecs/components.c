@@ -1,3 +1,4 @@
+#include "ecs/components.h"
 #include "../../include/ecs/ecs.h"
 #include "../../include/input/in.h"
 
@@ -5,22 +6,26 @@
 // Likely to further categorize as library expands
 void playerInputHandler(ECS *ecs, int entityId) {
   AnimationComponent *animation = &ecs->components->animation[entityId];
+  VelocityComponent *velocity = &ecs->components->velocity[entityId];
+
+  velocity->dx = 0;
+  velocity->dy = 0;
 
   if (keyDown(U)) {
-    ecs->components->position[entityId].y -= 1;
-    ecs->components->animation[entityId].direction = UP;
+    velocity->dy = -1;
+    animation->direction = UP;
     animation->state = WALK;
   } else if (keyDown(D)) {
-    ecs->components->position[entityId].y += 1;
-    ecs->components->animation[entityId].direction = DOWN;
+    velocity->dy = 1;
+    animation->direction = DOWN;
     animation->state = WALK;
   } else if (keyDown(L)) {
-    ecs->components->position[entityId].x -= 1;
-    ecs->components->animation[entityId].direction = LEFT;
+    velocity->dx = -1;
+    animation->direction = LEFT;
     animation->state = WALK;
   } else if (keyDown(R)) {
-    ecs->components->position[entityId].x += 1;
-    ecs->components->animation[entityId].direction = RIGHT;
+    velocity->dx = 1;
+    animation->direction = RIGHT;
     animation->state = WALK;
   }
 

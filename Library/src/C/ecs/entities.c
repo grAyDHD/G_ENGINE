@@ -12,18 +12,45 @@ int createEntity(ECS *ecs, int flag) {
 
   if (flag & COMPONENT_POSITION) {
     ecs->components->position[ecs->nextEntityId] =
-        (PositionComponent){120, 120};
+        // this should be provided as an argument
+        (PositionComponent){.x = 120, .y = 120};
   }
 
+  // this should be zero unless
   if (flag & COMPONENT_VELOCITY) {
-    ecs->components->velocity[ecs->nextEntityId] = (VelocityComponent){0, 0};
+    ecs->components->velocity[ecs->nextEntityId] =
+        (VelocityComponent){.dx = 0, .dy = 0};
   }
 
+  /*
   if (flag & COMPONENT_INPUT) {
     ecs->inputEntityCount++;
   }
+*/
 
   return ecs->nextEntityId++;
+}
+
+int createPlayer(ECS *ecs, const void *spriteSheet) {
+  int playerId = createEntity(ecs, PLAYER_ENTITY);
+  // currently, already have defined  position and velocity
+  // position, velocity, animation, sprite, input, enable input
+  //  ecs->components->animation[playerId] =
+  ecs->components->animation[playerId] =
+      (AnimationComponent){.frameNumber = 0,
+                           .direction = LEFT,
+                           .state = WALK,
+                           .keyframe = 0,
+                           .keyframeInterval = 8};
+
+  ecs->components->sprite[playerId] =
+      (SpriteComponent){.spriteSheet = spriteSheet};
+
+  ecs->components->input[playerId].handleInput = playerInputHandler;
+  ecs->inputEntityId[ecs->inputEntityCount++] = playerId;
+  //  instead, iterate through id array, set if > -1
+  //  else, reintroduce inputEntityCount
+  return playerId;
 }
 
 int createNPC(ECS *ecs, const void *spriteSheet) {
@@ -40,23 +67,4 @@ int createNPC(ECS *ecs, const void *spriteSheet) {
   ecs->components->ai[npcId].aiBehavior = patrolBehavior;
 
   return npcId;
-}
-
-int createPlayer(ECS *ecs, const void *spriteSheet) {
-  int playerId = createEntity(ecs, PLAYER_ENTITY);
-
-  ecs->components->animation[playerId] =
-      (AnimationComponent){.frameNumber = 0,
-                           .direction = LEFT,
-                           .state = WALK,
-                           .keyframe = 0,
-                           .keyframeInterval = 8};
-  ecs->components->sprite[playerId] =
-      (SpriteComponent){.spriteSheet = spriteSheet};
-
-  ecs->components->input[playerId].handleInput = playerInputHandler;
-  ecs->inputEntityId[ecs->inputEntityCount++] = playerId;
-  //  instead, iterate through id array, set if > -1
-  //  else, reintroduce inputEntityCount
-  return playerId;
 }

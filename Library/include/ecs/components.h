@@ -3,6 +3,12 @@
 
 #include "systems.h"
 
+#define VELOCITY_SCALE 256 // For fixed-point math
+#define MOVEMENT_SPEED 256 // 1 pixel per frame in fixed-point
+
+void playerInputHandler(ECS *ecs, int entityId);
+void patrolBehavior(ECS *ecs, int entityId);
+
 typedef struct {
   int x;
   int y;
@@ -37,6 +43,4 @@ typedef struct {
   int param2;
 } AIComponent;
 
-void playerInputHandler(ECS *ecs, int entityId);
-void patrolBehavior(ECS *ecs, int entityId);
 #endif // !COMPONENTS_H

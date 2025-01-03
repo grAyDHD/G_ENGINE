@@ -34,11 +34,3 @@ void inline clearSpriteFrames(ECS *system, ComponentStorage *world,
   clearSpriteFrame(world->position[0].x, world->position[0].y, 32, image);
   clearSpriteFrame(world->position[1].x, world->position[1].y, 32, image);
 }
-
-void updateRenderSystem(ECS *ecs, ComponentStorage *components) {
-  for (int i = 0; i < MAX_ENTITIES; i++) {
-    if (ecs->entity[i].flag & COMPONENT_ANIMATION) {
-      renderEntity(ecs, i);
-    }
-  }
-};
