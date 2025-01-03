@@ -4,6 +4,7 @@
 
 // These are included as potential component behaviors,
 // Likely to further categorize as library expands
+
 void playerInputHandler(ECS *ecs, int entityId) {
   AnimationComponent *animation = &ecs->components->animation[entityId];
   VelocityComponent *velocity = &ecs->components->velocity[entityId];
