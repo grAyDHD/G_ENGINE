@@ -20,6 +20,7 @@ int main() {
     //    updateBehaviorSystem(&entitySystem, &world);
     updateCollisionSystem(&entitySystem, &world);
     updateMovementSystem(&entitySystem, &world);
+    updateAnimationSystem(&entitySystem, &world);
     updateRenderSystem(&entitySystem, &world);
   }
 

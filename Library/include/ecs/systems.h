@@ -15,5 +15,6 @@ void updateBehaviorSystem(ECS *ecs, ComponentStorage *components);
 void updateRenderSystem(ECS *ecs, ComponentStorage *components);
 void updateCollisionSystem(ECS *ecs, ComponentStorage *components);
 void updateMovementSystem(ECS *ecs, ComponentStorage *components);
+void updateAnimationSystem(ECS *ecs, ComponentStorage *components);
 
 #endif // !SYSTEMS_H

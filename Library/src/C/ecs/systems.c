@@ -67,31 +67,33 @@ void updateCollisionSystem(ECS *ecs, ComponentStorage *components) {
 void updateMovementSystem(ECS *ecs, ComponentStorage *components) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
     if (ecs->entity[id].flag & COMPONENT_VELOCITY) {
-      VelocityComponent *vel = &components->velocity[id];
-      PositionComponent *pos = &components->position[id];
+      VelocityComponent *velocity = &components->velocity[id];
+      PositionComponent *position = &components->position[id];
 
       if ((ecs->entity[id].flag & COLLISION_DETECTED)) {
-        vel->dx = 0;
-        vel->dy = 0;
+        velocity->dx = 0;
+        velocity->dy = 0;
       } else {
-        pos->x += vel->dx;
-        pos->y += vel->dy;
+        position->x += velocity->dx;
+        position->y += velocity->dy;
       }
     }
   }
 }
 
-/*
+void updateAnimationSystem(ECS *ecs, ComponentStorage *components) {
+  for (int id = 0; id < MAX_ENTITIES; id++) {
+    if (ecs->entity[id].flag & COMPONENT_ANIMATION) {
+      AnimationComponent *animation = &components->animation[id];
 
-      // Try horizontal movement first
-      pos->x += vel->dx;
-      if (ecs->entity[id].flag & COLLISION_DETECTED) {
-        pos->x -= vel->dx; // Undo horizontal movement if collision
+      animation->keyframe++;
+      if (animation->keyframe >= animation->keyframeInterval) {
+        animation->keyframe = 0;
+        animation->frameNumber++;
+        if (animation->frameNumber == 4) {
+          animation->frameNumber = 0;
+        }
       }
-
-      // Try vertical movement second
-      pos->y += vel->dy;
-      if (ecs->entity[id].flag & COLLISION_DETECTED) {
-        pos->y -= vel->dy; // Undo vertical movement if collision
-      }
-*/
+    }
+  }
+}

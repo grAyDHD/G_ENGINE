@@ -37,15 +37,6 @@ void playerInputHandler(ECS *ecs, int entityId) {
       animation->keyframe = 0;
     }
   }
-
-  animation->keyframe++;
-  if (animation->keyframe >= animation->keyframeInterval) {
-    animation->keyframe = 0;
-    animation->frameNumber++;
-    if (animation->frameNumber == 4) {
-      animation->frameNumber = 0;
-    }
-  }
 }
 
 void patrolBehavior(ECS *ecs, int entityId) {
@@ -73,15 +64,6 @@ void patrolBehavior(ECS *ecs, int entityId) {
     if (ai->param1 >= ai->param2) {
       ai->param1 = 0;
       animation->direction = LEFT;
-    }
-  }
-
-  animation->keyframe++;
-  if (animation->keyframe >= animation->keyframeInterval) {
-    animation->keyframe = 0;
-    animation->frameNumber++;
-    if (animation->frameNumber == 4) {
-      animation->frameNumber = 0;
     }
   }
 };
