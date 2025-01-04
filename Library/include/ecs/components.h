@@ -27,7 +27,7 @@ typedef struct {
 typedef struct {
   int width;
   int height;
-  int offset; // y * image pixel width * 2 + x
+  //  int offset; // y * image pixel width * 2 + x
 } HitboxComponent;
 
 typedef enum : int { DOWN = 0, UP, LEFT, RIGHT } DIRECTION;

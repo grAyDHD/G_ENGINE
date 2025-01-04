@@ -1,0 +1,200 @@
+
+1. Velocity Update (Acceleration Integration)
+Formula:
+
+velocity = velocity + (acceleration * dt)
+
+Purpose:
+
+    Updates the velocity of an entity based on its acceleration.
+    Examples: Gravity increasing downward velocity, a thrust force accelerating an object forward.
+
+Fixed-Point Implementation:
+
+    Represent velocity, acceleration, and dt in 16.16 fixed-point format.
+    Multiply acceleration by dt (scale by time) and add to velocity:
+
+    velocity += (acceleration * dt) >> 16
+
+Where to Apply:
+
+    In the Physics System, after computing forces like gravity or thrust.
+
+2. Position Update (Velocity Integration)
+Formula:
+
+position = position + (velocity * dt)
+
+Purpose:
+
+    Updates the position of an entity based on its velocity.
+    Ensures consistent movement over time, scaled by the frame duration.
+
+Fixed-Point Implementation:
+
+    Represent position, velocity, and dt in 16.16 format.
+    Multiply velocity by dt and add to position:
+
+    position += (velocity * dt) >> 16
+
+Where to Apply:
+
+    In the Movement System, after updating velocity.
+
+3. Gravity
+Formula:
+
+accelerationY = GRAVITY
+
+Purpose:
+
+    Simulates the constant downward force acting on entities.
+    Adds a constant vertical acceleration to the entity's velocity.
+
+Fixed-Point Implementation:
+
+    Represent GRAVITY as a small fixed-point constant (e.g., GRAVITY = 0.1 → GRAVITY = 6554 in 16.16 format).
+    Add GRAVITY to the vertical acceleration:
+
+    accelerationY += GRAVITY
+
+Where to Apply:
+
+    In the Physics System, before updating velocity.
+
+4. Friction
+Formula:
+
+velocity = velocity * (1 - frictionCoefficient * dt)
+
+Purpose:
+
+    Simulates resistance (e.g., air drag, surface friction) that slows entities over time.
+    Gradually reduces velocity to simulate "realistic" slowing.
+
+Fixed-Point Implementation:
+
+    Represent frictionCoefficient and dt in 16.16 format.
+    Precompute the scaling factor:
+
+scalingFactor = (1 << 16) - (frictionCoefficient * dt) >> 16
+
+Multiply velocity by scalingFactor:
+
+    velocity = (velocity * scalingFactor) >> 16
+
+Where to Apply:
+
+    After updating velocity in the Physics System.
+
+5. Bouncing
+Formula:
+
+velocity = -velocity * elasticity
+
+Purpose:
+
+    Simulates the rebound of an entity after a collision with a surface.
+    The elasticity constant determines how much energy is retained (e.g., elasticity = 0.8 for 80% energy retention).
+
+Fixed-Point Implementation:
+
+    Represent elasticity in 16.16 format.
+    Multiply velocity by -elasticity:
+
+    velocity = -(velocity * elasticity) >> 16
+
+Where to Apply:
+
+    In the Collision Resolution System, after detecting a collision.
+
+6. Collision Detection
+Formula (Axis-Aligned Bounding Box):
+
+collision = (A.right > B.left AND A.left < B.right) AND
+            (A.bottom > B.top AND A.top < B.bottom)
+
+Purpose:
+
+    Detects if two entities are overlapping (colliding) based on their bounding boxes.
+
+Fixed-Point Implementation:
+
+    Convert positions to integers for collision checks:
+
+    A.right = (A.x + A.width) >> 16
+    B.left = B.x >> 16
+
+    Apply the collision formula using integer comparisons.
+
+Where to Apply:
+
+    In the Collision System, before resolving collisions.
+
+7. Delta Time Scaling
+Formula:
+
+scaledValue = (value * dt)
+
+Purpose:
+
+    Scales physics calculations (velocity, acceleration) by the elapsed time per frame.
+    Ensures consistent behavior regardless of frame rate.
+
+Fixed-Point Implementation:
+
+    Convert dt to 16.16 format:
+
+dtFixed = (dt << 16) / 1000
+
+Multiply value by dtFixed, then right-shift to scale:
+
+    scaledValue = (value * dtFixed) >> 16
+
+Where to Apply:
+
+    In all time-sensitive calculations (velocity, position, forces).
+
+8. Force Application (Newton’s Second Law)
+Formula:
+
+acceleration = force / mass
+
+Purpose:
+
+    Converts applied forces into acceleration based on the entity's mass.
+    Example: Jumping applies an upward force.
+
+Fixed-Point Implementation:
+
+    Represent force and mass in 16.16 format.
+    Divide force by mass to compute acceleration:
+
+    acceleration = (force << 16) / mass
+
+Where to Apply:
+
+    In the Physics System, before updating acceleration.
+
+Summary Table of Formulas and Implementation
+Formula	Purpose	Fixed-Point Implementation
+velocity += (acceleration * dt)	Update velocity with acceleration over time.	(acceleration * dt) >> 16
+position += (velocity * dt)	Update position based on velocity.	(velocity * dt) >> 16
+accelerationY += GRAVITY	Apply constant downward force.	GRAVITY = 6554 (0.1 in 16.16)
+velocity *= (1 - friction * dt)	Simulate resistance slowing the entity.	scalingFactor = (1 << 16) - (friction * dt) >> 16
+velocity = -velocity * elasticity	Simulate rebound after a collision.	(velocity * elasticity) >> 16
+collision = (A.right > B.left...)	Detect overlap between bounding boxes.	Convert positions to integers using >> 16.
+acceleration = force / mass	Compute acceleration from applied forces.	(force << 16) / mass
+Implementation Tips for Fixed-Point on GBA
+
+    Precompute Constants:
+        Store frequently used values like GRAVITY and elasticity in fixed-point format during initialization.
+
+    Optimize Shifts:
+        Minimize >> 16 operations by grouping calculations where possible.
+
+    Use Clamping:
+        Prevent overflow or underflow in multiplication and division.
+
+    Test with Small Values:
+        Validate that small velocities and accelerations (e.g., 0.01) behave as expected.

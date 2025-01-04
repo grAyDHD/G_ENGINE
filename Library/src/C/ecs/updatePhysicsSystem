@@ -1,0 +1,33 @@
+
+void updatePhysicsSystem(ECS *ecs, ComponentStorage *components) {
+  for (int id = 0; id < MAX_ENTITIES; id++) {
+    if (ecs->entity[id].flag & ENABLE_PHYSICS)
+      continue;
+    VelocityComponent *vel = &components->velocity[id];
+    AccelerationComponent *acc = &components->acceleration[id];
+    PositionComponent *pos = &components->position[id];
+    vel->dx += acc->ax;
+    vel->dy += acc->ay;
+    pos->x += vel->dx;
+    pos->y += vel->dy;
+  }
+}
+
+
+/*
+void updatePhysicsSystem(ECS *ecs, ComponentStorage *components) {
+    for (int id = 0; id < MAX_ENTITIES; id++) {
+        if (!(ecs->entity[id].flag & ENABLE_PHYSICS)) continue;
+
+        VelocityComponent *vel = &components->velocity[id];
+        AccelerationComponent *acc = &components->acceleration[id];
+
+        // Apply gravity
+        acc->ay = GRAVITY * gravityDirection;
+
+        // Update velocity
+        vel->dx += acc->ax;
+        vel->dy += acc->ay;
+    }
+}
+*/

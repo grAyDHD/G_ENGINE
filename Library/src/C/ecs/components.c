@@ -31,9 +31,11 @@ void playerInputHandler(ECS *ecs, int entityId) {
   }
 
   if (keyReleased(U | D | L | R)) {
-    animation->frameNumber = 0;
-    animation->state = IDLE;
-    animation->keyframe = 0;
+    if (!keyDown(U | D | L | R)) {
+      animation->frameNumber = 0;
+      animation->state = IDLE;
+      animation->keyframe = 0;
+    }
   }
 
   animation->keyframe++;
@@ -49,20 +51,24 @@ void playerInputHandler(ECS *ecs, int entityId) {
 void patrolBehavior(ECS *ecs, int entityId) {
   // this should be a walking back and forth animagion.
   AIComponent *ai = &ecs->components->ai[entityId];
-  PositionComponent *position = &ecs->components->position[entityId];
+  VelocityComponent *velocity = &ecs->components->velocity[entityId];
   AnimationComponent *animation = &ecs->components->animation[entityId];
+
+  velocity->dx = 0;
+  velocity->dy = 0;
+
   // p2 = distance
-  ai->param2 = 20;
+  ai->param2 = 40;
 
   if (animation->direction == LEFT) {
-    position->x--;
+    velocity->dx = -1;
     ai->param1++;
     if (ai->param1 >= ai->param2) {
       ai->param1 = 0;
       animation->direction = RIGHT;
     }
   } else { // RIGHT
-    position->x++;
+    velocity->dx = 1;
     ai->param1++;
     if (ai->param1 >= ai->param2) {
       ai->param1 = 0;

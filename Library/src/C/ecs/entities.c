@@ -1,5 +1,6 @@
 #include "../../include/ecs/ecs.h"
 #include "../../include/input/in.h"
+#include "ecs/components.h"
 
 int createEntity(ECS *ecs, int flag) {
   if (ecs->nextEntityId >= MAX_ENTITIES) {
@@ -9,12 +10,6 @@ int createEntity(ECS *ecs, int flag) {
   Entity *entity = &ecs->entity[ecs->nextEntityId];
   entity->ID = ecs->nextEntityId;
   entity->flag = flag;
-
-  if (flag & COMPONENT_POSITION) {
-    ecs->components->position[ecs->nextEntityId] =
-        // this should be provided as an argument
-        (PositionComponent){.x = 120, .y = 120};
-  }
 
   // this should be zero unless
   if (flag & COMPONENT_VELOCITY) {
@@ -33,9 +28,16 @@ int createEntity(ECS *ecs, int flag) {
 
 int createPlayer(ECS *ecs, const void *spriteSheet) {
   int playerId = createEntity(ecs, PLAYER_ENTITY);
-  // currently, already have defined  position and velocity
-  // position, velocity, animation, sprite, input, enable input
-  //  ecs->components->animation[playerId] =
+
+  ecs->components->position[playerId] =
+      // this should be provided as an argument
+      (PositionComponent){.x = 80, .y = 80};
+
+  ecs->components->hitbox[playerId] =
+      // not positive how this shall be implemented.  look up table based on
+      // sprite sheet probably
+      (HitboxComponent){.width = 32, .height = 32};
+
   ecs->components->animation[playerId] =
       (AnimationComponent){.frameNumber = 0,
                            .direction = LEFT,
@@ -56,6 +58,11 @@ int createPlayer(ECS *ecs, const void *spriteSheet) {
 int createNPC(ECS *ecs, const void *spriteSheet) {
   int npcId = createEntity(ecs, NPC_ENTITY);
 
+  ecs->components->position[ecs->nextEntityId] =
+      // this should be provided as an argument
+      (PositionComponent){.x = 120, .y = 120};
+
+  ecs->components->hitbox[npcId] = (HitboxComponent){.width = 32, .height = 32};
   ecs->components->animation[npcId] =
       (AnimationComponent){.frameNumber = 0,
                            .direction = RIGHT,

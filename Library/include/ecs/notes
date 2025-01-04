@@ -1,0 +1,1 @@
+need to add a way to track on screen entities, flag, array of ids?  Then collision check only would loop on screen entities, or better yet, each entity would make one check for anot

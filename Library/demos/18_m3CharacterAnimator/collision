@@ -1,0 +1,393 @@
+
+Simplified Logic for 2 Moving Entities
+
+    Predict Next Positions:
+        Calculate the "next position" for each entity by adding its velocity to its current position.
+
+    Example:
+
+Entity A: nextPosA = currentPosA + velocityA
+Entity B: nextPosB = currentPosB + velocityB
+
+Check Overlap in Movement Direction:
+
+    Compare the hitboxes of nextPosA and nextPosB to see if they overlap.
+    Only check in the directions the entities are moving:
+        Horizontal Movement: Compare X-axis bounds of the hitboxes.
+        Vertical Movement: Compare Y-axis bounds of the hitboxes.
+
+Example Logic:
+
+    If velocityA.x > 0 (moving right), check if:
+
+nextPosA.right > nextPosB.left && nextPosA.left < nextPosB.right
+
+If velocityA.y > 0 (moving down), check if:
+
+        nextPosA.bottom > nextPosB.top && nextPosA.top < nextPosB.bottom
+
+    Decide Outcome:
+        If overlap is detected:
+            Prevent the entity from moving in the direction of the collision.
+            Adjust the velocity or position to stop just before the collision.
+
+    Allow Gapless Movement:
+        If movement would bring the entities' edges exactly together (e.g., A.right == B.left), consider this not a collision unless behaviors demand otherwise.
+
+Handling Multiple Entities (Top-Down Approach)
+
+    Iterate Over All Entities:
+        For each entity, calculate its next position.
+
+    Check Against All Other Entities:
+        Compare the next position of the current entity with the current/next positions of all other entities.
+
+    Resolve Collisions:
+        If a collision is detected, prevent the entity from moving in that direction.
+
+Rules for Simplification
+
+    Check Only Moving Entities:
+        Skip entities with no velocity (static objects).
+
+    Check Only in Moving Directions:
+        For an entity moving horizontally, only check the X-axis bounds.
+        For an entity moving vertically, only check the Y-axis bounds.
+
+    Single-Step Resolution:
+        Prevent the movement entirely or stop at the point of collision.
+        Avoid complex adjustments (e.g., sliding) unless necessary.
+
+Understanding Collision Detection
+
+Collision detection works by checking if the bounding boxes (hitboxes) of two entities overlap. Here's the logic broken down:
+Step 1: Bounding Box Representation
+
+Each entity has a bounding box defined by:
+
+    Top, Bottom, Left, and Right edges.
+
+Given an entity's current position (x, y) (top-left corner) and its hitbox size (width, height):
+
+    Left = x
+    Right = x + width
+    Top = y
+    Bottom = y + height
+
+For two entities, A and B:
+
+    A's edges:
+        A.left = A.x
+        A.right = A.x + A.width
+        A.top = A.y
+        A.bottom = A.y + A.height
+    B's edges:
+        B.left = B.x
+        B.right = B.x + B.width
+        B.top = B.y
+        B.bottom = B.y + B.height
+
+Step 2: Overlap Conditions
+
+To detect a collision, the bounding boxes of A and B must overlap on both axes (X and Y).
+X-Axis Overlap
+
+For A and B to overlap horizontally:
+
+    A's right edge must be past B's left edge: A.right > B.left
+    A's left edge must be before B's right edge: A.left < B.right
+
+This ensures that A and B occupy the same space on the X-axis.
+Y-Axis Overlap
+
+For A and B to overlap vertically:
+
+    A's bottom edge must be below B's top edge: A.bottom > B.top
+    A's top edge must be above B's bottom edge: A.top < B.bottom
+
+This ensures that A and B occupy the same space on the Y-axis.
+Combined Condition
+
+A collision occurs if both conditions are true:
+
+(A.right > B.left AND A.left < B.right) AND
+(A.bottom > B.top AND A.top < B.bottom)
+
+Step 3: Prediction for Movement
+
+When entities are moving, we predict their next position by adding their velocity to their current position:
+
+    A.nextX = A.x + A.velocityX
+    A.nextY = A.y + A.velocityY
+
+Similarly, for B:
+
+    B.nextX = B.x + B.velocityX
+    B.nextY = B.y + B.velocityY
+
+Predicted Edges
+
+Using these predicted positions:
+
+    A.nextLeft = A.nextX
+    A.nextRight = A.nextX + A.width
+    A.nextTop = A.nextY
+    A.nextBottom = A.nextY + A.height
+
+The same applies for B.
+Step 4: Direction-Specific Checks
+
+To simplify, only check for collisions in the direction of movement:
+Horizontal Movement
+
+If A is moving horizontally (A.velocityX != 0):
+
+    Check if the predicted X edges overlap:
+
+    (A.nextRight > B.nextLeft AND A.nextLeft < B.nextRight)
+
+Vertical Movement
+
+If A is moving vertically (A.velocityY != 0):
+
+    Check if the predicted Y edges overlap:
+
+    (A.nextBottom > B.nextTop AND A.nextTop < B.nextBottom)
+
+Combined for Both Directions
+
+If A is moving diagonally (both velocityX and velocityY):
+
+    Check both X and Y overlaps together:
+
+    (A.nextRight > B.nextLeft AND A.nextLeft < B.nextRight) AND
+    (A.nextBottom > B.nextTop AND A.nextTop < B.nextBottom)
+
+Step 5: Collision Resolution
+
+Once a collision is detected:
+
+    Prevent Movement:
+        If A collides with B on the X-axis, set A.velocityX = 0.
+        If A collides with B on the Y-axis, set A.velocityY = 0.
+
+    Adjust Position (Optional):
+        Instead of completely stopping, adjust A’s position to stop just before the collision.
+
+Example:
+
+    If moving right, stop A at B.left - A.width.
+
+Example Walkthrough
+Scenario:
+
+    Entity A: (x = 10, y = 20, width = 5, height = 5, velocityX = 2, velocityY = 1)
+    Entity B: (x = 15, y = 22, width = 5, height = 5, velocityX = 0, velocityY = 0)
+
+Step 1: Predict Next Positions
+
+    A's next position:
+        A.nextX = 10 + 2 = 12
+        A.nextY = 20 + 1 = 21
+    A's predicted edges:
+        A.nextLeft = 12
+        A.nextRight = 12 + 5 = 17
+        A.nextTop = 21
+        A.nextBottom = 21 + 5 = 26
+    B's edges (unchanged since B is stationary):
+        B.left = 15
+        B.right = 15 + 5 = 20
+        B.top = 22
+        B.bottom = 22 + 5 = 27
+
+Step 2: Check Overlap
+
+    X-Axis Overlap:
+        A.nextRight (17) > B.left (15) TRUE
+        A.nextLeft (12) < B.right (20) TRUE
+    Y-Axis Overlap:
+        A.nextBottom (26) > B.top (22) TRUE
+        A.nextTop (21) < B.bottom (27) TRUE
+
+Since both X and Y conditions are true, A and B would collide.
+Step 3: Resolve
+
+    Stop A’s movement by setting:
+        A.velocityX = 0
+        A.velocityY = 0
+
+Summary of Steps
+
+    Calculate each entity's current edges and predicted edges.
+    Check for overlap in the direction(s) of movement.
+    If overlap is detected:
+        Stop or adjust movement to prevent collision.
+
+Design Specification for Collision Handling in Your ECS System
+
+This spec outlines the step-by-step approach to implementing collision detection and response in your current project. It starts with the minimum functionality and builds toward more advanced features, ensuring clarity and incremental progress.
+1. Minimum Functionality: Prevent Overlap Between Moving Entities
+Objective:
+
+Ensure that no two entities with hitboxes overlap after their movement update.
+Steps:
+
+    Identify Entities to Check:
+        Iterate over all entities with velocity and hitbox components.
+
+    Predict Next Position:
+        For each entity, calculate its next position by adding its velocity to its current position.
+
+    Check for Overlap:
+        Compare the predicted position of the current entity with the current/predicted positions of all other entities.
+        Use the bounding box overlap logic:
+            X-axis overlap: Edges intersect horizontally.
+            Y-axis overlap: Edges intersect vertically.
+            Both conditions must be true for a collision.
+
+    Prevent Movement:
+        If a collision is detected:
+            Stop the entity’s movement in the direction of the collision (set velocity to 0).
+
+    Iterate for All Entities:
+        Repeat the above steps for each entity.
+
+2. Add Directional Collision Checking
+Objective:
+
+Only check for collisions in the direction of an entity's movement (e.g., right, left, up, down).
+Steps:
+
+    Determine Movement Direction:
+        Based on the sign of velocity (dx, dy):
+            dx > 0: Moving right
+            dx < 0: Moving left
+            dy > 0: Moving down
+            dy < 0: Moving up
+
+    Simplify Collision Checks:
+        Only check for overlaps along the moving axis:
+            For horizontal movement, compare X-axis bounds only.
+            For vertical movement, compare Y-axis bounds only.
+
+    Optimize Checks:
+        Skip entities that are stationary (both dx and dy are 0).
+
+3. Handle Stationary Objects (Walls, Floors)
+Objective:
+
+Integrate static objects into the collision system, allowing entities to interact with obstacles like walls and floors.
+Steps:
+
+    Identify Static Entities:
+        Entities with hitboxes but no velocity are considered static.
+
+    Include in Collision Checks:
+        Check moving entities against the static entities' current positions.
+
+    Resolve Collisions:
+        If a moving entity collides with a static object:
+            Prevent the movement entirely or adjust the position to stop just before the collision (e.g., stop at a wall).
+
+4. Allow Interaction with Boundaries
+Objective:
+
+Prevent entities from moving outside the screen or level boundaries.
+Steps:
+
+    Define Boundaries:
+        Use constants for the screen or level dimensions (e.g., SCREEN_WIDTH, SCREEN_HEIGHT).
+
+    Check Against Boundaries:
+        For each entity’s predicted position:
+            Ensure left >= 0 and right <= SCREEN_WIDTH.
+            Ensure top >= 0 and bottom <= SCREEN_HEIGHT.
+
+    Resolve Boundary Collisions:
+        If an entity exceeds a boundary:
+            Clamp its position to the boundary.
+            Set velocity to 0 in the direction of the boundary.
+
+5. Implement Gapless Collision Resolution
+Objective:
+
+Allow entities to come into contact without leaving gaps, ensuring precise collision handling.
+Steps:
+
+    Adjust Position:
+        If an entity’s movement would bring it just into contact with another entity (e.g., A.right == B.left):
+            Adjust the position so the edges align exactly.
+            Prevent further movement in that direction.
+
+    Handle Edge Cases:
+        Ensure that slight differences in velocity or position rounding don’t cause jittering or overlapping.
+
+6. Expand to Multiple Entity Types
+Objective:
+
+Enable collision handling between different types of entities (e.g., player, enemies, projectiles, obstacles).
+Steps:
+
+    Use Collision Layers:
+        Assign entities to collision layers (e.g., PLAYER, ENEMY, PROJECTILE, OBSTACLE).
+        Define which layers can interact:
+            Example: PLAYER collides with ENEMY and OBSTACLE, but not with PROJECTILE.
+
+    Filter Collision Checks:
+        Before checking for overlap, ensure the layers of the two entities allow interaction.
+
+7. Introduce Predictive Behavior Handling
+Objective:
+
+Ensure behaviors (e.g., AI or player input) integrate seamlessly with collision detection.
+Steps:
+
+    Apply Behaviors First:
+        Allow AI or input systems to update velocities before predicting collisions.
+
+    Resolve Behaviors and Collisions:
+        If a behavior causes a collision (e.g., AI moves an enemy into the player):
+            Prevent the movement entirely.
+            Adjust the entity’s behavior if necessary (e.g., change AI direction).
+
+8. Optimize Collision Detection
+Objective:
+
+Improve performance for large numbers of entities or complex levels.
+Steps:
+
+    Spatial Partitioning:
+        Divide the game world into a grid or quadtree.
+        Only check for collisions between entities in the same or neighboring cells.
+
+    Sweep and Prune:
+        Sort entities along one axis (e.g., X-axis) and check only for overlaps within the sorted range.
+
+    Early Exits:
+        Stop checking further entities once a collision is detected for the current entity.
+
+9. Add Advanced Collision Responses
+Objective:
+
+Handle scenarios like sliding along surfaces, bouncing, or special interactions.
+Steps:
+
+    Sliding:
+        If an entity collides horizontally, allow vertical movement (and vice versa).
+
+    Bouncing:
+        Reverse velocity after a collision (e.g., projectiles bouncing off walls).
+
+    Special Cases:
+        Allow specific behaviors to override collision responses (e.g., enemies that pass through each other).
+
+Incremental Implementation Plan
+
+    Implement minimum functionality: Prevent overlap between moving entities.
+    Add directional checking for collisions based on movement.
+    Integrate static objects (walls, floors).
+    Handle boundaries to keep entities within the game area.
+    Introduce gapless resolution for precise contact handling.
+    Expand to multiple entity types using collision layers.
+    Optimize with spatial partitioning or sweep and prune.
+    Add advanced responses like sliding and bouncing.

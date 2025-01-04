@@ -19,11 +19,57 @@ void updateInputSystem(ECS *ecs, ComponentStorage *components) {
   components->input[0].handleInput(ecs, 0);
 }
 
-void updateGravitySystem(ECS *ecs, ComponentStorage *components) {
+void updateRenderSystem(ECS *ecs, ComponentStorage *components) {
+  for (int i = 0; i < MAX_ENTITIES; i++) {
+    if (ecs->entity[i].flag & COMPONENT_ANIMATION) {
+      renderEntity(ecs, i);
+    }
+  }
+};
+
+int checkForCollision(PositionComponent *position[2],
+                      VelocityComponent *velocity[2],
+                      HitboxComponent *hitbox[2]) {
+  int Ax1 = position[0]->x + velocity[0]->dx;
+  int Ax2 = Ax1 + hitbox[0]->width;
+  int Ay1 = position[0]->y + velocity[0]->dy;
+  int Ay2 = Ay1 + hitbox[0]->height;
+
+  int Bx1 = position[1]->x;
+  int Bx2 = Bx1 + hitbox[1]->width;
+  int By1 = position[1]->y;
+  int By2 = By1 + hitbox[1]->height;
+
+  return (Bx2 > Ax1 && Bx1 < Ax2 && By2 > Ay1 && By1 < Ay2);
+}
+
+void updateCollisionSystem(ECS *ecs, ComponentStorage *components) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
-    if (ecs->entity[id].flag & ENABLE_PHYSICS) {
-      AccelerationComponent *acc = &components->acceleration[id];
-      acc->ay = GRAVITY * gravityDirection;
+    ecs->entity[id].flag &= ~COLLISION_DETECTED; // Clear the collision flag
+  }
+
+  for (int idA = 0; idA < MAX_ENTITIES; idA++) {
+    if (ecs->entity[idA].flag & ENABLE_COLLISIONS) {
+      for (int idB = idA + 1; idB < MAX_ENTITIES; idB++) {
+        if (ecs->entity[idB].flag & ENABLE_COLLISIONS) {
+
+          VelocityComponent *velA = &components->velocity[idA];
+          VelocityComponent *velB = &components->velocity[idB];
+          PositionComponent *posA = &components->position[idA];
+          PositionComponent *posB = &components->position[idB];
+          HitboxComponent *hitA = &components->hitbox[idA];
+          HitboxComponent *hitB = &components->hitbox[idB];
+
+          VelocityComponent *velocity[2] = {velA, velB};
+          PositionComponent *position[2] = {posA, posB};
+          HitboxComponent *hitbox[2] = {hitA, hitB};
+
+          if (checkForCollision(position, velocity, hitbox)) {
+            ecs->entity[idA].flag |= COLLISION_DETECTED;
+            ecs->entity[idB].flag |= COLLISION_DETECTED;
+          };
+        }
+      }
     }
   }
 }
@@ -33,118 +79,29 @@ void updateMovementSystem(ECS *ecs, ComponentStorage *components) {
     if (ecs->entity[id].flag & COMPONENT_VELOCITY) {
       VelocityComponent *vel = &components->velocity[id];
       PositionComponent *pos = &components->position[id];
-      pos->x += vel->dx;
-      pos->y += vel->dy;
+
+      if ((ecs->entity[id].flag & COLLISION_DETECTED)) {
+        vel->dx = 0;
+        vel->dy = 0;
+      } else {
+        pos->x += vel->dx;
+        pos->y += vel->dy;
+      }
     }
   }
 }
 
-void updateRenderSystem(ECS *ecs, ComponentStorage *components) {
-  for (int i = 0; i < MAX_ENTITIES; i++) {
-    if (ecs->entity[i].flag & COMPONENT_ANIMATION) {
-      renderEntity(ecs, i);
-    }
-  }
-};
-
-void updatePhysicsSystem(ECS *ecs, ComponentStorage *components) {
-  for (int id = 0; id < MAX_ENTITIES; id++) {
-    if (ecs->entity[id].flag & ENABLE_PHYSICS)
-      continue;
-
-    VelocityComponent *vel = &components->velocity[id];
-    AccelerationComponent *acc = &components->acceleration[id];
-    PositionComponent *pos = &components->position[id];
-
-    vel->dx += acc->ax;
-    vel->dy += acc->ay;
-
-    pos->x += vel->dx;
-    pos->y += vel->dy;
-  }
-}
 /*
-void handleCollisionSystem(ECS *ecs, ComponentStorage *components) {
-  for (int id = 0; id < MAX_ENTITIES; id++) {
-    if (!(ecs->entity[id].flag & ENABLE_PHYSICS))
-      continue;
 
-    PositionComponent *pos = &components->position[id];
-    VelocityComponent *vel = &components->velocity[id];
-    HitboxComponent *hitbox = &components->hitbox[id];
-
-    if (gravityDirection == 1) {
-      if (pos->y >= SH - hitbox->height) {
-        pos->y = SH - hitbox->height;
-        vel->dy = -(vel->dy / 2);
-        ecs->entity[id].flag |= ON_GROUND;
-      } else if (pos->y <= 0) {
-        vel->dy = 0;
-        ecs->entity[id].flag &= ~ON_GROUND;
-      } else {
-        ecs->entity[id].flag &= ~ON_GROUND;
+      // Try horizontal movement first
+      pos->x += vel->dx;
+      if (ecs->entity[id].flag & COLLISION_DETECTED) {
+        pos->x -= vel->dx; // Undo horizontal movement if collision
       }
-    } else if (gravityDirection == -1) {
-      if (pos->y <= 0) {
-        pos->y = 0;
-        vel->dy = -(vel->dy / 2);
-        ecs->entity[id].flag |= ON_GROUND;
-      } else if (pos->y >= SH - hitbox->height) {
-        pos->y = SH - hitbox->height;
-        vel->dy = 0;
-        ecs->entity[id].flag &= ~ON_GROUND;
-      } else {
-        ecs->entity[id].flag &= ~ON_GROUND;
-      }
-    }
 
-    // Handle horizontal collisions
-    if (pos->x < 0) {
-      pos->x = 0;
-      vel->dx = 0;
-    }
-    if (pos->x >= SW - hitbox->width) {
-      pos->x = SW - hitbox->width;
-      vel->dx = 0;
-    }
-  }
-}
+      // Try vertical movement second
+      pos->y += vel->dy;
+      if (ecs->entity[id].flag & COLLISION_DETECTED) {
+        pos->y -= vel->dy; // Undo vertical movement if collision
+      }
 */
-
-void physicsInputHandler(ECS *ecs, int entityId) {
-  VelocityComponent *vel = &ecs->components->velocity[entityId];
-  AccelerationComponent *acc = &ecs->components->acceleration[entityId];
-
-  if (keyDown(A) && (ecs->entity[entityId].flag & ON_GROUND)) {
-    vel->dy = -SHOOT_VEL * gravityDirection;
-  }
-
-  if (keyDown(B)) {
-    gravityDirection = -1;
-  } else {
-    gravityDirection = 1;
-  }
-
-  if (keyDown(SL)) {
-    vel->dx = 0;
-    vel->dy = 0;
-    acc->ax = 0;
-    acc->ay = 0;
-  } else {
-    if (keyDown(L)) {
-      vel->dx = -MOVE_SPEED;
-    } else if (keyDown(R)) {
-      vel->dx = MOVE_SPEED;
-    } else {
-      vel->dx = 0;
-    }
-
-    if (keyDown(LT)) {
-      vel->dx = -SHOOT_VEL;
-      vel->dy = -SHOOT_VEL;
-    } else if (keyDown(RT)) {
-      vel->dx = SHOOT_VEL;
-      vel->dy = -SHOOT_VEL;
-    }
-  }
-}

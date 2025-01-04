@@ -1,0 +1,65 @@
+  
+void physicsInputHandler(ECS *ecs, int entityId) {
+  VelocityComponent *vel = &ecs->components->velocity[entityId];
+  AccelerationComponent *acc = &ecs->components->acceleration[entityId];
+  if (keyDown(A) && (ecs->entity[entityId].flag & ON_GROUND)) {
+    vel->dy = -SHOOT_VEL * gravityDirection;
+  }
+  if (keyDown(B)) {
+    gravityDirection = -1;
+  } else {
+    gravityDirection = 1;
+  }
+  if (keyDown(SL)) {
+    vel->dx = 0;
+    vel->dy = 0;
+    acc->ax = 0;
+    acc->ay = 0;
+  } else {
+    if (keyDown(L)) {
+      vel->dx = -MOVE_SPEED;
+    } else if (keyDown(R)) {
+      vel->dx = MOVE_SPEED;
+    } else {
+      vel->dx = 0;
+    }
+    if (keyDown(LT)) {
+      vel->dx = -SHOOT_VEL;
+      vel->dy = -SHOOT_VEL;
+    } else if (keyDown(RT)) {
+      vel->dx = SHOOT_VEL;
+      vel->dy = -SHOOT_VEL;
+    }
+  }
+}
+
+void physicsInputHandler(ECS *ecs, int entityId) {
+    VelocityComponent *vel = &ecs->components->velocity[entityId];
+    if (keyDown(A) && (ecs->entity[entityId].flag & ON_GROUND)) {
+        vel->dy = -SHOOT_VEL * gravityDirection;
+    }
+    if (keyDown(L)) {
+        vel->dx = -MOVE_SPEED;
+    } else if (keyDown(R)) {
+        vel->dx = MOVE_SPEED;
+    } else {
+        vel->dx = 0;
+    }
+}
+*/
+
+/*
+void physicsInputHandler(ECS *ecs, int entityId) {
+    VelocityComponent *vel = &ecs->components->velocity[entityId];
+    if (keyDown(A) && (ecs->entity[entityId].flag & ON_GROUND)) {
+        vel->dy = -SHOOT_VEL * gravityDirection;
+    }
+    if (keyDown(L)) {
+        vel->dx = -MOVE_SPEED;
+    } else if (keyDown(R)) {
+        vel->dx = MOVE_SPEED;
+    } else {
+        vel->dx = 0;
+    }
+}
+*/
