@@ -20,41 +20,8 @@ typedef void (*fnptr)(void);
 // set first bit to acknowledge interrupt |= 1
 #define REG_IF *(u16 *)0x4000202
 
-// Fixed point math utilities for GBA
-typedef s32 fixed_t;  // 16.16 fixed point
-typedef u32 ufixed_t; // Unsigned 16.16 for intermediate calculations
-
-#define FIX_SHIFT 16
-#define FIX_SCALE (1 << FIX_SHIFT)
-#define FIX_MASK (FIX_SCALE - 1)
-#define FIX_ONE FIX_SCALE
-
-// Conversion macros
-#define intToFixed(i) ((fixed_t)(i << FIX_SHIFT))
-#define fixedToInt(f) ((s32)(f >> FIX_SHIFT))
-
-// Multiplication using 32-bit operations only
-static inline fixed_t fixedMul(fixed_t a, fixed_t b) {
-  // Pre-shift one operand to prevent overflow
-  // and maintain precision in middle bits
-  fixed_t result;
-  result = ((a >> 8) * (b >> 8));
-  return result;
-}
-
-// Division using 32-bit operations
-static inline fixed_t fixedDiv(fixed_t a, fixed_t b) {
-  // Pre-shift numerator to maintain precision
-  fixed_t result;
-  result = ((a << 8) / (b >> 8));
-  return result;
-}
-
 // Time handling
 volatile s32 frame = 0;
-volatile s32 frameDelta = 0;    // Frames since last update
-volatile fixed_t deltaTime = 0; // Time in seconds as 16.16
-//  deltaTime = fixedMul(intToFixed(frame), 1092);
 
 void vblankISR() {
   if (frame == 60) {
@@ -62,9 +29,6 @@ void vblankISR() {
   } else {
     frame++;
   }
-  // Convert to seconds (approximately 1/60)
-  // We use a pre-calculated constant to avoid division
-  // 1/60 as fixed point ≈ 1092 in 16.16
 
   // acknowledge intterupt by setting bit 1 to 1  // first bit for vblank, |= 1
   REG_IF = 1;
@@ -100,3 +64,4 @@ int main() {
 
   return 0;
 }
+// current state, collisions working.  implement gravity
