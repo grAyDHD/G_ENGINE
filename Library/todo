@@ -1,26 +1,27 @@
-add transparency layer to SpriteFrame16 in project 15
-consolidate 4 way movement into one sprite sheet
+High Priority:
+refactor projects prior to 15 that make sense in doing so for integrating the Entity Component System.
+refactor circles project to have functioins to use for music visualizer, draw rings on button hold, erase on release
+
+Moderate priority:
+15:
+match SpriteFrame16 function in project 15 to match formatting of SpriteFrame32Bit from 18
+
+18 animator:
+update collisions/hitboxes 
+
+
+19 text:
+debug the printDebug function
+refactor print functions to library
+
+LOW PRIORITY:
+
+17 paint: (will address after implementing UI framework project)
+if any functions make sense to add into library do so
+otherwise, optimize caching and add bounds checking and correct minor bugs in pause menu
 
 move bgscaling/rotation etc to new header- graphics/effects?
 current use only in project 16
 add GREEN_SWAP to effects
   GREEN_SWAP = 1;
   GREEN_SWAP = 0;
-
-Starting from 17, refactor/optimize/finalize current project specs.
-17 paint:
-if any functions make sense to add into library do so
-otherwise, optimize caching and add bounds checking and correct minor bugs in pause menu
-
-18 animator:
-consolidate SpriteFrame32 function to incorporate transparency layer
-optimize and prep for collision handling by adding sprite height/width frame data
-keep consistent for sprite if possible, across all frames.  only copy this region.
-copy 4 bytes (2 pixels) at a time as usual (handle odd dimensions???)
-handle transparency pixel at a time?  
-Might be able to handle to at a time with some bit shifting/masking, but not sure if worth it
- 
-19 text
-debug the printDebug function
-implement more interpolation types
-refactor print functions to library
