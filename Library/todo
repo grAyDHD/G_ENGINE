@@ -35,7 +35,7 @@ currently collisions work, but hitboxes are size of full sprite frame, so transp
 19 text:
 debug the printDebug function
 refactor print functions to library
-
+http://homepage.divms.uiowa.edu/~jones/bcd/decimal.html
 LOW PRIORITY:
 
 17 paint: (will address after implementing UI framework project)
@@ -47,3 +47,8 @@ current use only in project 16
 add GREEN_SWAP to effects
   GREEN_SWAP = 1;
   GREEN_SWAP = 0;
+
+
+
+  For physics:
+  https://www.coranac.com/tonc/text/fixed.htm
