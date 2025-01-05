@@ -2,12 +2,34 @@ High Priority:
 refactor projects prior to 15 that make sense in doing so for integrating the Entity Component System.
 refactor circles project to have functioins to use for music visualizer, draw rings on button hold, erase on release
 
+project 8 input:
+refine logic, create basic color macros for library
+use ECS for movement
+
+9 physics:
+refactor to ECS, integrate gravity from project into ECS
+
+10 timer:
+update ECS to utilize a timer component.
+(update project 18 for npc to use timer for changing direction)
+
+11 dmg
+does this make sense to integrate?
+or dmg instrument?
+
+12
+fix functionality
+
+
 Moderate priority:
 15:
 match SpriteFrame16 function in project 15 to match formatting of SpriteFrame32Bit from 18
 
+
+
 18 animator:
-update collisions/hitboxes 
+update hitboxes (determine specific size/offset within bounds of actual sprite frame) 
+currently collisions work, but hitboxes are size of full sprite frame, so transparent regions are colliding
 
 
 19 text:
