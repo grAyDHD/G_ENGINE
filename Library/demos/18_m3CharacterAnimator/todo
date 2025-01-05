@@ -1,35 +1,7 @@
 game has velocity based movement
-next step, add collision check inside input handler
-
 implement position arguments for entities
 
-
-1. Collision Detection
-
-Define Bounding Boxes:
-
-    Ensure all entities with hitboxes have left, right, top, bottom edges derived from their position and size.
-
-Predict Next Positions:
-
-    Calculate the next position for moving entities using their current position and velocity.
-
-Check for Overlap:
-
-    Use axis-aligned bounding box (AABB) logic to detect overlaps between predicted positions.
-
-Handle Static Objects:
-
-    Include walls, floors, and other immovable objects in collision checks.
-
-Resolve Collisions:
-
-    Prevent movement or adjust position to stop entities just before collision.
-    Reverse velocity if bouncing is required (e.g., velocityY = -velocityY * elasticity).
-
-    Optimize Collision Checks:
-        Implement directional checks (only check in the direction of movement).
-        Consider spatial partitioning (grid or quadtree) for efficiency if there are many entities.
+    Optimize Collision Checks?
 
 2. Physics System
 

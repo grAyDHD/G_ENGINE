@@ -7,11 +7,11 @@
 #define SH 160
 
 //---Display control---//
-#define DSPC *(u32 *)0x4000000
+#define DSPC *(u16 *)0x4000000
+//---Green Swap Register---//
+#define GREEN_SWAP *(u16 *)0x4000002
 //---Video buffer---
 #define VRAM (u16 *)0x6000000
-
-#define GREEN_SWAP *(u16 *)0x4000002
 
 //---Modes---//
 #define MODE0 0x0000
