@@ -1,5 +1,6 @@
-#include "in.h"
-#include <engine.h>
+#include "audio/dmg.h"
+#include "graphics/video.h"
+#include "input/in.h"
 
 enum OctaveState { TWO = 0, THREE, FOUR, FIVE, SIX, SEVEN };
 enum Position { FIRST, SECOND, THIRD, FOURTH };
@@ -65,42 +66,42 @@ void playScaleDegree(int scaleDegree) {
 }
 
 void updatePosition() {
-  if (key_is_up(LT) && key_is_up(RT)) {
+  if (keyUp(LT) && keyUp(RT)) {
     currentPosition = FIRST;
-  } else if (key_is_down(LT) && key_is_up(RT)) {
+  } else if (keyDown(LT) && keyUp(RT)) {
     currentPosition = SECOND;
-  } else if (key_is_up(LT) && key_is_down(RT)) {
+  } else if (keyUp(LT) && keyDown(RT)) {
     currentPosition = THIRD;
-  } else if (key_is_down(LT) && key_is_down(RT)) {
+  } else if (keyDown(LT) && keyDown(RT)) {
     currentPosition = FOURTH;
   }
 }
 
 void changeOctave() {
-  if (key_hit(UP) && currentOctave < SEVEN) {
+  if (keyTapped(U) && currentOctave < SEVEN) {
     currentOctave++;
-  } else if (key_hit(DN) && currentOctave > TWO) {
+  } else if (keyTapped(D) && currentOctave > TWO) {
     currentOctave--;
   }
 }
 
 void changeRoot() {
-  if (key_is_down(ST) && key_is_up(SL) && key_hit(LT)) {
+  if (keyDown(ST) && keyUp(SL) && keyTapped(LT)) {
     currentRoot = (currentRoot + 5) % 12; // Equivalent to -7 mod 12
-  } else if (key_is_down(ST) && key_is_up(SL) && key_hit(RT)) {
+  } else if (keyDown(ST) && keyUp(SL) && keyTapped(RT)) {
     currentRoot = (currentRoot + 7) % 12; // Move up a fifth
   }
-  if (key_is_down(SL) && key_is_down(ST) && key_hit(LT)) {
+  if (keyDown(SL) && keyDown(ST) && keyTapped(LT)) {
     currentRoot = (currentRoot + 11) % 12;
-  } else if (key_is_down(SL) && key_is_down(ST) && key_hit(RT)) {
+  } else if (keyDown(SL) && keyDown(ST) && keyTapped(RT)) {
     currentRoot = (currentRoot + 1) % 12;
   }
 }
 
 void changeMode() {
-  if (key_is_down(SL) && key_is_up(ST) && key_hit(LT)) {
+  if (keyDown(SL) && keyUp(ST) && keyTapped(LT)) {
     currentMode = (currentMode + 6) % 7; // Previous mode
-  } else if (key_is_down(SL) && key_is_up(ST) && key_hit(RT)) {
+  } else if (keyDown(SL) && keyUp(ST) && keyTapped(RT)) {
     currentMode = (currentMode + 1) % 7; // Next mode
   }
 }
@@ -113,39 +114,39 @@ int main() {
 
   while (1) {
     VBLANK();
-    key_poll();
+    updateKeys();
 
     changeOctave();
     changeRoot();
     changeMode();
-    if (key_is_up(B) && key_is_up(A) && ENV_1 > 0)
+    if (keyUp(B) && keyUp(A) && ENV_1 > 0)
       ENV_1 = 0;
 
-    if (key_is_up(ST) && key_is_up(SL))
+    if (keyUp(ST) && keyUp(SL))
       updatePosition();
 
     if (currentPosition == FIRST) {
-      if (key_is_down(B) && ENV_1 == 0) {
+      if (keyDown(B) && ENV_1 == 0) {
         playScaleDegree(1);
-      } else if (key_is_down(A) && ENV_1 == 0) {
+      } else if (keyDown(A) && ENV_1 == 0) {
         playScaleDegree(2);
       }
     } else if (currentPosition == SECOND) {
-      if (key_is_down(B) && ENV_1 == 0) {
+      if (keyDown(B) && ENV_1 == 0) {
         playScaleDegree(3);
-      } else if (key_is_down(A) && ENV_1 == 0) {
+      } else if (keyDown(A) && ENV_1 == 0) {
         playScaleDegree(4);
       }
     } else if (currentPosition == THIRD) {
-      if (key_is_down(B) && ENV_1 == 0) {
+      if (keyDown(B) && ENV_1 == 0) {
         playScaleDegree(5);
-      } else if (key_is_down(A) && ENV_1 == 0) {
+      } else if (keyDown(A) && ENV_1 == 0) {
         playScaleDegree(6);
       }
     } else if (currentPosition == FOURTH) {
-      if (key_is_down(B) && ENV_1 == 0) {
+      if (keyDown(B) && ENV_1 == 0) {
         playScaleDegree(7);
-      } else if (key_is_down(A) && ENV_1 == 0) {
+      } else if (keyDown(A) && ENV_1 == 0) {
         playScaleDegree(8);
       }
     }
