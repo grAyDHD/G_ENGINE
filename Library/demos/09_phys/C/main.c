@@ -9,6 +9,7 @@
 #define MOVE_SPEED 2 // Speed of movement when pressing left/right
 #define SHOOT_VEL 5  // Initial velocity when shooting with bumpers
 #define JUMP_VELOCITY -10
+int BALL_SIZE = 4;
 
 extern int gravityDirection;
 
@@ -36,9 +37,9 @@ void handleCollisions(ECS *obj, int BALL_SIZE) {
       obj->entity[0].flag |= ON_GROUND;
     } else if (obj->components->position[0].y <= 0) {
       obj->components->velocity[0].dy = 0;
-      // on ground flag bit = 0
+      obj->entity[0].flag &= ~ON_GROUND; // Clear ON_GROUND flag
     } else {
-      // on ground flag bit = 0
+      obj->entity[0].flag &= ~ON_GROUND; // Clear ON_GROUND flag
     }
   } else if (gravityDirection == -1) {
     if (obj->components->position[0].y <= 0) {
@@ -49,9 +50,9 @@ void handleCollisions(ECS *obj, int BALL_SIZE) {
       obj->components->position[0].y = SH - BALL_SIZE;
       obj->components->velocity[0].dy = 0;
 
-      // on ground flag bit = 0
+      obj->entity[0].flag &= ~ON_GROUND; // Clear ON_GROUND flag
     } else {
-      // on ground flag bit = 0
+      obj->entity[0].flag &= ~ON_GROUND; // Clear ON_GROUND flag
     }
   }
 
@@ -104,8 +105,6 @@ void checkInput(ECS *ball) {
     }
   }
 }
-
-int BALL_SIZE = 20;
 
 static ComponentStorage world;
 static ECS entitySystem;
