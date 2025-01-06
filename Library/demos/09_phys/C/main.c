@@ -1,6 +1,7 @@
 #include "ecs/components.h"
 #include "ecs/ecs.h"
 #include "ecs/entities.h"
+#include "ecs/systems.h"
 #include "graphics/draw.h"
 #include "graphics/video.h"
 #include "input/in.h"
@@ -68,7 +69,7 @@ void handleCollisions(ECS *obj, int BALL_SIZE) {
 /*
  */
 
-void checkInput(ECS *ball) {
+void playerInput(ECS *ball, int entityId) {
 
   if (keyDown(A)) {
     ball->components->velocity[0].dy = -SHOOT_VEL * gravityDirection;
@@ -87,7 +88,6 @@ void checkInput(ECS *ball) {
     ball->components->acceleration[0].ay = 0;
   } else {
 
-    applyGravity(ball);
     if (keyDown(L)) {
       ball->components->velocity[0].dx = -MOVE_SPEED;
     } else if (keyDown(R)) {
@@ -127,6 +127,8 @@ int main() {
   entitySystem.components->acceleration[ball].ax = 120;
   entitySystem.components->acceleration[ball].ay = 80;
 
+  entitySystem.components->input[0].handleInput = playerInput;
+
   Coordinate previousCorner = {entitySystem.components->position[ball].x,
                                entitySystem.components->position[ball].y};
   Coordinate corner = {entitySystem.components->position[ball].x,
@@ -140,7 +142,11 @@ int main() {
     // erase current position
     drawRect(previousCorner, BALL_SIZE, BALL_SIZE, 0x0000);
 
-    checkInput(&entitySystem);
+    applyGravity(&entitySystem);
+    //
+    updateInputSystem(&entitySystem, entitySystem.components);
+    updateMovementSystem(&entitySystem, entitySystem.components);
+    // playerInput(&entitySystem);
 
     // update position based on input/physics
     updateMovement(&entitySystem);
