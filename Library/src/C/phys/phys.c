@@ -23,9 +23,7 @@ void handleCollisions(struct Object *obj, int BALL_SIZE) {
     } else {
       obj->onGround = 0;
     }
-  }
-
-  else if (gravityDirection == -1) {
+  } else if (gravityDirection == -1) {
     if (obj->y <= 0) {
       obj->y = 0;
       obj->vy = -(obj->vy / 2);

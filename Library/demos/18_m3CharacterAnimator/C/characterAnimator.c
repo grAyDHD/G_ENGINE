@@ -7,14 +7,11 @@ static ComponentStorage world;
 static ECS entitySystem;
 
 typedef void (*fnptr)(void);
-#define ISR *(fnptr *)(0x03007FFC)
-
+#define ISR *(fnptr *)(0x03007FFC) // put function address
 // bit three vblank timer
 #define DISPSTAT *(u16 *)0x4000004
-
 // set bit 1 to enable interrupts
 #define REG_IME *(u16 *)0x4000208
-
 // first bit for vblank, |= 1
 #define REG_IE *(u16 *)0x4000200
 // set first bit to acknowledge interrupt |= 1
@@ -22,15 +19,12 @@ typedef void (*fnptr)(void);
 
 // Time handling
 volatile s32 frame = 0;
-
 void vblankISR() {
   if (frame == 60) {
     frame = 0;
   } else {
     frame++;
   }
-
-  // acknowledge intterupt by setting bit 1 to 1  // first bit for vblank, |= 1
   REG_IF = 1;
 }
 

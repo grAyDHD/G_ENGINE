@@ -17,6 +17,7 @@ struct ComponentStorage {
   SpriteComponent sprite[MAX_ENTITIES];
   InputComponent input[MAX_INPUT_ENTITIES];
   AIComponent ai[MAX_ENTITIES];
+  DrawingComponent draw[MAX_ENTITIES];
 };
 
 struct ECS {
@@ -32,9 +33,9 @@ extern void clearSpriteFrame(int x, int y, int size, const void *image);
 extern void SpriteFrame32Bit(PositionComponent *positionData,
                              AnimationComponent *animationData,
                              const void *image);
+
 int initEntitySystem(ECS *ecs, ComponentStorage *world);
 void renderEntity(ECS *ecs, int entityId);
-
 void clearSpriteFrames(ECS *system, ComponentStorage *world, const void *image);
 
 #endif // ECS_H

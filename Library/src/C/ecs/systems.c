@@ -8,7 +8,7 @@ static int gravityDirection = 1;
 
 void updateBehaviorSystem(ECS *ecs, ComponentStorage *components) {
   for (int i = 0; i < MAX_ENTITIES; i++) {
-    if (ecs->entity[i].flag & COMPONENT_AI) {
+    if (ecs->entity[i].flag & AI_COMPONENT) {
       ecs->components->ai[i].aiBehavior(ecs, i);
     }
   }
@@ -21,7 +21,7 @@ void updateInputSystem(ECS *ecs, ComponentStorage *components) {
 
 void updateRenderSystem(ECS *ecs, ComponentStorage *components) {
   for (int i = 0; i < MAX_ENTITIES; i++) {
-    if (ecs->entity[i].flag & COMPONENT_ANIMATION) {
+    if (ecs->entity[i].flag & ANIMATION_COMPONENT) {
       renderEntity(ecs, i);
     }
   }
@@ -66,7 +66,7 @@ void updateCollisionSystem(ECS *ecs, ComponentStorage *components) {
 
 void updateMovementSystem(ECS *ecs, ComponentStorage *components) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
-    if (ecs->entity[id].flag & COMPONENT_VELOCITY) {
+    if (ecs->entity[id].flag & VELOCITY_COMPONENT) {
       VelocityComponent *velocity = &components->velocity[id];
       PositionComponent *position = &components->position[id];
 
@@ -83,7 +83,7 @@ void updateMovementSystem(ECS *ecs, ComponentStorage *components) {
 
 void updateAnimationSystem(ECS *ecs, ComponentStorage *components) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
-    if (ecs->entity[id].flag & COMPONENT_ANIMATION) {
+    if (ecs->entity[id].flag & ANIMATION_COMPONENT) {
       AnimationComponent *animation = &components->animation[id];
 
       animation->keyframe++;

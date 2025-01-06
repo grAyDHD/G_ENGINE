@@ -2,9 +2,6 @@ High Priority:
 refactor projects prior to 15 that make sense in doing so for integrating the Entity Component System.
 refactor circles project to have functioins to use for music visualizer, draw rings on button hold, erase on release
 
-project 8 input:
-refine logic, create basic color macros for library
-use ECS for movement
 
 9 physics:
 refactor to ECS, integrate gravity from project into ECS
@@ -37,6 +34,10 @@ debug the printDebug function
 refactor print functions to library
 http://homepage.divms.uiowa.edu/~jones/bcd/decimal.html
 LOW PRIORITY:
+
+project 8 input:
+refine logic, create basic color macros for library
+use ECS for movement
 
 17 paint: (will address after implementing UI framework project)
 if any functions make sense to add into library do so

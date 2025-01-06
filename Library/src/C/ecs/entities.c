@@ -1,3 +1,4 @@
+#include "ecs/entities.h"
 #include "../../include/ecs/ecs.h"
 #include "../../include/input/in.h"
 #include "ecs/components.h"
@@ -12,7 +13,7 @@ int createEntity(ECS *ecs, int flag) {
   entity->flag = flag;
 
   // this should be zero unless
-  if (flag & COMPONENT_VELOCITY) {
+  if (flag & VELOCITY_COMPONENT) {
     ecs->components->velocity[ecs->nextEntityId] =
         (VelocityComponent){.dx = 0, .dy = 0};
   }
