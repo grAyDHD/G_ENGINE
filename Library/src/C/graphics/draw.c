@@ -1,5 +1,6 @@
 #include "graphics/draw.h"
 #include "core/typedefs.h"
+#include "ecs/components.h"
 #include "graphics/video.h"
 
 void plotPixel(int x, int y, u16 clr) {
@@ -49,7 +50,7 @@ void drawCircle(int x, int y, int radius, unsigned short color) {
   }
 }
 
-void drawLine(Coordinate start, Coordinate end, u16 color) {
+void drawLine(PositionComponent start, PositionComponent end, u16 color) {
   int dx = (end.x - start.x);
   int dy = (end.y - start.y);
   int sx = (start.x < end.x) ? 1 : -1;
@@ -73,7 +74,7 @@ void drawLine(Coordinate start, Coordinate end, u16 color) {
   plotPixel(end.x, end.y, color);
 }
 
-void drawRect(Coordinate start, int width, int height, u16 color) {
+void drawRect(PositionComponent start, int width, int height, u16 color) {
   for (int i = start.x; i < start.x + width; i++) {
     plotPixel(i, start.y, color);
     plotPixel(i, start.y + height - 1, color);

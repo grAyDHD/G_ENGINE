@@ -1,9 +1,0 @@
-
-void updateGravitySystem(ECS *ecs, ComponentStorage *components) {
-  for (int id = 0; id < MAX_ENTITIES; id++) {
-    if (ecs->entity[id].flag & ENABLE_PHYSICS) {
-      AccelerationComponent *acc = &components->acceleration[id];
-      acc->ay = GRAVITY * gravityDirection;
-    }
-  }
-}

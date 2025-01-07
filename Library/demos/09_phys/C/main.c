@@ -1,3 +1,4 @@
+#include "core/typedefs.h"
 #include "ecs/components.h"
 #include "ecs/ecs.h"
 #include "ecs/entities.h"
@@ -8,17 +9,14 @@
 
 #define GRAVITY 1    // Gravity constant
 #define MOVE_SPEED 2 // Speed of movement when pressing left/right
-#define SHOOT_VEL 5  // Initial velocity when shooting with bumpers
+#define SHOOT_VEL 10 // Initial velocity when shooting with bumpers
 #define JUMP_VELOCITY -10
 int BALL_SIZE = 4;
 
 extern int gravityDirection;
 
-// void applyGravity(struct Object *obj);
-// void updateMovement(struct Object *obj);
-// void handleCollisions(struct Object *obj, int BALL_SIZE);
-
 int gravityDirection = 1;
+
 void applyGravity(ECS *obj) {
   obj->components->acceleration[0].ay = GRAVITY * gravityDirection;
 }
@@ -30,48 +28,9 @@ void updateMovement(ECS *obj) {
   obj->components->position[0].y += obj->components->velocity[0].dy;
 }
 
-void handleCollisions(ECS *obj, int BALL_SIZE) {
-  if (gravityDirection == 1) {
-    if (obj->components->position[0].y >= SH - BALL_SIZE) {
-      obj->components->position[0].y = SH - BALL_SIZE;
-      obj->components->velocity[0].dy = -(obj->components->velocity[0].dy / 2);
-      obj->entity[0].flag |= ON_GROUND;
-    } else if (obj->components->position[0].y <= 0) {
-      obj->components->velocity[0].dy = 0;
-      obj->entity[0].flag &= ~ON_GROUND; // Clear ON_GROUND flag
-    } else {
-      obj->entity[0].flag &= ~ON_GROUND; // Clear ON_GROUND flag
-    }
-  } else if (gravityDirection == -1) {
-    if (obj->components->position[0].y <= 0) {
-      obj->components->position[0].y = 0;
-      obj->components->velocity[0].dy = -(obj->components->velocity[0].dy / 2);
-      obj->entity[0].flag |= ON_GROUND;
-    } else if (obj->components->position[0].y >= SH - BALL_SIZE) {
-      obj->components->position[0].y = SH - BALL_SIZE;
-      obj->components->velocity[0].dy = 0;
-
-      obj->entity[0].flag &= ~ON_GROUND; // Clear ON_GROUND flag
-    } else {
-      obj->entity[0].flag &= ~ON_GROUND; // Clear ON_GROUND flag
-    }
-  }
-
-  if (obj->components->position[0].x < 0) {
-    obj->components->position[0].x = 0;
-    obj->components->velocity[0].dx = 0;
-  }
-  if (obj->components->position[0].x >= SW - BALL_SIZE) {
-    obj->components->position[0].x = SW - BALL_SIZE;
-    obj->components->velocity[0].dx = 0;
-  }
-}
-/*
- */
-
 void playerInput(ECS *ball, int entityId) {
 
-  if (keyDown(A)) {
+  if (keyTapped(A)) {
     ball->components->velocity[0].dy = -SHOOT_VEL * gravityDirection;
   }
 
@@ -86,78 +45,85 @@ void playerInput(ECS *ball, int entityId) {
     ball->components->velocity[0].dy = 0;
     ball->components->acceleration[0].ax = 0;
     ball->components->acceleration[0].ay = 0;
+  }
+
+  if (keyDown(L)) {
+    ball->components->velocity[0].dx = -MOVE_SPEED;
+  } else if (keyDown(R)) {
+    ball->components->velocity[0].dx = MOVE_SPEED;
   } else {
+    ball->components->velocity[0].dx = 0;
+  }
 
-    if (keyDown(L)) {
-      ball->components->velocity[0].dx = -MOVE_SPEED;
-    } else if (keyDown(R)) {
-      ball->components->velocity[0].dx = MOVE_SPEED;
-    } else {
-      ball->components->velocity[0].dx = 0;
-    }
-
-    if (keyDown(LT)) {
-      ball->components->velocity[0].dx = -SHOOT_VEL;
-      ball->components->velocity[0].dy = -SHOOT_VEL;
-    } else if (keyDown(RT)) {
-      ball->components->velocity[0].dx = SHOOT_VEL;
-      ball->components->velocity[0].dy = -SHOOT_VEL;
-    }
+  if (keyDown(LT)) {
+    ball->components->velocity[0].dx = -SHOOT_VEL;
+  } else if (keyDown(RT)) {
+    ball->components->velocity[0].dx = SHOOT_VEL;
+  }
+  if (keyTapped(LT)) {
+    ball->components->velocity[0].dy = -SHOOT_VEL;
+  } else if (keyTapped(RT)) {
+    ball->components->velocity[0].dy = -SHOOT_VEL;
   }
 }
 
 static ComponentStorage world;
 static ECS entitySystem;
 
+void drawSquare(ECS *ecs, int entityId) {
+  drawRect(ecs->components->position[entityId], BALL_SIZE, BALL_SIZE, 0x03E0);
+}
+
 int main() {
   DSPC = MODE3 | BG2;
   initEntitySystem(&entitySystem, &world);
-  int ball =
-      createEntity(&entitySystem, POSITION_COMPONENT | VELOCITY_COMPONENT |
-                                      ACCELERATION_COMPONENT | INPUT_COMPONENT |
-                                      ENABLE_INPUT | ENABLE_PHYSICS |
-                                      ENABLE_COLLISIONS | ON_GROUND);
-
-  entitySystem.components->position[ball].x = 120;
-  entitySystem.components->position[ball].y = 80;
-
-  entitySystem.components->velocity[ball].dx = 120;
-  entitySystem.components->velocity[ball].dy = 80;
-
-  entitySystem.components->acceleration[ball].ax = 120;
-  entitySystem.components->acceleration[ball].ay = 80;
-
+  int ball = createEntity(
+      &entitySystem, POSITION_COMPONENT | VELOCITY_COMPONENT |
+                         ACCELERATION_COMPONENT | INPUT_COMPONENT |
+                         DRAWING_COMPONENT | ENABLE_INPUT | ENABLE_PHYSICS |
+                         TRIGGERS_COLLISIONS | DETECTS_COLLISIONS | ON_GROUND);
+  entitySystem.components->position[ball] = (PositionComponent){120, 80};
+  entitySystem.components->velocity[ball] = (VelocityComponent){0, 0};
+  entitySystem.components->acceleration[ball] = (AccelerationComponent){0, 0};
   entitySystem.components->input[0].handleInput = playerInput;
+  entitySystem.components->draw[0].drawingRoutine = drawSquare;
 
-  Coordinate previousCorner = {entitySystem.components->position[ball].x,
-                               entitySystem.components->position[ball].y};
-  Coordinate corner = {entitySystem.components->position[ball].x,
-                       entitySystem.components->position[ball].y};
+  // create floor entity id = 1
+  createEntity(&entitySystem, BOUNDARY_ENTITY);
+  //(POSITION_COMPONENT | HITBOX_COMPONENT | TRIGGERS_COLLISIONS)
+  // need not check collisions itself, but causes collisions/is checked for
+  // collisions by other collision DETECTING entities
+  entitySystem.components->position[1] = (PositionComponent){0, 160};
+  entitySystem.components->hitbox[1] = (HitboxComponent){BALL_SIZE, BALL_SIZE};
+  entitySystem.components->acceleration[1] = (AccelerationComponent){240, 1};
 
+  PositionComponent previousCorner = {
+      entitySystem.components->position[ball].x,
+      entitySystem.components->position[ball].y};
+  PositionComponent corner = {entitySystem.components->position[ball].x,
+                              entitySystem.components->position[ball].y};
+
+  PositionComponent test = {.x = 20, .y = 100};
   while (1) {
-
-    updateKeys();
     VBLANK();
 
-    // erase current position
+    // erase current position.  update to clear all drawn sprites,
+    // clearRenderSystem?
     drawRect(previousCorner, BALL_SIZE, BALL_SIZE, 0x0000);
 
-    applyGravity(&entitySystem);
-    //
     updateInputSystem(&entitySystem, entitySystem.components);
-    updateMovementSystem(&entitySystem, entitySystem.components);
-    // playerInput(&entitySystem);
-
-    // update position based on input/physics
+    applyGravity(&entitySystem);
+    //    updateCollisionSystem(&entitySystem, entitySystem.components);
+    //    updateMovementSystem(&entitySystem, entitySystem.components);
+    //    instead of sprites updateRenderSystem
     updateMovement(&entitySystem);
-    handleCollisions(&entitySystem, BALL_SIZE);
+    //     handleCollisions(&entitySystem, BALL_SIZE);
     corner.x = entitySystem.components->position[ball].x;
     corner.y = entitySystem.components->position[ball].y;
 
-    // draw in new position
-    drawRect(corner, BALL_SIZE, BALL_SIZE, 0x03E0);
+    updateRenderSystem(&entitySystem, entitySystem.components);
+
     previousCorner = corner;
-    //
   }
   return 0;
 }

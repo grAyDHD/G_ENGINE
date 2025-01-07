@@ -35,8 +35,6 @@ int createPlayer(ECS *ecs, const void *spriteSheet) {
       (PositionComponent){.x = 80, .y = 80};
 
   ecs->components->hitbox[playerId] =
-      // not positive how this shall be implemented.  look up table based on
-      // sprite sheet probably
       (HitboxComponent){.width = 32, .height = 32};
 
   ecs->components->animation[playerId] =

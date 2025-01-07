@@ -24,8 +24,8 @@ typedef struct {
 #define ENABLE_INPUT (1 << 16)
 #define ENABLE_PHYSICS (1 << 17)
 #define ON_GROUND (1 << 18)
-#define ENABLE_COLLISIONS (1 << 19)
-#define ENABLE_COLLISION_DETECTION (1 << 20)
+#define TRIGGERS_COLLISIONS (1 << 19)
+#define DETECTS_COLLISIONS (1 << 20)
 #define COLLISION_DETECTED (1 << 21)
 
 // #define PLAYER_FLAG (1 << 19)
@@ -34,11 +34,15 @@ typedef struct {
 #define PLAYER_ENTITY                                                          \
   (POSITION_COMPONENT | VELOCITY_COMPONENT | ANIMATION_COMPONENT |             \
    SPRITE_COMPONENT | INPUT_COMPONENT | HITBOX_COMPONENT | ENABLE_INPUT |      \
-   ENABLE_COLLISIONS)
+   DETECTS_COLLISIONS | TRIGGERS_COLLISIONS)
 
 #define NPC_ENTITY                                                             \
   (POSITION_COMPONENT | VELOCITY_COMPONENT | ANIMATION_COMPONENT |             \
-   SPRITE_COMPONENT | AI_COMPONENT | HITBOX_COMPONENT | ENABLE_COLLISIONS)
+   SPRITE_COMPONENT | AI_COMPONENT | HITBOX_COMPONENT | DETECTS_COLLISIONS |   \
+   TRIGGERS_COLLISIONS)
+
+#define BOUNDARY_ENTITY                                                        \
+  (POSITION_COMPONENT | HITBOX_COMPONENT | TRIGGERS_COLLISIONS)
 
 int createEntity(ECS *ecs, int activeComponentMask);
 int createPlayer(ECS *ecs, const void *spriteSheet);

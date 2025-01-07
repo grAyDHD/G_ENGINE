@@ -20,9 +20,13 @@ void updateInputSystem(ECS *ecs, ComponentStorage *components) {
 }
 
 void updateRenderSystem(ECS *ecs, ComponentStorage *components) {
-  for (int i = 0; i < MAX_ENTITIES; i++) {
-    if (ecs->entity[i].flag & ANIMATION_COMPONENT) {
-      renderEntity(ecs, i);
+  for (int id = 0; id < MAX_ENTITIES; id++) {
+    if (ecs->entity[id].flag & ANIMATION_COMPONENT) {
+      renderEntity(ecs, id);
+    }
+
+    if (ecs->entity[id].flag & DRAWING_COMPONENT) {
+      components->draw[id].drawingRoutine(ecs, id);
     }
   }
 };
@@ -48,9 +52,9 @@ void updateCollisionSystem(ECS *ecs, ComponentStorage *components) {
   }
 
   for (int idA = 0; idA < MAX_ENTITIES; idA++) {
-    if (ecs->entity[idA].flag & ENABLE_COLLISIONS) {
+    if (ecs->entity[idA].flag & DETECTS_COLLISIONS) {
       for (int idB = idA + 1; idB < MAX_ENTITIES; idB++) {
-        if (ecs->entity[idB].flag & ENABLE_COLLISIONS) {
+        if (ecs->entity[idB].flag & TRIGGERS_COLLISIONS) {
           if (checkForCollision(
                   &components->position[idA], &components->velocity[idA],
                   &components->hitbox[idA], &components->position[idB],
