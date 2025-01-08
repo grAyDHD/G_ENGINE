@@ -4,8 +4,23 @@
 #include "ecs/components.h"
 #include "ecs/entities.h"
 
-#define GRAVITY 1 // Gravity constant
+#define GRAVITY (1 << 8) // Gravity constant
+// delta time = 4.  frame
+
 static int gravityDirection = 1;
+
+void updateBehaviorSystem(ECS *ecs, ComponentStorage *components) {
+  for (int i = 0; i < MAX_ENTITIES; i++) {
+    if (ecs->entity[i].flag & AI_COMPONENT) {
+      ecs->components->ai[i].aiBehavior(ecs, i);
+    }
+  }
+};
+
+void updateInputSystem(ECS *ecs, ComponentStorage *components) {
+  updateKeys();
+  components->input[0].handleInput(ecs, 0);
+}
 
 void updatePhysicsSystem(ECS *ecs, ComponentStorage *components) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
@@ -20,19 +35,6 @@ void updatePhysicsSystem(ECS *ecs, ComponentStorage *components) {
     ecs->components->acceleration[id].ax = 0;
     ecs->components->acceleration[id].ay = 0;
   }
-}
-
-void updateBehaviorSystem(ECS *ecs, ComponentStorage *components) {
-  for (int i = 0; i < MAX_ENTITIES; i++) {
-    if (ecs->entity[i].flag & AI_COMPONENT) {
-      ecs->components->ai[i].aiBehavior(ecs, i);
-    }
-  }
-};
-
-void updateInputSystem(ECS *ecs, ComponentStorage *components) {
-  updateKeys();
-  components->input[0].handleInput(ecs, 0);
 }
 
 static inline int
@@ -72,6 +74,8 @@ void updateCollisionSystem(ECS *ecs, ComponentStorage *components) {
   }
 }
 
+// void updateMovementSystem(Entity *entity, PositionComponent *position,
+//                         VelocityComponent *velocity) {
 void updateMovementSystem(ECS *ecs, ComponentStorage *components) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
     if (ecs->entity[id].flag & VELOCITY_COMPONENT) {

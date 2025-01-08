@@ -1,10 +1,10 @@
 #ifndef COMPONENTS_H
 #define COMPONENTS_H
 
-#include "systems.h"
-
-void playerInputHandler(ECS *ecs, int entityId);
-void patrolBehavior(ECS *ecs, int entityId);
+// void playerInputHandler(ECS *ecs, int entityId);
+// void patrolBehavior(ECS *ecs, int entityId);
+typedef struct ECS ECS;
+typedef struct ComponentStorage ComponentStorage;
 
 typedef struct {
   int x;

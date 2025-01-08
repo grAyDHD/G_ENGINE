@@ -1,4 +1,5 @@
 #include "../includes/characterAnimator.h"
+#include "ecs/components.h"
 #include "ecs/entities.h"
 #include "ecs/systems.h"
 #include "graphics/draw.h"
@@ -42,6 +43,7 @@ int main() {
   createScreenBorders(&entitySystem);
   m3_Background(BedroomBitmap);
 
+  entitySystem.entity[0].flag |= PHYSICS_FLAG;
   while (1) {
     VBLANK();
 

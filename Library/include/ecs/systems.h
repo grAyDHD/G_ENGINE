@@ -1,6 +1,8 @@
 #ifndef SYSTEMS_H
 #define SYSTEMS_H
 
+#include "components.h"
+
 typedef struct ECS ECS;
 typedef struct ComponentStorage ComponentStorage;
 
