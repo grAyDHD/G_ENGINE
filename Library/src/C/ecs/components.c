@@ -8,24 +8,23 @@
 void playerInputHandler(ECS *ecs, int entityId) {
   AnimationComponent *animation = &ecs->components->animation[entityId];
   VelocityComponent *velocity = &ecs->components->velocity[entityId];
-
-  velocity->dx = 0;
-  velocity->dy = 0;
+  AccelerationComponent *acceleration =
+      &ecs->components->acceleration[entityId];
 
   if (keyDown(U)) {
-    velocity->dy = -1;
+    acceleration->ay -= 1;
     animation->direction = UP;
     animation->state = WALK;
   } else if (keyDown(D)) {
-    velocity->dy = 1;
+    acceleration->ay += 1;
     animation->direction = DOWN;
     animation->state = WALK;
   } else if (keyDown(L)) {
-    velocity->dx = -1;
+    acceleration->ax -= 1;
     animation->direction = LEFT;
     animation->state = WALK;
   } else if (keyDown(R)) {
-    velocity->dx = 1;
+    acceleration->ax += 1;
     animation->direction = RIGHT;
     animation->state = WALK;
   }

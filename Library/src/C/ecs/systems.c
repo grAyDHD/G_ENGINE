@@ -4,7 +4,23 @@
 #include "ecs/components.h"
 #include "ecs/entities.h"
 
+#define GRAVITY 1 // Gravity constant
 static int gravityDirection = 1;
+
+void updatePhysicsSystem(ECS *ecs, ComponentStorage *components) {
+  for (int id = 0; id < MAX_ENTITIES; id++) {
+    // apply gravity to acceleration, apply acceleration to velocity
+    if (ecs->entity[id].flag & PHYSICS_FLAG) {
+      ecs->components->acceleration[id].ay += GRAVITY;
+    }
+
+    ecs->components->velocity[id].dx += ecs->components->acceleration[id].ax;
+    ecs->components->velocity[id].dy += ecs->components->acceleration[id].ay;
+
+    ecs->components->acceleration[id].ax = 0;
+    ecs->components->acceleration[id].ay = 0;
+  }
+}
 
 void updateBehaviorSystem(ECS *ecs, ComponentStorage *components) {
   for (int i = 0; i < MAX_ENTITIES; i++) {
@@ -18,18 +34,6 @@ void updateInputSystem(ECS *ecs, ComponentStorage *components) {
   updateKeys();
   components->input[0].handleInput(ecs, 0);
 }
-
-void updateRenderSystem(ECS *ecs, ComponentStorage *components) {
-  for (int id = 0; id < MAX_ENTITIES; id++) {
-    if (ecs->entity[id].flag & ANIMATION_COMPONENT) {
-      renderEntity(ecs, id);
-    }
-
-    if (ecs->entity[id].flag & DRAWING_COMPONENT) {
-      components->draw[id].drawingRoutine(ecs, id);
-    }
-  }
-};
 
 static inline int
 checkForCollision(PositionComponent *posA, VelocityComponent *velA,
@@ -101,3 +105,15 @@ void updateAnimationSystem(ECS *ecs, ComponentStorage *components) {
     }
   }
 }
+
+void updateRenderSystem(ECS *ecs, ComponentStorage *components) {
+  for (int id = 0; id < MAX_ENTITIES; id++) {
+    if (ecs->entity[id].flag & ANIMATION_COMPONENT) {
+      renderEntity(ecs, id);
+    }
+
+    if (ecs->entity[id].flag & DRAWING_COMPONENT) {
+      components->draw[id].drawingRoutine(ecs, id);
+    }
+  }
+};

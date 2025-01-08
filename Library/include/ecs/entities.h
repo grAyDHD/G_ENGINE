@@ -27,6 +27,7 @@ typedef struct {
 #define TRIGGERS_COLLISIONS (1 << 19)
 #define DETECTS_COLLISIONS (1 << 20)
 #define COLLISION_DETECTED (1 << 21)
+#define PHYSICS_FLAG (1 << 22)
 
 // #define PLAYER_FLAG (1 << 19)
 //  define PLAYER_ENTITY ENEMY_ENTITY INTERACTABLE_ENTITY
@@ -42,10 +43,12 @@ typedef struct {
    TRIGGERS_COLLISIONS)
 
 #define BOUNDARY_ENTITY                                                        \
-  (POSITION_COMPONENT | HITBOX_COMPONENT | TRIGGERS_COLLISIONS)
+  (POSITION_COMPONENT | VELOCITY_COMPONENT | HITBOX_COMPONENT |                \
+   TRIGGERS_COLLISIONS)
 
 int createEntity(ECS *ecs, int activeComponentMask);
 int createPlayer(ECS *ecs, const void *spriteSheet);
 int createNPC(ECS *ecs, const void *spriteSheet);
+void createScreenBorders(ECS *ecs);
 
 #endif // !ENTITIES_H

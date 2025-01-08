@@ -1,4 +1,5 @@
 #include "../includes/characterAnimator.h"
+#include "ecs/entities.h"
 #include "ecs/systems.h"
 #include "graphics/draw.h"
 #include "graphics/video.h"
@@ -30,7 +31,6 @@ void vblankISR() {
 
 int main() {
   DSPC = MODE3 | BG2;
-
   ISR = vblankISR;   // tell the GBA where my isr is
   DISPSTAT = 1 << 3; // tell display to fire vblank interrupts
   REG_IE |= 1;       // tell GBA to accept vblank interrupts
@@ -39,6 +39,7 @@ int main() {
   initEntitySystem(&entitySystem, &world);
   createPlayer(&entitySystem, &RoboBitmap); // returns ID
   createNPC(&entitySystem, &RoboBitmap);    // returns ID
+  createScreenBorders(&entitySystem);
   m3_Background(BedroomBitmap);
 
   while (1) {
@@ -48,8 +49,9 @@ int main() {
     updateInputSystem(&entitySystem, &world);
     updateBehaviorSystem(&entitySystem, &world);
     // implement fixed point system for delta time, then gravity
-    //     updateGravitySystem(&entitySystem, &world); apply force downwards
+    // updateGravitySystem(&entitySystem, &world);
     //     based on delta time
+    updatePhysicsSystem(&entitySystem, &world);
     updateCollisionSystem(&entitySystem, &world);
     updateMovementSystem(&entitySystem, &world);
     updateAnimationSystem(&entitySystem, &world);
@@ -58,4 +60,5 @@ int main() {
 
   return 0;
 }
+
 // current state, collisions working.  implement gravity

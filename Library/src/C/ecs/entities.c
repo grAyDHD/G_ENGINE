@@ -1,7 +1,7 @@
 #include "ecs/entities.h"
 #include "../../include/ecs/ecs.h"
-#include "../../include/input/in.h"
 #include "ecs/components.h"
+#include "graphics/video.h"
 
 int createEntity(ECS *ecs, int flag) {
   if (ecs->nextEntityId >= MAX_ENTITIES) {
@@ -73,4 +73,36 @@ int createNPC(ECS *ecs, const void *spriteSheet) {
   ecs->components->ai[npcId].aiBehavior = patrolBehavior;
 
   return npcId;
+}
+
+void createScreenBorders(ECS *ecs) {
+  // BOUNDARY_ENTITY = bitmask for:
+  //  POSITION_COMPONENT | HITBOX_COMPONENT | TRIGGERS_COLLISIONS
+  /*---Create Left Border---*/
+  int boundaryId = createEntity(ecs, BOUNDARY_ENTITY);
+  ecs->components->position[boundaryId] = (PositionComponent){.x = 0, .y = 0};
+  ecs->components->velocity[boundaryId] = (VelocityComponent){.dx = 0, .dy = 0};
+  ecs->components->hitbox[boundaryId] =
+      (HitboxComponent){.width = 0, .height = SH};
+
+  /*---Create Right Border---*/
+  boundaryId = createEntity(ecs, BOUNDARY_ENTITY);
+  ecs->components->position[boundaryId] = (PositionComponent){.x = SW, .y = 0};
+  ecs->components->velocity[boundaryId] = (VelocityComponent){.dx = 0, .dy = 0};
+  ecs->components->hitbox[boundaryId] =
+      (HitboxComponent){.width = 0, .height = SH};
+
+  /*---Create Bottom Border---*/
+  boundaryId = createEntity(ecs, BOUNDARY_ENTITY);
+  ecs->components->position[boundaryId] = (PositionComponent){.x = 0, .y = SH};
+  ecs->components->velocity[boundaryId] = (VelocityComponent){.dx = 0, .dy = 0};
+  ecs->components->hitbox[boundaryId] =
+      (HitboxComponent){.width = SW, .height = 0};
+
+  /*---Create Top Border---*/
+  boundaryId = createEntity(ecs, BOUNDARY_ENTITY);
+  ecs->components->position[boundaryId] = (PositionComponent){.x = 0, .y = 0};
+  ecs->components->velocity[boundaryId] = (VelocityComponent){.dx = 0, .dy = 0};
+  ecs->components->hitbox[boundaryId] =
+      (HitboxComponent){.width = SW, .height = 0};
 }
