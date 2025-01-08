@@ -5,8 +5,8 @@
 #include "graphics/draw.h"
 #include "graphics/video.h"
 
-static ComponentStorage world;
-static ECS entitySystem;
+static ComponentStorage components;
+static ECS ecs;
 
 typedef void (*fnptr)(void);
 #define ISR *(fnptr *)(0x03007FFC) // put function address
@@ -37,30 +37,31 @@ int main() {
   REG_IE |= 1;       // tell GBA to accept vblank interrupts
   REG_IME |= 1;      // tell GBA to enable intterupts
 
-  initEntitySystem(&entitySystem, &world);
-  createPlayer(&entitySystem, &RoboBitmap); // returns ID
-  createNPC(&entitySystem, &RoboBitmap);    // returns ID
-  createScreenBorders(&entitySystem);
+  initEntitySystem(&ecs, &components);
+  createPlayer(&ecs, RoboBitmap); // returns ID
+  createNPC(&ecs, RoboBitmap);    // returns ID
+  createScreenBorders(&ecs);
   m3_Background(BedroomBitmap);
 
-  entitySystem.entity[0].flag |= PHYSICS_FLAG;
+  // ecs.entity[0].flag |= PHYSICS_FLAG;
   while (1) {
     VBLANK();
 
-    clearSpriteFrames(&entitySystem, &world, BedroomBitmap);
-    updateInputSystem(&entitySystem, &world);
-    updateBehaviorSystem(&entitySystem, &world);
-    // implement fixed point system for delta time, then gravity
-    // updateGravitySystem(&entitySystem, &world);
-    //     based on delta time
-    updatePhysicsSystem(&entitySystem, &world);
-    updateCollisionSystem(&entitySystem, &world);
-    updateMovementSystem(&entitySystem, &world);
-    updateAnimationSystem(&entitySystem, &world);
-    updateRenderSystem(&entitySystem, &world);
+    clearSpriteFrames(&ecs, &components, BedroomBitmap);
+    updateInputSystem(&ecs, ecs.entity, ecs.components->input);
+    updateBehaviorSystem(&ecs, ecs.entity, ecs.components->ai);
+
+    updatePhysicsSystem(ecs.entity, ecs.components->velocity,
+                        ecs.components->acceleration);
+    updateCollisionSystem(ecs.entity, ecs.components->position,
+                          ecs.components->velocity, ecs.components->hitbox);
+    updateMovementSystem(ecs.entity, ecs.components->position,
+                         ecs.components->velocity);
+    updateAnimationSystem(ecs.entity, ecs.components->animation);
+    updateRenderSystem(&ecs, ecs.entity, ecs.components->animation,
+                       ecs.components->draw);
   }
 
   return 0;
 }
-
 // current state, collisions working.  implement gravity
