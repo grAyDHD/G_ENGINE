@@ -66,3 +66,71 @@ void patrolBehavior(ECS *ecs, int entityId) {
     }
   }
 };
+
+/*
+
+// components.h
+#ifndef COMPONENTS_H
+#define COMPONENTS_H
+
+#include "entities.h"
+
+// Forward declare ECS for function pointers
+typedef struct ECS ECS;
+
+typedef struct {
+  int x;
+  int y;
+} PositionComponent;
+
+typedef struct {
+  int dx;
+  int dy;
+} VelocityComponent;
+
+typedef struct {
+  int ax;
+  int ay;
+} AccelerationComponent;
+
+typedef struct {
+  int width;
+  int height;
+} HitboxComponent;
+
+typedef enum : int { DOWN = 0, UP, LEFT, RIGHT } DIRECTION;
+typedef enum : int { IDLE = 0, WALK, TALK, RUN } STATE;
+
+typedef struct {
+  int frameNumber;
+  DIRECTION direction;
+  STATE state;
+  int keyframe;
+  int keyframeInterval;
+} AnimationComponent;
+
+typedef struct {
+  const void *spriteSheet;
+} SpriteComponent;
+
+typedef struct {
+  void (*handleInput)(Entity* entity, int entityId);
+} InputComponent;
+
+typedef struct {
+  void (*aiBehavior)(Entity* entity, int entityId);
+  int param1;
+  int param2;
+} AIComponent;
+
+typedef struct {
+  void (*drawingRoutine)(Entity* entity, int entityId);
+} DrawingComponent;
+
+// Function declarations
+void playerInputHandler(Entity* entity, int entityId);
+void patrolBehavior(Entity* entity, int entityId);
+
+#endif // COMPONENTS_H
+
+*/

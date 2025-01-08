@@ -1,10 +1,9 @@
 #ifndef COMPONENTS_H
 #define COMPONENTS_H
 
-// void playerInputHandler(ECS *ecs, int entityId);
-// void patrolBehavior(ECS *ecs, int entityId);
+#define MAX_ENTITIES 10
+#define MAX_INPUT_ENTITIES 4
 typedef struct ECS ECS;
-typedef struct ComponentStorage ComponentStorage;
 
 typedef struct {
   int x;
@@ -55,4 +54,15 @@ typedef struct {
   void (*drawingRoutine)(ECS *ecs, int entityId);
 } DrawingComponent;
 
+typedef struct ComponentStorage {
+  PositionComponent position[MAX_ENTITIES];
+  VelocityComponent velocity[MAX_ENTITIES];
+  AccelerationComponent acceleration[MAX_ENTITIES];
+  HitboxComponent hitbox[MAX_ENTITIES];
+  AnimationComponent animation[MAX_ENTITIES];
+  SpriteComponent sprite[MAX_ENTITIES];
+  InputComponent input[MAX_INPUT_ENTITIES];
+  AIComponent ai[MAX_ENTITIES];
+  DrawingComponent draw[MAX_ENTITIES];
+} ComponentStorage;
 #endif // !COMPONENTS_H
