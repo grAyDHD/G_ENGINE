@@ -1,4 +1,5 @@
 #include "../../include/ecs/ecs.h"
+#include "entities.c"
 
 int initEntitySystem(ECS *ecs, ComponentStorage *components) {
   if (!ecs || !components) {

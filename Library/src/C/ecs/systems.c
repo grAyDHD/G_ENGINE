@@ -4,36 +4,37 @@
 #include "ecs/components.h"
 #include "ecs/entities.h"
 
-#define GRAVITY (1 << 8) // Gravity constant
+#define GRAVITY 1
+//(1 << 8) // Gravity constant
 // delta time = 4.  frame
 
 static int gravityDirection = 1;
 
-void updateBehaviorSystem(ECS *ecs, ComponentStorage *components) {
+void updateInputSystem(ECS *ecs, Entity *entity, InputComponent *input) {
+  updateKeys();
+  input[0].handleInput(ecs, 0);
+}
+
+void updateBehaviorSystem(ECS *ecs, Entity *entity, AIComponent *ai) {
   for (int i = 0; i < MAX_ENTITIES; i++) {
-    if (ecs->entity[i].flag & AI_COMPONENT) {
-      ecs->components->ai[i].aiBehavior(ecs, i);
+    if (entity[i].flag & AI_COMPONENT) {
+      ai[i].aiBehavior(ecs, i);
     }
   }
 };
 
-void updateInputSystem(ECS *ecs, ComponentStorage *components) {
-  updateKeys();
-  components->input[0].handleInput(ecs, 0);
-}
-
-void updatePhysicsSystem(ECS *ecs, ComponentStorage *components) {
+void updatePhysicsSystem(Entity *entity, VelocityComponent *velocity,
+                         AccelerationComponent *acceleration) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
-    // apply gravity to acceleration, apply acceleration to velocity
-    if (ecs->entity[id].flag & PHYSICS_FLAG) {
-      ecs->components->acceleration[id].ay += GRAVITY;
+    if (entity[id].flag & PHYSICS_FLAG) {
+      acceleration[id].ay += GRAVITY;
     }
 
-    ecs->components->velocity[id].dx += ecs->components->acceleration[id].ax;
-    ecs->components->velocity[id].dy += ecs->components->acceleration[id].ay;
+    velocity[id].dx += acceleration[id].ax;
+    velocity[id].dy += acceleration[id].ay;
 
-    ecs->components->acceleration[id].ax = 0;
-    ecs->components->acceleration[id].ay = 0;
+    acceleration[id].ax = 0;
+    acceleration[id].ay = 0;
   }
 }
 
@@ -52,21 +53,21 @@ checkForCollision(PositionComponent *posA, VelocityComponent *velA,
   return (Bx2 > Ax1 && Bx1 < Ax2 && By2 > Ay1 && By1 < Ay2);
 }
 
-void updateCollisionSystem(ECS *ecs, ComponentStorage *components) {
+void updateCollisionSystem(Entity *entity, PositionComponent *position,
+                           VelocityComponent *velocity,
+                           HitboxComponent *hitbox) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
-    ecs->entity[id].flag &= ~COLLISION_DETECTED;
+    entity[id].flag &= ~COLLISION_DETECTED;
   }
 
   for (int idA = 0; idA < MAX_ENTITIES; idA++) {
-    if (ecs->entity[idA].flag & DETECTS_COLLISIONS) {
+    if (entity[idA].flag & DETECTS_COLLISIONS) {
       for (int idB = idA + 1; idB < MAX_ENTITIES; idB++) {
-        if (ecs->entity[idB].flag & TRIGGERS_COLLISIONS) {
-          if (checkForCollision(
-                  &components->position[idA], &components->velocity[idA],
-                  &components->hitbox[idA], &components->position[idB],
-                  &components->velocity[idB], &components->hitbox[idB])) {
-            ecs->entity[idA].flag |= COLLISION_DETECTED;
-            ecs->entity[idB].flag |= COLLISION_DETECTED;
+        if (entity[idB].flag & TRIGGERS_COLLISIONS) {
+          if (checkForCollision(&position[idA], &velocity[idA], &hitbox[idA],
+                                &position[idB], &velocity[idB], &hitbox[idB])) {
+            entity[idA].flag |= COLLISION_DETECTED;
+            entity[idB].flag |= COLLISION_DETECTED;
           }
         }
       }
@@ -74,15 +75,12 @@ void updateCollisionSystem(ECS *ecs, ComponentStorage *components) {
   }
 }
 
-// void updateMovementSystem(Entity *entity, PositionComponent *position,
-//                         VelocityComponent *velocity) {
-void updateMovementSystem(ECS *ecs, ComponentStorage *components) {
+void updateMovementSystem(Entity *entity, PositionComponent *position,
+                          VelocityComponent *velocity) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
-    if (ecs->entity[id].flag & VELOCITY_COMPONENT) {
-      VelocityComponent *velocity = &components->velocity[id];
-      PositionComponent *position = &components->position[id];
+    if (entity[id].flag & VELOCITY_COMPONENT) {
 
-      if ((ecs->entity[id].flag & COLLISION_DETECTED)) {
+      if ((entity[id].flag & COLLISION_DETECTED)) {
         velocity->dx = 0;
         velocity->dy = 0;
       } else {
@@ -93,11 +91,9 @@ void updateMovementSystem(ECS *ecs, ComponentStorage *components) {
   }
 }
 
-void updateAnimationSystem(ECS *ecs, ComponentStorage *components) {
+void updateAnimationSystem(Entity *entity, AnimationComponent *animation) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
-    if (ecs->entity[id].flag & ANIMATION_COMPONENT) {
-      AnimationComponent *animation = &components->animation[id];
-
+    if (entity[id].flag & ANIMATION_COMPONENT) {
       animation->keyframe++;
       if (animation->keyframe >= animation->keyframeInterval) {
         animation->keyframe = 0;
@@ -110,14 +106,15 @@ void updateAnimationSystem(ECS *ecs, ComponentStorage *components) {
   }
 }
 
-void updateRenderSystem(ECS *ecs, ComponentStorage *components) {
+void updateRenderSystem(ECS *ecs, Entity *entity, AnimationComponent *animation,
+                        DrawingComponent *draw) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
-    if (ecs->entity[id].flag & ANIMATION_COMPONENT) {
+    if (entity[id].flag & ANIMATION_COMPONENT) {
       renderEntity(ecs, id);
     }
 
-    if (ecs->entity[id].flag & DRAWING_COMPONENT) {
-      components->draw[id].drawingRoutine(ecs, id);
+    if (entity[id].flag & DRAWING_COMPONENT) {
+      draw[id].drawingRoutine(ecs, id);
     }
   }
 };

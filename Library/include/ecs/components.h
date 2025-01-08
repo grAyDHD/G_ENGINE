@@ -3,6 +3,7 @@
 
 #define MAX_ENTITIES 10
 #define MAX_INPUT_ENTITIES 4
+
 typedef struct ECS ECS;
 
 typedef struct {
@@ -65,4 +66,5 @@ typedef struct ComponentStorage {
   AIComponent ai[MAX_ENTITIES];
   DrawingComponent draw[MAX_ENTITIES];
 } ComponentStorage;
+
 #endif // !COMPONENTS_H

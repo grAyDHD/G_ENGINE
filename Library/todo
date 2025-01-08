@@ -1,7 +1,11 @@
 High Priority:
+  Refactor C files post header reorganization
+  update ai and player input behavior functions for calling from system
+
+
+Moderate priority:
 refactor projects prior to 15 that make sense in doing so for integrating the Entity Component System.
 refactor circles project to have functioins to use for music visualizer, draw rings on button hold, erase on release
-
 
 9 physics:
 refactor to ECS, integrate gravity from project into ECS
@@ -18,7 +22,6 @@ or dmg instrument?
 fix functionality
 
 
-Moderate priority:
 15:
 match SpriteFrame16 function in project 15 to match formatting of SpriteFrame32Bit from 18
 
