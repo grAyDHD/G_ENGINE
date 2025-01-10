@@ -1,24 +1,27 @@
 #ifndef COMPONENTS_H
 #define COMPONENTS_H
 
+#include "core/typedefs.h"
+
 #define MAX_ENTITIES 10
 #define MAX_INPUT_ENTITIES 4
 
+typedef s32 fixed_s32;
 typedef struct ECS ECS;
 
 typedef struct {
-  int x;
-  int y;
+  s32 x;
+  s32 y;
 } PositionComponent;
 
 typedef struct {
-  int dx;
-  int dy;
+  fixed_s32 dx;
+  fixed_s32 dy;
 } VelocityComponent;
 
 typedef struct {
-  int ax;
-  int ay;
+  fixed_s32 ax;
+  fixed_s32 ay;
 } AccelerationComponent;
 
 typedef struct {
@@ -29,6 +32,7 @@ typedef struct {
 
 typedef enum : int { DOWN = 0, UP, LEFT, RIGHT } DIRECTION;
 typedef enum : int { IDLE = 0, WALK, TALK, RUN } STATE;
+
 typedef struct {
   int frameNumber;
   DIRECTION direction;
@@ -42,7 +46,8 @@ typedef struct {
 } SpriteComponent;
 
 typedef struct {
-  void (*handleInput)(ECS *ecs, int entityId); // Custom behavior
+  void (*handleInput)(ECS *ecs, int entityId,
+                      fixed_s32 deltaTime); // Custom behavior
 } InputComponent;
 
 typedef struct {

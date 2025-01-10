@@ -1,12 +1,10 @@
 #include "../includes/characterAnimator.h"
+#include "core/typedefs.h"
 #include "ecs/components.h"
 #include "ecs/entities.h"
 #include "ecs/systems.h"
 #include "graphics/draw.h"
 #include "graphics/video.h"
-
-static ComponentStorage components;
-static ECS ecs;
 
 typedef void (*fnptr)(void);
 #define ISR *(fnptr *)(0x03007FFC) // put function address
@@ -19,16 +17,16 @@ typedef void (*fnptr)(void);
 // set first bit to acknowledge interrupt |= 1
 #define REG_IF *(u16 *)0x4000202
 
-// Time handling
+// vblank interrupt handler, for counting frames to calculate delta time
 volatile s32 frame = 0;
 void vblankISR() {
-  if (frame == 60) {
-    frame = 0;
-  } else {
-    frame++;
-  }
+  frame++;
   REG_IF = 1;
 }
+static ComponentStorage components;
+static ECS ecs;
+
+fixed_s32 deltaTime;
 
 int main() {
   DSPC = MODE3 | BG2;
@@ -39,24 +37,21 @@ int main() {
 
   initEntitySystem(&ecs, &components);
   createPlayer(&ecs, RoboBitmap); // returns ID
-  createNPC(&ecs, RoboBitmap);    // returns ID
   createScreenBorders(&ecs);
-  m3_Background(BedroomBitmap);
 
-  // ecs.entity[0].flag |= PHYSICS_FLAG;
   while (1) {
     VBLANK();
 
-    clearSpriteFrames(&ecs, &components, BedroomBitmap);
-    updateInputSystem(&ecs, ecs.entity, ecs.components->input);
-    updateBehaviorSystem(&ecs, ecs.entity, ecs.components->ai);
+    deltaTime = 0; // FIXED_MULTIPLY(5, INT_TO_FIXED(frame));
+                   //    frame = 0;
 
+    clearSpriteFrames(&ecs, &components, BedroomBitmap);
+    updateInputSystem(&ecs, ecs.entity, ecs.components->input, deltaTime);
     updatePhysicsSystem(ecs.entity, ecs.components->velocity,
-                        ecs.components->acceleration);
-    updateCollisionSystem(ecs.entity, ecs.components->position,
-                          ecs.components->velocity, ecs.components->hitbox);
+                        ecs.components->acceleration, deltaTime);
+
     updateMovementSystem(ecs.entity, ecs.components->position,
-                         ecs.components->velocity);
+                         ecs.components->velocity, deltaTime);
     updateAnimationSystem(ecs.entity, ecs.components->animation);
     updateRenderSystem(&ecs, ecs.entity, ecs.components->animation,
                        ecs.components->draw);
@@ -64,4 +59,14 @@ int main() {
 
   return 0;
 }
-// current state, collisions working.  implement gravity
+
+//  ecs.entity[0].flag |= PHYSICS_FLAG;
+
+// updateCollisionSystem(ecs.entity, ecs.components->position,
+//                      ecs.components->velocity, ecs.components->hitbox,
+//                     deltaTime);
+
+// createNPC(&ecs, RoboBitmap);    // returns ID
+// m3_Background(BedroomBitmap);
+// 0000 0000 0000 0100
+//    updateBehaviorSystem(&ecs, ecs.entity, ecs.components->ai);

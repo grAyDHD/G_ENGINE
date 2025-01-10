@@ -3,7 +3,7 @@
 
 int main() {
   DSPC = (MODE3 | BG2);
-  u16 green = 0x03E0;
+  unsigned short green = 0x03E0;
 
   Coordinate start = {20, 20};
 
