@@ -10,7 +10,7 @@ typedef unsigned int u32;
 #define s32 signed long
 
 //---Pointer Types---
-#define p8 u8 *
+typedef void (*fnptr)(void);
 #define p16 u16 *
 #define p32 u32 *
 
