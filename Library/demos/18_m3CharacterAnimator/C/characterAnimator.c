@@ -1,12 +1,23 @@
 #include "../includes/characterAnimator.h"
 #include "core/interrupts.h"
+#include "core/timer.h"
 #include "ecs/components.h"
+#include "ecs/ecs.h"
+#include "graphics/draw.h"
+#include "math/math.h"
 
 static ComponentStorage components;
 static ECS ecs;
 
-fixed_s32 deltaTime;
-volatile long frame;
+volatile fixed_s32 deltaTime;
+// steps, implement fixed multiply, int to fixed, fixed to int
+// #define MUL_FINTEGER(x, y) \
+  (((x >> 16) * (y >> 16)) << 16) // clear lower bits to multiply integer
+// portion
+// #define MUL_FFRACTION(x, y) (((x & 0x0000FFFF) * (y & 0x0000FFFF)) >> 16)
+// #define MULT(x, y) (MUL_FINTEGER(x, y) | MUL_FFRACTION(x, y))
+
+// #define MUL(x, y) ((int)((((long long)(x)) * ((long long)(y))) >> 16))
 
 int main() {
   DSPC = MODE3 | BG2;
@@ -16,15 +27,13 @@ int main() {
   REG_IME |= 1;      // tell GBA to enable intterupts
 
   initEntitySystem(&ecs, &components);
-  createPlayer(&ecs, RoboBitmap); // returns ID
+  int playerId = createPlayer(&ecs, RoboBitmap); // returns ID
   createScreenBorders(&ecs);
 
-  m3_Background(BedroomBitmap);
+  //  m3_Background(BedroomBitmap);
+
   while (1) {
     VBLANK();
-
-    deltaTime = FIXED_MULTIPLY(5, INT_TO_FIXED(frame));
-    frame = 0;
 
     clearSpriteFrames(&ecs, &components, BedroomBitmap);
     updateInputSystem(&ecs, ecs.entity, ecs.components->input, deltaTime);
@@ -36,6 +45,7 @@ int main() {
     updateAnimationSystem(ecs.entity, ecs.components->animation);
     updateRenderSystem(&ecs, ecs.entity, ecs.components->animation,
                        ecs.components->draw);
+    deltaTime = 0;
   }
 
   return 0;

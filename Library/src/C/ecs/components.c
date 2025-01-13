@@ -2,6 +2,7 @@
 #include "../../include/ecs/ecs.h"
 #include "../../include/input/in.h"
 #include "ecs/systems.h"
+#include "math/math.h"
 
 // These are included as potential component behaviors,
 // Likely to further categorize as library expands
@@ -11,24 +12,22 @@ void playerInputHandler(ECS *ecs, int entityId, fixed_s32 deltaTime) {
   VelocityComponent *velocity = &ecs->components->velocity[entityId];
   AccelerationComponent *acceleration =
       &ecs->components->acceleration[entityId];
+  // 1092 0000010001000100 0x0444
 
   if (keyDown(U)) {
-    acceleration->ay -= 1 << 2;
+    acceleration->ay -= INT_TO_FIXED(64);
     animation->direction = UP;
     animation->state = WALK;
   } else if (keyDown(D)) {
-    acceleration->ay += 1 << 2;
-
+    acceleration->ay += INT_TO_FIXED(64);
     animation->direction = DOWN;
     animation->state = WALK;
   } else if (keyDown(L)) {
-
-    acceleration->ax -= 1 << 2;
+    acceleration->ax -= INT_TO_FIXED(64);
     animation->direction = LEFT;
     animation->state = WALK;
   } else if (keyDown(R)) {
-
-    acceleration->ax += 1 << 2;
+    acceleration->ax += INT_TO_FIXED(64);
     animation->direction = RIGHT;
     animation->state = WALK;
   }

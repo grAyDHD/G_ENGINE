@@ -18,7 +18,7 @@ typedef struct {
 #define HITBOX_COMPONENT (1 << 7)
 #define DRAWING_COMPONENT (1 << 8)
 // TIMER_COMPONENT
-// sound component, direct sound component?
+// sound component?
 
 #define ENABLE_INPUT (1 << 16)
 #define ENABLE_PHYSICS (1 << 17)

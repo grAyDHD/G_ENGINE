@@ -3,6 +3,7 @@
 #include "../../include/input/in.h"
 #include "ecs/components.h"
 #include "ecs/entities.h"
+#include "math/math.h"
 
 static int gravityDirection = 1;
 
@@ -24,13 +25,23 @@ void updateBehaviorSystem(ECS *ecs, Entity *entity, AIComponent *ai) {
 //   acceleration[id].ay += FIXED_MULTIPLY(GRAVITY, deltaTime);
 //    }
 
+// 1092 0000010001000100 0x0444
+/*
+#define MUL_FINTEGER(x, y)                                                     \
+  (((x >> 16) * (y >> 16)) << 16) // clear lower bits to multiply integer
+                                  // portion
+#define MUL_FFRACTION(x, y) (((x & 0x0000FFFF) * (y & 0x0000FFFF)) >> 16)
+#define MUL(x, y) (s32)(MUL_FINTEGER(x, y) | MUL_FFRACTION(x, y))
+*/
+
+// MUL(INT_TO_FIXED(256), 1092)
+
 void updatePhysicsSystem(Entity *entity, VelocityComponent *velocity,
                          AccelerationComponent *acceleration,
                          fixed_s32 deltaTime) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
-
-    velocity[id].dx += acceleration[id].ax;
-    velocity[id].dy += acceleration[id].ay;
+    velocity[id].dx += MULT(acceleration[id].ax, deltaTime);
+    velocity[id].dy += MULT(acceleration[id].ay, deltaTime);
     acceleration[id].ax = 0;
     acceleration[id].ay = 0;
   }
@@ -44,18 +55,12 @@ void updateMovementSystem(Entity *entity, PositionComponent *position,
         velocity[id].dx = 0;
         velocity[id].dy = 0;
       } else {
-        position[id].x += FIXED_TO_INT(velocity[id].dx);
-        position[id].y += FIXED_TO_INT(velocity[id].dy);
-
-        //(FIXED_MULTIPLY(velocity[id].dx, deltaTime));
-        // (FIXED_MULTIPLY(velocity[id].dy, deltaTime));
+        position[id].x += (MULT(velocity[id].dx, deltaTime));
+        position[id].y += (MULT(velocity[id].dy, deltaTime));
       }
     }
   }
 }
-
-//  position[id].x += FIXED_TO_INT(velocity[id].dx);
-//  position[id].y += FIXED_TO_INT(velocity[id].dy);
 
 static inline int
 checkForCollision(PositionComponent *posA, VelocityComponent *velA,
@@ -105,26 +110,6 @@ void updateCollisionSystem(Entity *entity, PositionComponent *position,
     }
   }
 }
-
-/*
-  if (keyDown(U)) {
-    ecs->components->velocity[entityId].dy -= 1;
-    animation->direction = UP;
-    animation->state = WALK;
-  } else if (keyDown(D)) {
-    ecs->components->velocity[entityId].dy += 10;
-    animation->direction = DOWN;
-    animation->state = WALK;
-  } else if (keyDown(L)) {
-    ecs->components->velocity[entityId].dx -= 1;
-    animation->direction = LEFT;
-    animation->state = WALK;
-  } else if (keyDown(R)) {
-    ecs->components->velocity[entityId].dx += 10;
-    animation->direction = RIGHT;
-    animation->state = WALK;
-  }
-*/
 
 void updateAnimationSystem(Entity *entity, AnimationComponent *animation) {
   for (int id = 0; id < MAX_ENTITIES; id++) {

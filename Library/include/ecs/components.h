@@ -10,8 +10,8 @@ typedef s32 fixed_s32;
 typedef struct ECS ECS;
 
 typedef struct {
-  s32 x;
-  s32 y;
+  fixed_s32 x;
+  fixed_s32 y;
 } PositionComponent;
 
 typedef struct {

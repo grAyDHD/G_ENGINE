@@ -5,21 +5,6 @@
 #include "core/typedefs.h"
 #include "entities.h"
 
-#define FIXED_ONE (1 << 8)
-#define FIXED_HALF (1 << 7)
-#define FIXED_QUARTER (2 << 6)
-#define FIXED_ZERO 0
-
-#define INT_TO_FIXED(i) ((i) << 8)
-#define FIXED_TO_INT(f) ((f) >> 8)
-//  ((f) >= 0 ? ((f) + (FIXED_ONE >> 1)) >> 8 : ((f) - (FIXED_ONE >> 1)) >> 8)
-#define FIXED_MULTIPLY(a, b) ((a * b) >> 8)
-
-#define FIXED_ADD(a, b) ((a) + (b))
-
-#define GRAVITY FIXED_QUARTER
-
-// #define FIXED_MULTIPLY(a, b) ((fixed_s32)(((s32)(a) * (s32)(b)) >> 8))
 typedef s32 fixed_s32;
 
 typedef struct ECS {

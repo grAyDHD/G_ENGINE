@@ -25,7 +25,4 @@ void patrolBehavior(ECS *ecs, int entityId);
 //                   AIComponent *ai);
 //
 
-// void patrolBehavior(AnimationComponent *animation, VelocityComponent
-// *velocity,
-//                   AIComponent *ai);
 #endif // ECS_H

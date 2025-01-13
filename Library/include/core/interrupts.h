@@ -13,9 +13,9 @@
 #define REG_IF *(u16 *)0x4000202
 
 // vblank interrupt handler, for counting frames to calculate delta time
-extern volatile s32 frame;
+extern volatile s32 deltaTime;
 void vblankISR() {
-  frame++;
+  deltaTime += 1092; // 60 fps fixed constant value for seconds/frame
   REG_IF = 1;
 }
 
