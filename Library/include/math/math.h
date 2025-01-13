@@ -16,6 +16,6 @@
 #define FIXED_HALF (1 << 15)
 #define FIXED_QUARTER (2 << 14)
 
-#define GRAVITY INT_TO_FIXED(10)
+#define GRAVITY INT_TO_FIXED(256)
 
 #endif // !MATH_H

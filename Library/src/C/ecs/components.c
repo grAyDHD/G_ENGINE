@@ -12,24 +12,27 @@ void playerInputHandler(ECS *ecs, int entityId, fixed_s32 deltaTime) {
   VelocityComponent *velocity = &ecs->components->velocity[entityId];
   AccelerationComponent *acceleration =
       &ecs->components->acceleration[entityId];
-  // 1092 0000010001000100 0x0444
 
   if (keyDown(U)) {
-    acceleration->ay -= INT_TO_FIXED(64);
+    acceleration->ay -= INT_TO_FIXED(256);
     animation->direction = UP;
     animation->state = WALK;
   } else if (keyDown(D)) {
-    acceleration->ay += INT_TO_FIXED(64);
+    acceleration->ay += INT_TO_FIXED(256);
     animation->direction = DOWN;
     animation->state = WALK;
   } else if (keyDown(L)) {
-    acceleration->ax -= INT_TO_FIXED(64);
+    acceleration->ax -= INT_TO_FIXED(256);
     animation->direction = LEFT;
     animation->state = WALK;
   } else if (keyDown(R)) {
-    acceleration->ax += INT_TO_FIXED(64);
+    acceleration->ax += INT_TO_FIXED(256);
     animation->direction = RIGHT;
     animation->state = WALK;
+  }
+
+  if (keyTapped(A)) {
+    velocity->dy = -INT_TO_FIXED(64);
   }
 
   if (keyReleased(U | D | L | R)) {
@@ -39,8 +42,8 @@ void playerInputHandler(ECS *ecs, int entityId, fixed_s32 deltaTime) {
 
     acceleration->ax = 0;
     acceleration->ay = 0;
-    velocity->dx = 0;
-    velocity->dy = 0;
+    //    velocity->dx = 0;
+    //    velocity->dy = 0;
   }
 }
 

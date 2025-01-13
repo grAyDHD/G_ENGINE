@@ -21,14 +21,15 @@ void updateBehaviorSystem(ECS *ecs, Entity *entity, AIComponent *ai) {
   }
 };
 
-//   if (entity[id].flag & PHYSICS_FLAG) {
-//   acceleration[id].ay += FIXED_MULTIPLY(GRAVITY, deltaTime);
-//    }
-
+// 1092 0000010001000100 0x0444
 void updatePhysicsSystem(Entity *entity, VelocityComponent *velocity,
                          AccelerationComponent *acceleration,
                          fixed_s32 deltaTime) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
+    if (entity[id].flag & PHYSICS_FLAG) {
+      acceleration[id].ay += GRAVITY;
+    }
+
     velocity[id].dx += MULT(acceleration[id].ax, deltaTime);
     velocity[id].dy += MULT(acceleration[id].ay, deltaTime);
     acceleration[id].ax = 0;
