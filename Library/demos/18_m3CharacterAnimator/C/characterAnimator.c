@@ -10,9 +10,10 @@ static ComponentStorage components;
 static ECS ecs;
 
 volatile fixed_s32 deltaTime;
+
 // steps, implement fixed multiply, int to fixed, fixed to int
 // #define MUL_FINTEGER(x, y) \
-  (((x >> 16) * (y >> 16)) << 16) // clear lower bits to multiply integer
+//  (((x >> 16) * (y >> 16)) << 16) // clear lower bits to multiply integer
 // portion
 // #define MUL_FFRACTION(x, y) (((x & 0x0000FFFF) * (y & 0x0000FFFF)) >> 16)
 // #define MULT(x, y) (MUL_FINTEGER(x, y) | MUL_FFRACTION(x, y))

@@ -5,7 +5,7 @@
 @ 4 state, 4 direction, 4 frame animations
 
 @ SpriteFrame32Bit(*image);
-@ r0 = PositionComponent struct {int x, int y}
+@ r0 = PositionComponent struct {s32 x, s32 y}
 @ r1 = AnimationComponent struct {frame, direction, state}
 @ r2 = image (pointer to sprite sheet) 
 
@@ -16,6 +16,10 @@ SpriteFrame32Bit:
 
   ldr r3, [r0]                          @ r3 = position.x
   ldr r4, [r0, #4]                      @ r4 = position.y
+  mov r5, #16
+  asr r3, r3, r5
+  asr r4, r4, r5
+  
   mov r5, #240                          @ r5 = y offset multiplier
   mul r0, r4, r5                        @ r0 = y * 240
   add r3, r0, r3                        @ r4 = y offset + x
@@ -28,7 +32,7 @@ SpriteFrame32Bit:
   @ r1 AnimationComponent
   @ r2 image
 
-@ Step 2: calculate image animation offset
+@ Step 2: calculate image animation offsetpirate software wow drama
 
 @ calculate frame offset 
   ldr r3, [r1]                            @ r3 = frameNumber
@@ -108,7 +112,7 @@ SpriteFrame32Bit:
 .global clearSpriteFrame
 .type clearSpriteFrame, %function
   
-@ clearSpriteFrame(int x, int y, int size, const void *IMAGE)
+@ clearSpriteFrame(fixed_s32, fixed_s32 y, int size, const void *IMAGE)
 @ r0 = x
 @ r1 = y
 @ r2 = size
@@ -116,6 +120,9 @@ SpriteFrame32Bit:
 
 clearSpriteFrame:
   push {r4-r11}
+  mov r4, #16
+  asr r0, r0, r4
+  asr r1, r1, r4
 
   @ Step 1: calculate VRAM and IMAGE byte offsets
   mov r4, #240
