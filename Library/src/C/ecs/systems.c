@@ -25,17 +25,6 @@ void updateBehaviorSystem(ECS *ecs, Entity *entity, AIComponent *ai) {
 //   acceleration[id].ay += FIXED_MULTIPLY(GRAVITY, deltaTime);
 //    }
 
-// 1092 0000010001000100 0x0444
-/*
-#define MUL_FINTEGER(x, y)                                                     \
-  (((x >> 16) * (y >> 16)) << 16) // clear lower bits to multiply integer
-                                  // portion
-#define MUL_FFRACTION(x, y) (((x & 0x0000FFFF) * (y & 0x0000FFFF)) >> 16)
-#define MUL(x, y) (s32)(MUL_FINTEGER(x, y) | MUL_FFRACTION(x, y))
-*/
-
-// MUL(INT_TO_FIXED(256), 1092)
-
 void updatePhysicsSystem(Entity *entity, VelocityComponent *velocity,
                          AccelerationComponent *acceleration,
                          fixed_s32 deltaTime) {
@@ -69,17 +58,15 @@ checkForCollision(PositionComponent *posA, VelocityComponent *velA,
                   fixed_s32 deltaTime) {
 
   // Checking for what the NEXT position will be
-  int Ax1 =
-      posA->x + FIXED_TO_INT(velA->dx); //(FIXED_MULTIPLY(velA->dx, deltaTime));
+  // hitbox is an int, Ax1 etc is an int, pos vel and deltaTime are 16.16 fixed
+  // point values
+  int Ax1 = (posA->x + (MULT(velA->dx, deltaTime))) >> 16;
   int Ax2 = Ax1 + hitA->width;
-  int Ay1 =
-      posA->y + FIXED_TO_INT(velB->dy); //(FIXED_MULTIPLY(velA->dy, deltaTime));
+  int Ay1 = (posA->y + (MULT(velA->dy, deltaTime))) >> 16;
   int Ay2 = Ay1 + hitA->height;
-  int Bx1 =
-      posB->x + FIXED_TO_INT(velB->dx); //(FIXED_MULTIPLY(velB->dx, deltaTime));
+  int Bx1 = (posB->x + (MULT(velB->dx, deltaTime))) >> 16;
   int Bx2 = Bx1 + hitB->width;
-  int By1 =
-      posB->y + FIXED_TO_INT(velB->dy); //(FIXED_MULTIPLY(velB->dy, deltaTime));
+  int By1 = (posB->y + (MULT(velB->dy, deltaTime))) >> 16;
   int By2 = By1 + hitB->height;
 
   return (Bx2 > Ax1 && Bx1 < Ax2 && By2 > Ay1 && By1 < Ay2);
