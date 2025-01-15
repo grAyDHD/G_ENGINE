@@ -1,6 +1,7 @@
 #include "ecs/systems.h"
 #include "../../include/ecs/ecs.h"
 #include "../../include/input/in.h"
+#include "core/typedefs.h"
 #include "ecs/components.h"
 #include "ecs/entities.h"
 #include "math/math.h"
@@ -41,65 +42,90 @@ void updateMovementSystem(Entity *entity, PositionComponent *position,
                           VelocityComponent *velocity, fixed_s32 deltaTime) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
     if (entity[id].flag & VELOCITY_COMPONENT) {
-      if ((entity[id].flag & COLLISION_DETECTED)) {
-        velocity[id].dx = 0;
-        velocity[id].dy = 0;
-      } else {
-        position[id].x += (MULT(velocity[id].dx, deltaTime));
-        position[id].y += (MULT(velocity[id].dy, deltaTime));
-      }
+      position[id].x += (MULT(velocity[id].dx, deltaTime));
+      position[id].y += (MULT(velocity[id].dy, deltaTime));
     }
   }
 }
 
-static inline int
-checkForCollision(PositionComponent *posA, VelocityComponent *velA,
-                  HitboxComponent *hitA, PositionComponent *posB,
-                  VelocityComponent *velB, HitboxComponent *hitB,
-                  fixed_s32 deltaTime) {
+// change to overlap sturct? same params, width and height
+static inline HitboxComponent
+checkForOverlap(PositionComponent *posA,
+                VelocityComponent *velA, // no longer need for function
+                HitboxComponent *hitA, PositionComponent *posB,
+                VelocityComponent *velB, // no longer need for function
+                HitboxComponent *hitB, fixed_s32 deltaTime) {
 
-  // Checking for what the NEXT position will be
-  // hitbox is an int, Ax1 etc is an int, pos vel and deltaTime are 16.16 fixed
-  // point values
-  int Ax1 = (posA->x + (MULT(velA->dx, deltaTime))) >> 16;
+  int Ax1 = FIXED_TO_INT(posA->x);
   int Ax2 = Ax1 + hitA->width;
-  int Ay1 = (posA->y + (MULT(velA->dy, deltaTime))) >> 16;
+  int Ay1 = FIXED_TO_INT(posA->y);
   int Ay2 = Ay1 + hitA->height;
-  int Bx1 = (posB->x + (MULT(velB->dx, deltaTime))) >> 16;
+  int Bx1 = FIXED_TO_INT(posB->x);
   int Bx2 = Bx1 + hitB->width;
-  int By1 = (posB->y + (MULT(velB->dy, deltaTime))) >> 16;
+  int By1 = FIXED_TO_INT(posB->y);
   int By2 = By1 + hitB->height;
 
-  return (Bx2 > Ax1 && Bx1 < Ax2 && By2 > Ay1 && By1 < Ay2);
+  HitboxComponent overlap = {0, 0};
+
+  // only need to find 1 single overlapping corner to determine x and y depth
+  if (Ax1 > Bx1 && Ax1 < Bx2 && Ay1 > By1 &&
+      Ay2 < By2) { // check if top left corner of a is inside b
+    overlap.width = Bx2 - Ax1;
+    overlap.height = By2 - By1;
+    return overlap;
+  } else if (Ax2 > Bx1 && Ax2 < Bx2 && Ay1 > By1 &&
+             Ay1 < By2) { // check if top right corner overlap
+    overlap.width = Ax2 - Bx1;
+    overlap.height = By2 - Ay1;
+    return overlap;
+  } else if (Ax1 > Bx1 && Ax1 < Bx2 && Ay2 > By1 &&
+             Ay2 < By2) { // check bottom left of a for overlap
+    overlap.width = Bx2 - Ax1;
+    overlap.height = Ay2 - By1;
+    return overlap;
+  } else if (Ax2 > Bx1 && Ax2 < Bx2 && Ay2 > By1 &&
+             Ay2 < By2) { // check bottom right of A for overlap
+    overlap.width = Ax2 - Bx1;
+    overlap.height = Ay2 - By1;
+    return overlap;
+  } else {
+    return overlap;
+    // if this returns height and width are both 0 meaning no
+    // collision happened
+  }
 }
 
 void updateCollisionSystem(Entity *entity, PositionComponent *position,
                            VelocityComponent *velocity, HitboxComponent *hitbox,
                            fixed_s32 deltaTime) {
-  // Resets collision flags
-  for (int id = 0; id < MAX_ENTITIES; id++) {
-    entity[id].flag &= ~COLLISION_DETECTED;
-  }
-
   for (int idA = 0; idA < MAX_ENTITIES; idA++) {
-    if (entity[idA].flag & DETECTS_COLLISIONS) {
-      // for every entity that can detect collisions,
-      for (int idB = idA + 1; idB < MAX_ENTITIES; idB++) {
-        if (entity[idB].flag & TRIGGERS_COLLISIONS) {
-          //  check for collisions with any entity that triggers them
-          if (checkForCollision(&position[idA], &velocity[idA], &hitbox[idA],
-                                &position[idB], &velocity[idB], &hitbox[idB],
-                                deltaTime)) {
-            entity[idA].flag |= COLLISION_DETECTED;
-            entity[idB].flag |= COLLISION_DETECTED;
-          }
-        }
+    if (!(entity[idA].flag & DETECTS_COLLISIONS))
+      continue;
+
+    for (int idB = idA + 1; idB < MAX_ENTITIES; idB++) {
+      if (!(entity[idB].flag & TRIGGERS_COLLISIONS))
+        continue;
+
+      HitboxComponent overlap = checkForOverlap(
+          &position[idA], &velocity[idA], &hitbox[idA], &position[idB],
+          &velocity[idB], &hitbox[idB], deltaTime);
+      if (overlap.width > 0 && overlap.height > 0) {
+        // set collision flag if detects collisions
+        //  if idB is static, (add static collider flag)
+        //  then, idA should be only eintity with position corrected.
+        //  future idea: platform pushes plyer up if approached from below
       }
     }
   }
 }
 
-void updateAnimationSystem(Entity *entity, AnimationComponent *animation) {
+// resets collision flags
+// for (int id = 0; id < max_entities; id++) {
+//  entity[id].flag &= ~collision_detected;
+//}
+//
+
+void updateanimationsystem(Entity *entity, AnimationComponent *animation) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
     if (entity[id].flag & ANIMATION_COMPONENT) {
       animation->keyframe++;
@@ -114,7 +140,7 @@ void updateAnimationSystem(Entity *entity, AnimationComponent *animation) {
   }
 }
 
-void updateRenderSystem(ECS *ecs, Entity *entity, AnimationComponent *animation,
+void updaterendersystem(ECS *ecs, Entity *entity, AnimationComponent *animation,
                         DrawingComponent *draw) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
     if (entity[id].flag & ANIMATION_COMPONENT) {
@@ -127,6 +153,6 @@ void updateRenderSystem(ECS *ecs, Entity *entity, AnimationComponent *animation,
   }
 };
 
-#define HORIZONTAL_COLLISION (1 << 30)
-#define VERTICAL_COLLISION (1 << 31)
-// entity[id].flag &= ~(HORIZONTAL_COLLISION | VERTICAL_COLLISION);
+#define horizontal_collision (1 << 30)
+#define vertical_collision (1 << 31)
+// entity[id].flag &= ~(horizontal_collision | vertical_collision);

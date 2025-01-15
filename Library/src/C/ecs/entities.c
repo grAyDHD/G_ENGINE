@@ -71,6 +71,9 @@ int createNPC(ECS *ecs, const void *spriteSheet) {
                            .keyframeInterval = 8};
   ecs->components->sprite[npcId] =
       (SpriteComponent){.spriteSheet = spriteSheet};
+
+  // NPC BEHAVIOR, make assignable, assignBehavior function?  states and
+  // triggers to assign specific behavior under certain conditions
   ecs->components->ai[npcId].aiBehavior = patrolBehavior;
 
   return npcId;

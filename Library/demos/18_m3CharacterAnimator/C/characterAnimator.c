@@ -1,10 +1,8 @@
 #include "../includes/characterAnimator.h"
 #include "core/interrupts.h"
-#include "core/timer.h"
 #include "ecs/components.h"
 #include "ecs/ecs.h"
 #include "graphics/draw.h"
-#include "math/math.h"
 
 static ComponentStorage components;
 static ECS ecs;
@@ -12,31 +10,48 @@ static ECS ecs;
 volatile fixed_s32 deltaTime;
 void initializeVBI();
 
+int min(int a, int b) {
+  if (a < b) {
+    return a;
+  }
+  return b;
+};
+
+int max(int a, int b) {
+  if (a > b) {
+    return a;
+  }
+  return b;
+};
+
+int approach(int currentSpeed, int targetSpeed, int increase) {
+  if (currentSpeed < targetSpeed) {
+    return min(currentSpeed + increase, targetSpeed);
+  }
+  return max(currentSpeed - increase, targetSpeed);
+}
+
 int main() {
   DSPC = MODE3 | BG2;
   initializeVBI();
   m3_Background(BedroomBitmap);
-
   initEntitySystem(&ecs, &components);
-  int playerId = createPlayer(&ecs, RoboBitmap); // returns ID
+  createPlayer(&ecs, RoboBitmap);
+  createNPC(&ecs, RoboBitmap);
   createScreenBorders(&ecs);
-
-  ecs.entity[0].flag |= PHYSICS_FLAG;
 
   while (1) {
     VBLANK();
-
     clearSpriteFrames(&ecs, &components, BedroomBitmap);
     updateInputSystem(&ecs, ecs.entity, ecs.components->input, deltaTime);
+    updateBehaviorSystem(&ecs, ecs.entity, ecs.components->ai);
     updatePhysicsSystem(ecs.entity, ecs.components->velocity,
                         ecs.components->acceleration, deltaTime);
-
+    updateMovementSystem(ecs.entity, ecs.components->position,
+                         ecs.components->velocity, deltaTime);
     updateCollisionSystem(ecs.entity, ecs.components->position,
                           ecs.components->velocity, ecs.components->hitbox,
                           deltaTime);
-
-    updateMovementSystem(ecs.entity, ecs.components->position,
-                         ecs.components->velocity, deltaTime);
     updateAnimationSystem(ecs.entity, ecs.components->animation);
     updateRenderSystem(&ecs, ecs.entity, ecs.components->animation,
                        ecs.components->draw);
@@ -54,7 +69,4 @@ void initializeVBI() {
   REG_IME |= 1;      // tell GBA to enable intterupts
 }
 
-// createNPC(&ecs, RoboBitmap);    // returns ID
-//
-// 0000 0000 0000 0100
-//    updateBehaviorSystem(&ecs, ecs.entity, ecs.components->ai);
+//  ecs.entity[0].flag |= PHYSICS_FLAG;
