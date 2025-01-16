@@ -22,7 +22,6 @@ void updateBehaviorSystem(ECS *ecs, Entity *entity, AIComponent *ai) {
   }
 };
 
-// 1092 0000010001000100 0x0444
 void updatePhysicsSystem(Entity *entity, VelocityComponent *velocity,
                          AccelerationComponent *acceleration,
                          fixed_s32 deltaTime) {
@@ -30,7 +29,6 @@ void updatePhysicsSystem(Entity *entity, VelocityComponent *velocity,
     if (entity[id].flag & PHYSICS_FLAG) {
       acceleration[id].ay += GRAVITY;
     }
-
     velocity[id].dx += MULT(acceleration[id].ax, deltaTime);
     velocity[id].dy += MULT(acceleration[id].ay, deltaTime);
     acceleration[id].ax = 0;
@@ -110,22 +108,33 @@ void updateCollisionSystem(Entity *entity, PositionComponent *position,
           &position[idA], &velocity[idA], &hitbox[idA], &position[idB],
           &velocity[idB], &hitbox[idB], deltaTime);
       if (overlap.width > 0 && overlap.height > 0) {
-        // set collision flag if detects collisions
-        //  if idB is static, (add static collider flag)
-        //  then, idA should be only eintity with position corrected.
-        //  future idea: platform pushes plyer up if approached from below
+        if (velocity[idA].dx > 0) {
+          position[idA].x -= overlap.width;
+        } else if (velocity[idA].dx < 0) {
+          position[idA].x += overlap.width;
+        }
+        if (velocity[idA].dy > 0) {
+          position[idA].y -= overlap.height;
+        } else if (velocity[idA].dy < 0) {
+          position[idA].y += overlap.height;
+        }
       }
     }
   }
 }
 
+// set collision flag if detects collisions
+//  if idB is static, (add static collider flag)
+
+//  then, idA should be only eintity with position corrected.
+//  future idea: platform pushes plyer up if approached from below
 // resets collision flags
 // for (int id = 0; id < max_entities; id++) {
 //  entity[id].flag &= ~collision_detected;
 //}
 //
 
-void updateanimationsystem(Entity *entity, AnimationComponent *animation) {
+void updateAnimationSystem(Entity *entity, AnimationComponent *animation) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
     if (entity[id].flag & ANIMATION_COMPONENT) {
       animation->keyframe++;
@@ -140,7 +149,7 @@ void updateanimationsystem(Entity *entity, AnimationComponent *animation) {
   }
 }
 
-void updaterendersystem(ECS *ecs, Entity *entity, AnimationComponent *animation,
+void updateRenderSystem(ECS *ecs, Entity *entity, AnimationComponent *animation,
                         DrawingComponent *draw) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
     if (entity[id].flag & ANIMATION_COMPONENT) {

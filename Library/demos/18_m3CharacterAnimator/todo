@@ -1,2 +1,25 @@
 add input params for entity position when creating
 adjust hitboxes/offsets
+
+add celest approach velocity?
+
+int min(int a, int b) {
+  if (a < b) {
+    return a;
+  }
+  return b;
+};
+
+int max(int a, int b) {
+  if (a > b) {
+    return a;
+  }
+  return b;
+};
+
+int approach(int currentSpeed, int targetSpeed, int increase) {
+  if (currentSpeed < targetSpeed) {
+    return min(currentSpeed + increase, targetSpeed);
+  }
+  return max(currentSpeed - increase, targetSpeed);
+}

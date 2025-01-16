@@ -10,27 +10,6 @@ static ECS ecs;
 volatile fixed_s32 deltaTime;
 void initializeVBI();
 
-int min(int a, int b) {
-  if (a < b) {
-    return a;
-  }
-  return b;
-};
-
-int max(int a, int b) {
-  if (a > b) {
-    return a;
-  }
-  return b;
-};
-
-int approach(int currentSpeed, int targetSpeed, int increase) {
-  if (currentSpeed < targetSpeed) {
-    return min(currentSpeed + increase, targetSpeed);
-  }
-  return max(currentSpeed - increase, targetSpeed);
-}
-
 int main() {
   DSPC = MODE3 | BG2;
   initializeVBI();
