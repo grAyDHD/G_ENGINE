@@ -85,27 +85,29 @@ void createScreenBorders(ECS *ecs) {
 
   /*---Create Left Border---*/
   int boundaryId = createEntity(ecs, BOUNDARY_ENTITY);
-  ecs->components->position[boundaryId] = (PositionComponent){.x = 0, .y = 0};
+  ecs->components->position[boundaryId] =
+      (PositionComponent){.x = -INT_TO_FIXED(10), .y = 0};
   ecs->components->hitbox[boundaryId] =
-      (HitboxComponent){.width = 0, .height = SH};
+      (HitboxComponent){.width = 10, .height = SH};
 
   /*---Create Right Border---*/
   boundaryId = createEntity(ecs, BOUNDARY_ENTITY);
   ecs->components->position[boundaryId] =
       (PositionComponent){.x = INT_TO_FIXED(SW), .y = 0};
   ecs->components->hitbox[boundaryId] =
-      (HitboxComponent){.width = 0, .height = SH};
+      (HitboxComponent){.width = 10, .height = SH};
 
   /*---Create Bottom Border---*/
   boundaryId = createEntity(ecs, BOUNDARY_ENTITY);
   ecs->components->position[boundaryId] =
       (PositionComponent){.x = 0, .y = INT_TO_FIXED(SH)};
   ecs->components->hitbox[boundaryId] =
-      (HitboxComponent){.width = SW, .height = 0};
+      (HitboxComponent){.width = SW, .height = 10};
 
   /*---Create Top Border---*/
   boundaryId = createEntity(ecs, BOUNDARY_ENTITY);
-  ecs->components->position[boundaryId] = (PositionComponent){.x = 0, .y = 0};
+  ecs->components->position[boundaryId] =
+      (PositionComponent){.x = 0, .y = -INT_TO_FIXED(10)};
   ecs->components->hitbox[boundaryId] =
-      (HitboxComponent){.width = SW, .height = 0};
+      (HitboxComponent){.width = SW, .height = 10};
 }
