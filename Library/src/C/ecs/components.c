@@ -1,6 +1,7 @@
 #include "ecs/components.h"
 #include "../../include/ecs/ecs.h"
 #include "../../include/input/in.h"
+#include "ecs/entities.h"
 #include "ecs/systems.h"
 #include "math/math.h"
 
@@ -11,9 +12,12 @@ void playerInputHandler(ECS *ecs, int entityId, fixed_s32 deltaTime) {
       &ecs->components->acceleration[entityId];
 
   if (keyDown(U)) {
-    acceleration->ay -= INT_TO_FIXED(256);
-    animation->direction = UP;
-    animation->state = WALK;
+    if (!(ecs->entity[entityId].flag & PHYSICS_FLAG)) {
+
+      acceleration->ay -= INT_TO_FIXED(256);
+      animation->direction = UP;
+      animation->state = WALK;
+    }
   } else if (keyDown(D)) {
     acceleration->ay += INT_TO_FIXED(256);
     animation->direction = DOWN;

@@ -19,6 +19,7 @@ int main() {
   createPlayer(&ecs, RoboBitmap);
   createScreenBorders(&ecs);
 
+  ecs.entity[0].flag |= PHYSICS_FLAG;
   while (1) {
     VBLANK();
     clearSpriteFrames(&ecs, &components, BedroomBitmap);
@@ -47,5 +48,3 @@ void initializeVBI() {
   REG_IE |= 1;       // tell GBA to accept vblank interrupts
   REG_IME |= 1;      // tell GBA to enable intterupts
 }
-
-//  ecs.entity[0].flag |= PHYSICS_FLAG;
