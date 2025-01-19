@@ -1,3 +1,5 @@
+// createNPC(&ecs, RoboBitmap);
+//
 #include "../includes/characterAnimator.h"
 #include "core/interrupts.h"
 #include "ecs/components.h"
@@ -10,7 +12,6 @@ static ECS ecs;
 volatile fixed_s32 deltaTime;
 void initializeVBI();
 
-//  createNPC(&ecs, RoboBitmap);
 int main() {
   DSPC = MODE3 | BG2;
   initializeVBI();
@@ -19,7 +20,8 @@ int main() {
   createPlayer(&ecs, RoboBitmap);
   createScreenBorders(&ecs);
 
-  ecs.entity[0].flag |= PHYSICS_FLAG;
+  //  ecs.entity[0].flag |= PHYSICS_FLAG;
+
   while (1) {
     VBLANK();
     clearSpriteFrames(&ecs, &components, BedroomBitmap);
