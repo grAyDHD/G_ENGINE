@@ -58,15 +58,11 @@ void patrolBehavior(ECS *ecs, int entityId) {
       &ecs->components->acceleration[entityId];
   AnimationComponent *animation = &ecs->components->animation[entityId];
 
-  velocity->dx = 0;
-  velocity->dy = 0;
-
   // p2 = distance
   ai->param2 = 120;
 
   if (animation->direction == LEFT) {
-    velocity->dx -= INT_TO_FIXED(24);
-    // acceleration->ax -= INT_TO_FIXED(32);
+    acceleration->ax -= INT_TO_FIXED(128);
 
     ai->param1++;
     if (ai->param1 >= ai->param2) {
@@ -74,8 +70,7 @@ void patrolBehavior(ECS *ecs, int entityId) {
       animation->direction = RIGHT;
     }
   } else { // RIGHT
-    velocity->dx += INT_TO_FIXED(24);
-    // acceleration->ax += INT_TO_FIXED(32);
+    acceleration->ax += INT_TO_FIXED(128);
     ai->param1++;
     if (ai->param1 >= ai->param2) {
       ai->param1 = 0;

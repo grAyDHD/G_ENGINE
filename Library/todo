@@ -1,14 +1,13 @@
+FINISHED:
+basic static collisions
+
 High Priority:
-  Refactor C files post header reorganization
-  update ai and player input behavior functions for calling from system
+dynamic collisions
 
 
 Moderate priority:
 refactor projects prior to 15 that make sense in doing so for integrating the Entity Component System.
 refactor circles project to have functioins to use for music visualizer, draw rings on button hold, erase on release
-
-9 physics:
-refactor to ECS, integrate gravity from project into ECS
 
 10 timer:
 update ECS to utilize a timer component.
@@ -21,11 +20,8 @@ or dmg instrument?
 12
 fix functionality
 
-
 15:
-match SpriteFrame16 function in project 15 to match formatting of SpriteFrame32Bit from 18
-
-
+match SpriteFrame16 function in project 15 to match formatting of SpriteFrame32Bit from 18f
 
 18 animator:
 update hitboxes (determine specific size/offset within bounds of actual sprite frame) 

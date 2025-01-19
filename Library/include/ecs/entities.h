@@ -25,9 +25,11 @@ typedef struct {
 #define ON_GROUND (1 << 18)
 #define TRIGGERS_COLLISIONS (1 << 19)
 #define DETECTS_COLLISIONS (1 << 20)
-#define COLLISION_DETECTED (1 << 21)
+// #define COLLISION_DETECTED (1 << 21)
 #define PHYSICS_FLAG (1 << 22)
 #define STATIC_COLLIDER (1 << 23)
+#define HORIZONTAL_COLLISION (1 << 30)
+#define VERTICAL_COLLISION (1 << 31)
 
 // #define PLAYER_FLAG (1 << 19)
 //  define PLAYER_ENTITY ENEMY_ENTITY INTERACTABLE_ENTITY

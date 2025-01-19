@@ -49,6 +49,8 @@ void updateMovementSystem(Entity *entity, PositionComponent *position,
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
+static inline fixed_s32 ABS(fixed_s32 x) { return (x < 0) ? -x : x; }
+
 static inline HitboxComponent getOverlap(PositionComponent *posA,
                                          HitboxComponent *hitA,
                                          PositionComponent *posB,
@@ -75,6 +77,8 @@ void updateCollisionSystem(Entity *entity, PositionComponent *position,
     if (!(entity[idA].flag & DETECTS_COLLISIONS))
       continue;
 
+    int hasCollision = 0; // track if collision this frame
+
     for (int idB = idA + 1; idB < MAX_ENTITIES; idB++) {
       if (!(entity[idB].flag & TRIGGERS_COLLISIONS))
         continue;
@@ -84,6 +88,7 @@ void updateCollisionSystem(Entity *entity, PositionComponent *position,
       if (overlap.width < 0 || overlap.height < 0) {
         continue;
       } else {
+        hasCollision = 1;
 
         if (entity[idB].flag & STATIC_COLLIDER) {
           if (overlap.width < overlap.height) {
@@ -102,26 +107,63 @@ void updateCollisionSystem(Entity *entity, PositionComponent *position,
             }
             velocity[idA].dy = 0;
           }
-        } else {
-          // dynamic collision handling, 2 moving entities
+        } else { // dynamic collision handling
+
+          int resolveHorizontally;
+
+          if (entity[idA].flag & (HORIZONTAL_COLLISION | VERTICAL_COLLISION)) {
+            resolveHorizontally = (entity[idA].flag & HORIZONTAL_COLLISION);
+          } else {
+            resolveHorizontally = (overlap.width < overlap.height);
+            entity[idA].flag |=
+                resolveHorizontally ? HORIZONTAL_COLLISION : VERTICAL_COLLISION;
+          }
+          if (resolveHorizontally) {
+            int speedA = FIXED_TO_INT(ABS(velocity[idA].dx));
+            int speedB = FIXED_TO_INT(ABS(velocity[idB].dx));
+            int totalSpeed = speedA + speedB;
+            if (totalSpeed > 0) {
+              int moveA = (overlap.width * speedA) / totalSpeed;
+              int moveB = overlap.width - moveA;
+              if (position[idA].x < position[idB].x) {
+                position[idA].x -= INT_TO_FIXED(moveA);
+                position[idB].x += INT_TO_FIXED(moveB);
+              } else {
+                position[idA].x += INT_TO_FIXED(moveA);
+                position[idB].x -= INT_TO_FIXED(moveB);
+              }
+            }
+          } else {
+            int speedA = FIXED_TO_INT(ABS(velocity[idA].dy));
+            int speedB = FIXED_TO_INT(ABS(velocity[idB].dy));
+            int totalSpeed = speedA + speedB;
+            if (totalSpeed > 0) {
+              int moveA = (overlap.height * speedA) / totalSpeed;
+              int moveB = overlap.height - moveA;
+              if (position[idA].y < position[idB].y) {
+                position[idA].y -= INT_TO_FIXED(moveA);
+                position[idB].y += INT_TO_FIXED(moveB);
+              } else {
+                position[idA].y += INT_TO_FIXED(moveA);
+                position[idB].y -= INT_TO_FIXED(moveB);
+              }
+            }
+          }
         }
       }
+    }
+    if (!hasCollision) {
+      entity[idA].flag &= ~(HORIZONTAL_COLLISION | VERTICAL_COLLISION);
     }
   }
 }
 
-/*
- */
-
-// set collision flag if detects collisions
-//  if idB is static, (add static collider flag)
-
-//  then, idA should be only eintity with position corrected.
-//  future idea: platform pushes plyer up if approached from below
 // resets collision flags
 // for (int id = 0; id < max_entities; id++) {
 //  entity[id].flag &= ~collision_detected;
 //}
+
+// entity[id].flag &= ~(horizontal_collision | vertical_collision);
 //
 
 void updateAnimationSystem(Entity *entity, AnimationComponent *animation) {
@@ -151,7 +193,3 @@ void updateRenderSystem(ECS *ecs, Entity *entity, AnimationComponent *animation,
     }
   }
 };
-
-// #define horizontal_collision (1 << 30)
-// #define vertical_collision (1 << 31)
-// entity[id].flag &= ~(horizontal_collision | vertical_collision);

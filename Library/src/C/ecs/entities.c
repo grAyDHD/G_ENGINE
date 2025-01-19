@@ -49,7 +49,7 @@ int createPlayer(ECS *ecs, const void *spriteSheet) {
       (SpriteComponent){.spriteSheet = spriteSheet};
 
   ecs->components->input[playerId].handleInput = playerInputHandler;
-  ecs->inputEntityId[ecs->inputEntityCount++] = playerId;
+  //  ecs->inputEntityId[ecs->inputEntityCount++] = playerId;
   //  instead, iterate through id array, set if > -1
   //  else, reintroduce inputEntityCount
   return playerId;
@@ -60,7 +60,7 @@ int createNPC(ECS *ecs, const void *spriteSheet) {
 
   ecs->components->position[ecs->nextEntityId] =
       // this should be provided as an argument
-      (PositionComponent){.x = 120, .y = 100};
+      (PositionComponent){.x = INT_TO_FIXED(120), .y = INT_TO_FIXED(100)};
 
   ecs->components->hitbox[npcId] = (HitboxComponent){.width = 32, .height = 32};
   ecs->components->animation[npcId] =

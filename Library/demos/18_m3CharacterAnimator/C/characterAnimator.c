@@ -1,6 +1,7 @@
 // createNPC(&ecs, RoboBitmap);
 //
 #include "../includes/characterAnimator.h"
+#include "Robo.h"
 #include "core/interrupts.h"
 #include "ecs/components.h"
 #include "ecs/ecs.h"
@@ -18,6 +19,7 @@ int main() {
   m3_Background(BedroomBitmap);
   initEntitySystem(&ecs, &components);
   createPlayer(&ecs, RoboBitmap);
+  createNPC(&ecs, RoboBitmap);
   createScreenBorders(&ecs);
 
   //  ecs.entity[0].flag |= PHYSICS_FLAG;
