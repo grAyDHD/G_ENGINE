@@ -84,12 +84,34 @@ void updateCollisionSystem(Entity *entity, PositionComponent *position,
       if (overlap.width < 0 || overlap.height < 0) {
         continue;
       } else {
-        velocity[idA].dx = 0;
-        velocity[idA].dy = 0;
+
+        if (entity[idB].flag & STATIC_COLLIDER) {
+          if (overlap.width < overlap.height) {
+            if (velocity[idA].dx > 0) {
+              position[idA].x -= INT_TO_FIXED(overlap.width);
+            } else {
+              position[idA].x += INT_TO_FIXED(overlap.width);
+            }
+            velocity[idA].dx = 0;
+          } else {
+
+            if (velocity[idA].dy > 0) {
+              position[idA].y -= INT_TO_FIXED(overlap.height);
+            } else {
+              position[idA].y += INT_TO_FIXED(overlap.height);
+            }
+            velocity[idA].dy = 0;
+          }
+        } else {
+          // dynamic collision handling, 2 moving entities
+        }
       }
     }
   }
 }
+
+/*
+ */
 
 // set collision flag if detects collisions
 //  if idB is static, (add static collider flag)

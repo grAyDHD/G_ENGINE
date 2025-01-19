@@ -43,6 +43,7 @@ typedef struct {
    TRIGGERS_COLLISIONS)
 
 #define BOUNDARY_ENTITY                                                        \
-  (POSITION_COMPONENT | HITBOX_COMPONENT | TRIGGERS_COLLISIONS)
+  (POSITION_COMPONENT | HITBOX_COMPONENT | TRIGGERS_COLLISIONS |               \
+   STATIC_COLLIDER)
 
 #endif // !ENTITIES_H
