@@ -4,6 +4,12 @@
 #include "graphics/video.h"
 #include "math/math.h"
 
+/*
+if (flag & COMPONENT_INPUT) {
+  ecs->inputEntityCount++;
+}
+*/
+
 int createEntity(ECS *ecs, int flag) {
   if (ecs->nextEntityId >= MAX_ENTITIES) {
     return -1;
@@ -18,12 +24,6 @@ int createEntity(ECS *ecs, int flag) {
     ecs->components->velocity[ecs->nextEntityId] =
         (VelocityComponent){.dx = 0, .dy = 0};
   }
-
-  /*
-  if (flag & COMPONENT_INPUT) {
-    ecs->inputEntityCount++;
-  }
-*/
 
   return ecs->nextEntityId++;
 }
@@ -60,7 +60,7 @@ int createNPC(ECS *ecs, const void *spriteSheet) {
 
   ecs->components->position[ecs->nextEntityId] =
       // this should be provided as an argument
-      (PositionComponent){.x = 120, .y = 120};
+      (PositionComponent){.x = 120, .y = 100};
 
   ecs->components->hitbox[npcId] = (HitboxComponent){.width = 32, .height = 32};
   ecs->components->animation[npcId] =
@@ -81,12 +81,11 @@ int createNPC(ECS *ecs, const void *spriteSheet) {
 
 void createScreenBorders(ECS *ecs) {
   // BOUNDARY_ENTITY = bitmask for:
-  //  POSITION_COMPONENT | VELOCITY_COMPONENT | HITBOX_COMPONENT |
-  //  TRIGGERS_COLLISIONS
+  //  POSITION_COMPONENT| HITBOX_COMPONENT | TRIGGERS_COLLISIONS
+
   /*---Create Left Border---*/
   int boundaryId = createEntity(ecs, BOUNDARY_ENTITY);
   ecs->components->position[boundaryId] = (PositionComponent){.x = 0, .y = 0};
-  ecs->components->velocity[boundaryId] = (VelocityComponent){.dx = 0, .dy = 0};
   ecs->components->hitbox[boundaryId] =
       (HitboxComponent){.width = 0, .height = SH};
 
@@ -94,7 +93,6 @@ void createScreenBorders(ECS *ecs) {
   boundaryId = createEntity(ecs, BOUNDARY_ENTITY);
   ecs->components->position[boundaryId] =
       (PositionComponent){.x = INT_TO_FIXED(SW), .y = 0};
-  ecs->components->velocity[boundaryId] = (VelocityComponent){.dx = 0, .dy = 0};
   ecs->components->hitbox[boundaryId] =
       (HitboxComponent){.width = 0, .height = SH};
 
@@ -102,14 +100,12 @@ void createScreenBorders(ECS *ecs) {
   boundaryId = createEntity(ecs, BOUNDARY_ENTITY);
   ecs->components->position[boundaryId] =
       (PositionComponent){.x = 0, .y = INT_TO_FIXED(SH)};
-  ecs->components->velocity[boundaryId] = (VelocityComponent){.dx = 0, .dy = 0};
   ecs->components->hitbox[boundaryId] =
       (HitboxComponent){.width = SW, .height = 0};
 
   /*---Create Top Border---*/
   boundaryId = createEntity(ecs, BOUNDARY_ENTITY);
   ecs->components->position[boundaryId] = (PositionComponent){.x = 0, .y = 0};
-  ecs->components->velocity[boundaryId] = (VelocityComponent){.dx = 0, .dy = 0};
   ecs->components->hitbox[boundaryId] =
       (HitboxComponent){.width = SW, .height = 0};
 }

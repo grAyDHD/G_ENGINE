@@ -46,52 +46,27 @@ void updateMovementSystem(Entity *entity, PositionComponent *position,
   }
 }
 
-// change to overlap sturct? same params, width and height
-static inline HitboxComponent
-checkForOverlap(PositionComponent *posA,
-                VelocityComponent *velA, // no longer need for function
-                HitboxComponent *hitA, PositionComponent *posB,
-                VelocityComponent *velB, // no longer need for function
-                HitboxComponent *hitB, fixed_s32 deltaTime) {
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
 
+static inline HitboxComponent getOverlap(PositionComponent *posA,
+                                         HitboxComponent *hitA,
+                                         PositionComponent *posB,
+                                         HitboxComponent *hitB) {
   int Ax1 = FIXED_TO_INT(posA->x);
-  int Ax2 = Ax1 + hitA->width;
   int Ay1 = FIXED_TO_INT(posA->y);
-  int Ay2 = Ay1 + hitA->height;
   int Bx1 = FIXED_TO_INT(posB->x);
-  int Bx2 = Bx1 + hitB->width;
   int By1 = FIXED_TO_INT(posB->y);
+
+  int Ax2 = Ax1 + hitA->width;
+  int Ay2 = Ay1 + hitA->height;
+  int Bx2 = Bx1 + hitB->width;
   int By2 = By1 + hitB->height;
 
-  HitboxComponent overlap = {0, 0};
-
-  // only need to find 1 single overlapping corner to determine x and y depth
-  if (Ax1 > Bx1 && Ax1 < Bx2 && Ay1 > By1 &&
-      Ay2 < By2) { // check if top left corner of a is inside b
-    overlap.width = Bx2 - Ax1;
-    overlap.height = By2 - By1;
-    return overlap;
-  } else if (Ax2 > Bx1 && Ax2 < Bx2 && Ay1 > By1 &&
-             Ay1 < By2) { // check if top right corner overlap
-    overlap.width = Ax2 - Bx1;
-    overlap.height = By2 - Ay1;
-    return overlap;
-  } else if (Ax1 > Bx1 && Ax1 < Bx2 && Ay2 > By1 &&
-             Ay2 < By2) { // check bottom left of a for overlap
-    overlap.width = Bx2 - Ax1;
-    overlap.height = Ay2 - By1;
-    return overlap;
-  } else if (Ax2 > Bx1 && Ax2 < Bx2 && Ay2 > By1 &&
-             Ay2 < By2) { // check bottom right of A for overlap
-    overlap.width = Ax2 - Bx1;
-    overlap.height = Ay2 - By1;
-    return overlap;
-  } else {
-    return overlap;
-    // if this returns height and width are both 0 meaning no
-    // collision happened
-  }
-}
+  HitboxComponent overlap = {.width = MIN(Ax2, Bx2) - MAX(Ax1, Bx1),
+                             .height = MIN(Ay2, By2) - MAX(Ay1, By1)};
+  return overlap;
+};
 
 void updateCollisionSystem(Entity *entity, PositionComponent *position,
                            VelocityComponent *velocity, HitboxComponent *hitbox,
@@ -104,20 +79,13 @@ void updateCollisionSystem(Entity *entity, PositionComponent *position,
       if (!(entity[idB].flag & TRIGGERS_COLLISIONS))
         continue;
 
-      HitboxComponent overlap = checkForOverlap(
-          &position[idA], &velocity[idA], &hitbox[idA], &position[idB],
-          &velocity[idB], &hitbox[idB], deltaTime);
-      if (overlap.width > 0 && overlap.height > 0) {
-        if (velocity[idA].dx > 0) {
-          position[idA].x -= overlap.width;
-        } else if (velocity[idA].dx < 0) {
-          position[idA].x += overlap.width;
-        }
-        if (velocity[idA].dy > 0) {
-          position[idA].y -= overlap.height;
-        } else if (velocity[idA].dy < 0) {
-          position[idA].y += overlap.height;
-        }
+      HitboxComponent overlap = getOverlap(&position[idA], &hitbox[idA],
+                                           &position[idB], &hitbox[idB]);
+      if (overlap.width < 0 || overlap.height < 0) {
+        continue;
+      } else {
+        velocity[idA].dx = 0;
+        velocity[idA].dy = 0;
       }
     }
   }
@@ -162,6 +130,6 @@ void updateRenderSystem(ECS *ecs, Entity *entity, AnimationComponent *animation,
   }
 };
 
-#define horizontal_collision (1 << 30)
-#define vertical_collision (1 << 31)
+// #define horizontal_collision (1 << 30)
+// #define vertical_collision (1 << 31)
 // entity[id].flag &= ~(horizontal_collision | vertical_collision);

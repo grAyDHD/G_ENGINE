@@ -10,13 +10,13 @@ static ECS ecs;
 volatile fixed_s32 deltaTime;
 void initializeVBI();
 
+//  createNPC(&ecs, RoboBitmap);
 int main() {
   DSPC = MODE3 | BG2;
   initializeVBI();
   m3_Background(BedroomBitmap);
   initEntitySystem(&ecs, &components);
   createPlayer(&ecs, RoboBitmap);
-  createNPC(&ecs, RoboBitmap);
   createScreenBorders(&ecs);
 
   while (1) {
