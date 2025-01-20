@@ -51,6 +51,23 @@ void updateMovementSystem(Entity *entity, PositionComponent *position,
 
 static inline fixed_s32 ABS(fixed_s32 x) { return (x < 0) ? -x : x; }
 
+static inline int getCollisionPriority(Entity *entity) {
+  if (entity->flag & STATIC_COLLIDER)
+    return 3; // highest priority
+  if (entity->flag & AI_COMPONENT)
+    return 2; // medium priority
+  if (entity->flag & INPUT_COMPONENT)
+    return 1; // low priority
+  return 0;   // default/lowest priority
+}
+
+// example priority, can create new flags to balance priorities:
+//  if (entity->flag & AI_COMPONENT) {
+//  if (entity->flag & PUSHABLE_NPC)
+//   return 1;  // if pushable, return same/lower priority as player
+// return 2;
+//  }
+
 static inline HitboxComponent getOverlap(PositionComponent *posA,
                                          HitboxComponent *hitA,
                                          PositionComponent *posB,
@@ -97,6 +114,8 @@ resolveDynamicCollisions(Entity *entity, VelocityComponent *velA,
                          PositionComponent *posB, HitboxComponent overlap) {
 
   int resolveHorizontally;
+  // compare entity priorities
+  //
 
   if (entity->flag & (HORIZONTAL_COLLISION | VERTICAL_COLLISION)) {
     resolveHorizontally = (entity->flag & HORIZONTAL_COLLISION);
