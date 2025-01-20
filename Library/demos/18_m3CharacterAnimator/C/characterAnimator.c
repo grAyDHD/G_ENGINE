@@ -13,6 +13,8 @@ static ECS ecs;
 volatile fixed_s32 deltaTime;
 void initializeVBI();
 
+//  ecs.entity[0].flag |= PHYSICS_FLAG;
+
 int main() {
   DSPC = MODE3 | BG2;
   initializeVBI();
@@ -21,8 +23,6 @@ int main() {
   createPlayer(&ecs, RoboBitmap);
   createNPC(&ecs, RoboBitmap);
   createScreenBorders(&ecs);
-
-  //  ecs.entity[0].flag |= PHYSICS_FLAG;
 
   while (1) {
     VBLANK();

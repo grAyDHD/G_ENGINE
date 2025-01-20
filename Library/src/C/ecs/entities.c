@@ -58,9 +58,9 @@ int createPlayer(ECS *ecs, const void *spriteSheet) {
 int createNPC(ECS *ecs, const void *spriteSheet) {
   int npcId = createEntity(ecs, NPC_ENTITY);
 
-  ecs->components->position[ecs->nextEntityId] =
+  ecs->components->position[npcId] =
       // this should be provided as an argument
-      (PositionComponent){.x = INT_TO_FIXED(120), .y = INT_TO_FIXED(100)};
+      (PositionComponent){.x = INT_TO_FIXED(20), .y = INT_TO_FIXED(20)};
 
   ecs->components->hitbox[npcId] = (HitboxComponent){.width = 32, .height = 32};
   ecs->components->animation[npcId] =

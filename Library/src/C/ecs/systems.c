@@ -169,12 +169,12 @@ void updateCollisionSystem(Entity *entity, PositionComponent *position,
 void updateAnimationSystem(Entity *entity, AnimationComponent *animation) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
     if (entity[id].flag & ANIMATION_COMPONENT) {
-      animation->keyframe++;
-      if (animation->keyframe >= animation->keyframeInterval) {
-        animation->keyframe = 0;
-        animation->frameNumber++;
-        if (animation->frameNumber == 4) {
-          animation->frameNumber = 0;
+      animation[id].keyframe++;
+      if (animation[id].keyframe >= animation->keyframeInterval) {
+        animation[id].keyframe = 0;
+        animation[id].frameNumber++;
+        if (animation[id].frameNumber == 4) {
+          animation[id].frameNumber = 0;
         }
       }
     }
