@@ -70,6 +70,74 @@ static inline HitboxComponent getOverlap(PositionComponent *posA,
   return overlap;
 };
 
+// Collision resolution helpers
+static inline void resolveStaticCollisions(PositionComponent *position,
+                                           VelocityComponent *velocity,
+                                           HitboxComponent overlap) {
+  if (overlap.width < overlap.height) {
+    if (velocity->dx > 0) {
+      position->x -= INT_TO_FIXED(overlap.width);
+    } else {
+      position->x += INT_TO_FIXED(overlap.width);
+    }
+    velocity->dx = 0;
+  } else {
+    if (velocity->dy > 0) {
+      position->y -= INT_TO_FIXED(overlap.height);
+    } else {
+      position->y += INT_TO_FIXED(overlap.height);
+    }
+    velocity->dy = 0;
+  }
+}
+
+static inline void
+resolveDynamicCollisions(Entity *entity, VelocityComponent *velA,
+                         PositionComponent *posA, VelocityComponent *velB,
+                         PositionComponent *posB, HitboxComponent overlap) {
+
+  int resolveHorizontally;
+
+  if (entity->flag & (HORIZONTAL_COLLISION | VERTICAL_COLLISION)) {
+    resolveHorizontally = (entity->flag & HORIZONTAL_COLLISION);
+  } else {
+    resolveHorizontally = (overlap.width < overlap.height);
+    entity->flag |=
+        resolveHorizontally ? HORIZONTAL_COLLISION : VERTICAL_COLLISION;
+  }
+  if (resolveHorizontally) {
+    int speedA = FIXED_TO_INT(ABS(velA->dx));
+    int speedB = FIXED_TO_INT(ABS(velB->dx));
+    int totalSpeed = speedA + speedB;
+    if (totalSpeed > 0) {
+      int moveA = (overlap.width * speedA) / totalSpeed;
+      int moveB = overlap.width - moveA;
+      if (posA->x < posB->x) {
+        posA->x -= INT_TO_FIXED(moveA);
+        posB->x += INT_TO_FIXED(moveB);
+      } else {
+        posA->x += INT_TO_FIXED(moveA);
+        posB->x -= INT_TO_FIXED(moveB);
+      }
+    }
+  } else {
+    int speedA = FIXED_TO_INT(ABS(velA->dy));
+    int speedB = FIXED_TO_INT(ABS(velB->dy));
+    int totalSpeed = speedA + speedB;
+    if (totalSpeed > 0) {
+      int moveA = (overlap.height * speedA) / totalSpeed;
+      int moveB = overlap.height - moveA;
+      if (posA->y < posB->y) {
+        posA->y -= INT_TO_FIXED(moveA);
+        posB->y += INT_TO_FIXED(moveB);
+      } else {
+        posA->y += INT_TO_FIXED(moveA);
+        posB->y -= INT_TO_FIXED(moveB);
+      }
+    }
+  }
+}
+
 void updateCollisionSystem(Entity *entity, PositionComponent *position,
                            VelocityComponent *velocity, HitboxComponent *hitbox,
                            fixed_s32 deltaTime) {
@@ -78,80 +146,27 @@ void updateCollisionSystem(Entity *entity, PositionComponent *position,
       continue;
 
     int hasCollision = 0; // track if collision this frame
-
     for (int idB = idA + 1; idB < MAX_ENTITIES; idB++) {
       if (!(entity[idB].flag & TRIGGERS_COLLISIONS))
         continue;
 
       HitboxComponent overlap = getOverlap(&position[idA], &hitbox[idA],
                                            &position[idB], &hitbox[idB]);
+
       if (overlap.width < 0 || overlap.height < 0) {
         continue;
-      } else {
-        hasCollision = 1;
+      }
 
-        if (entity[idB].flag & STATIC_COLLIDER) {
-          if (overlap.width < overlap.height) {
-            if (velocity[idA].dx > 0) {
-              position[idA].x -= INT_TO_FIXED(overlap.width);
-            } else {
-              position[idA].x += INT_TO_FIXED(overlap.width);
-            }
-            velocity[idA].dx = 0;
-          } else {
+      hasCollision = 1;
 
-            if (velocity[idA].dy > 0) {
-              position[idA].y -= INT_TO_FIXED(overlap.height);
-            } else {
-              position[idA].y += INT_TO_FIXED(overlap.height);
-            }
-            velocity[idA].dy = 0;
-          }
-        } else { // dynamic collision handling
-
-          int resolveHorizontally;
-
-          if (entity[idA].flag & (HORIZONTAL_COLLISION | VERTICAL_COLLISION)) {
-            resolveHorizontally = (entity[idA].flag & HORIZONTAL_COLLISION);
-          } else {
-            resolveHorizontally = (overlap.width < overlap.height);
-            entity[idA].flag |=
-                resolveHorizontally ? HORIZONTAL_COLLISION : VERTICAL_COLLISION;
-          }
-          if (resolveHorizontally) {
-            int speedA = FIXED_TO_INT(ABS(velocity[idA].dx));
-            int speedB = FIXED_TO_INT(ABS(velocity[idB].dx));
-            int totalSpeed = speedA + speedB;
-            if (totalSpeed > 0) {
-              int moveA = (overlap.width * speedA) / totalSpeed;
-              int moveB = overlap.width - moveA;
-              if (position[idA].x < position[idB].x) {
-                position[idA].x -= INT_TO_FIXED(moveA);
-                position[idB].x += INT_TO_FIXED(moveB);
-              } else {
-                position[idA].x += INT_TO_FIXED(moveA);
-                position[idB].x -= INT_TO_FIXED(moveB);
-              }
-            }
-          } else {
-            int speedA = FIXED_TO_INT(ABS(velocity[idA].dy));
-            int speedB = FIXED_TO_INT(ABS(velocity[idB].dy));
-            int totalSpeed = speedA + speedB;
-            if (totalSpeed > 0) {
-              int moveA = (overlap.height * speedA) / totalSpeed;
-              int moveB = overlap.height - moveA;
-              if (position[idA].y < position[idB].y) {
-                position[idA].y -= INT_TO_FIXED(moveA);
-                position[idB].y += INT_TO_FIXED(moveB);
-              } else {
-                position[idA].y += INT_TO_FIXED(moveA);
-                position[idB].y -= INT_TO_FIXED(moveB);
-              }
-            }
-          }
-        }
+      if (entity[idB].flag & STATIC_COLLIDER) {
+        resolveStaticCollisions(&position[idA], &velocity[idA], overlap);
+      } else { // dynamic collision handling
+        resolveDynamicCollisions(&entity[idA], &velocity[idA], &position[idA],
+                                 &velocity[idB], &position[idB], overlap);
       }
     }
+
     if (!hasCollision) {
       entity[idA].flag &= ~(HORIZONTAL_COLLISION | VERTICAL_COLLISION);
     }
