@@ -2,7 +2,13 @@ FINISHED:
 basic static collisions
 
 High Priority:
+
 dynamic collisions
+adjust hitboxes, add offset (might be annoying)
+
+debugging program?
+debug features like, hitbox outlines, overlap outlines, velocity vector representation (line?)
+printf implementation
 
 
 Moderate priority:
