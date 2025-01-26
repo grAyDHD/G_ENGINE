@@ -1,73 +1,84 @@
+#include "core/interrupts.h"
+#include "core/timer.h"
 #include "ecs/components.h"
+#include "ecs/ecs.h"
+#include "ecs/entities.h"
+#include "ecs/systems.h"
 #include "graphics/draw.h"
 #include "graphics/video.h"
 #include "input/in.h"
+#include "math/math.h"
 #include "physics/phys.h"
 
-void checkInput(struct Object *ball) {
+static ComponentStorage components;
+static ECS ecs;
 
-  if (keyDown(A)) {
-    ball->vy = -SHOOT_VEL * gravityDirection;
-  }
-
-  if (keyDown(B)) {
-    gravityDirection = -1;
-  } else {
-    gravityDirection = 1;
-  }
-
-  if (keyDown(SL)) {
-    ball->vx = 0;
-    ball->vy = 0;
-    ball->ax = 0;
-    ball->ay = 0;
-  } else {
-
-    applyGravity(ball);
-    if (keyDown(L)) {
-      ball->vx = -MOVE_SPEED;
-    } else if (keyDown(R)) {
-      ball->vx = MOVE_SPEED;
-    } else {
-      ball->vx = 0;
-    }
-
-    if (keyDown(LT)) {
-      ball->vx = -SHOOT_VEL;
-      ball->vy = -SHOOT_VEL;
-    } else if (keyDown(RT)) {
-      ball->vx = SHOOT_VEL;
-      ball->vy = -SHOOT_VEL;
-    }
-  }
-}
+volatile fixed_s32 deltaTime = 0;
 
 int BALL_SIZE = 20;
 
+// void (*drawingRoutine)(ECS *ecs, int entityId);
+
+void drawBall(ECS *ecs, int entityId) {
+  // migrate drawing of ball into this function
+}
+
+int initBall(ECS *ecs, ComponentStorage *components) {
+  int ball = createEntity(
+      ecs, POSITION_COMPONENT | VELOCITY_COMPONENT | ACCELERATION_COMPONENT |
+               INPUT_COMPONENT | HITBOX_COMPONENT | DRAWING_COMPONENT |
+               ENABLE_INPUT | ENABLE_PHYSICS | PHYSICS_FLAG |
+               DETECTS_COLLISIONS | TRIGGERS_COLLISIONS);
+
+  components->position[ball] =
+      (PositionComponent){.x = INT_TO_FIXED(120), .y = INT_TO_FIXED(80)};
+  components->velocity[ball] = (VelocityComponent){.dx = 0, .dy = 0};
+  components->acceleration[ball] = (AccelerationComponent){.ax = 0, .ay = 0};
+
+  ecs->components->input[ball].handleInput = playerInputHandler;
+  ecs->components->draw[ball].drawingRoutine = drawBall;
+
+  // add input handling
+  // add drawing
+
+  return ball;
+}
+
 int main() {
   DSPC = MODE3 | BG2;
+  initializeVBI();
+  initEntitySystem(&ecs, &components);
 
-  struct Object ball = {120, 80, 0, 0, 0, 0};
-  PositionComponent previousCorner = {ball.x,
-                                      ball.y}; // Track the previous position
-  PositionComponent corner = {ball.x, ball.y};
+  int ball = initBall(&ecs, &components);
+  // struct Object ball = {120, 80, 0, 0, 0, 0};
+
+  Coordinate previousCorner = {
+      .x = FIXED_TO_INT(components.position[ball].x),
+      .y = FIXED_TO_INT(components.position[ball].y)}; // Track the previous
+  Coordinate corner = {
+      .x = FIXED_TO_INT(components.position[ball].x),
+      .y = FIXED_TO_INT(components.position[ball].y)}; // Track the previous
 
   while (1) {
-    updateKeys();
     VBLANK();
-    float a = 4.5;
-    drawRect((PositionComponent){.x = a, .y = a}, a, a, a * a);
-    // erase current position
+
+    // clear previous position
     drawRect(previousCorner, BALL_SIZE, BALL_SIZE, 0x0000);
-    checkInput(&ball);
-    // update position based on input/physics
-    updateMovement(&ball);
-    handleCollisions(&ball, BALL_SIZE);
-    corner.x = ball.x;
-    corner.y = ball.y;
-    // draw in new position
+
+    updateInputSystem(&ecs, ecs.entity, components.input, deltaTime);
+    updatePhysicsSystem(ecs.entity, components.velocity,
+                        components.acceleration, deltaTime);
+    updateMovementSystem(ecs.entity, components.position, components.velocity,
+                         deltaTime);
+    //   handleCollisions(&ball, BALL_SIZE);
+    corner.x = FIXED_TO_INT(components.position[ball].x);
+    corner.y = FIXED_TO_INT(components.position[ball].y);
+
     drawRect(corner, BALL_SIZE, BALL_SIZE, 0x03E0);
     previousCorner = corner;
+    deltaTime = 0;
+
+    //    simpleWait(25);
   }
   return 0;
 }

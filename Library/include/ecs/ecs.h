@@ -18,7 +18,7 @@ int createPlayer(ECS *ecs, const void *spriteSheet);
 int createNPC(ECS *ecs, const void *spriteSheet);
 void createScreenBorders(ECS *ecs);
 
-void playerInputHandler(ECS *ecs, int entityId, fixed_s32 deltaTime);
+void playerInputHandler(ECS *ecs, int entityId);
 void patrolBehavior(ECS *ecs, int entityId);
 
 // void patrolBehavior(AnimationComponent *animation, VelocityComponent

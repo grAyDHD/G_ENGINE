@@ -11,7 +11,7 @@ static int gravityDirection = 1;
 void updateInputSystem(ECS *ecs, Entity *entity, InputComponent *input,
                        fixed_s32 deltaTime) {
   updateKeys();
-  input[0].handleInput(ecs, 0, deltaTime);
+  input[0].handleInput(ecs, 0);
 }
 
 void updateBehaviorSystem(ECS *ecs, Entity *entity, AIComponent *ai) {

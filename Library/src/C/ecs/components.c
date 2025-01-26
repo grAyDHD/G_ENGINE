@@ -5,7 +5,7 @@
 #include "ecs/systems.h"
 #include "math/math.h"
 
-void playerInputHandler(ECS *ecs, int entityId, fixed_s32 deltaTime) {
+void playerInputHandler(ECS *ecs, int entityId) {
   AnimationComponent *animation = &ecs->components->animation[entityId];
   VelocityComponent *velocity = &ecs->components->velocity[entityId];
   AccelerationComponent *acceleration =

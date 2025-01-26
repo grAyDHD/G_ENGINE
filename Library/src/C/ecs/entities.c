@@ -49,6 +49,7 @@ int createPlayer(ECS *ecs, const void *spriteSheet) {
       (SpriteComponent){.spriteSheet = spriteSheet};
 
   ecs->components->input[playerId].handleInput = playerInputHandler;
+
   //  ecs->inputEntityId[ecs->inputEntityCount++] = playerId;
   //  instead, iterate through id array, set if > -1
   //  else, reintroduce inputEntityCount

@@ -46,8 +46,7 @@ typedef struct {
 } SpriteComponent;
 
 typedef struct {
-  void (*handleInput)(ECS *ecs, int entityId,
-                      fixed_s32 deltaTime); // Custom behavior
+  void (*handleInput)(ECS *ecs, int entityId);
 } InputComponent;
 
 typedef struct {

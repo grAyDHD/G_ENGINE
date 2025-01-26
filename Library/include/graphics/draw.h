@@ -8,12 +8,10 @@
 #define dblClr(color) ((color) | (color << 16))
 
 void plotPixel(int x, int y, unsigned short color);
-void drawLine(PositionComponent start, PositionComponent end,
-              unsigned short color);
+void drawLine(Coordinate start, Coordinate end, unsigned short color);
 void drawCircle(int x, int y, int radius, unsigned short color);
 void fillCircle(int x, int y, int radius, unsigned short color);
-void drawRect(PositionComponent start, int width, int height,
-              unsigned short color);
+void drawRect(Coordinate start, int width, int height, unsigned short color);
 
 extern void fillScreen(u32 clr);
 extern void m3_Background(const void *src);
