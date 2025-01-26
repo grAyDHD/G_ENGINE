@@ -14,9 +14,8 @@
 
 // vblank interrupt handler, for counting frames to calculate delta time
 extern volatile s32 deltaTime;
-void vblankISR() {
-  deltaTime += 1092; // 60 fps fixed constant value for seconds/frame
-  REG_IF = 1;
-}
 
+void vblankISR();
+
+void initializeVBI();
 #endif

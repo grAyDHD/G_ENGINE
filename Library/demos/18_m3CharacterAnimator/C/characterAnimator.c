@@ -11,7 +11,6 @@ static ComponentStorage components;
 static ECS ecs;
 
 volatile fixed_s32 deltaTime;
-void initializeVBI();
 
 //  ecs.entity[0].flag |= PHYSICS_FLAG;
 
@@ -43,12 +42,4 @@ int main() {
   }
 
   return 0;
-}
-
-void initializeVBI() {
-
-  ISR = vblankISR;   // tell the GBA where my isr is
-  DISPSTAT = 1 << 3; // tell display to fire vblank interrupts
-  REG_IE |= 1;       // tell GBA to accept vblank interrupts
-  REG_IME |= 1;      // tell GBA to enable intterupts
 }

@@ -18,8 +18,8 @@ CC := arm-none-eabi-gcc
 AS := arm-none-eabi-as
 AR := arm-none-eabi-ar
 
-# Flags
-CFLAGS := -mthumb -mthumb-interwork -O2 -Wall -fno-strict-aliasing $(foreach dir, $(INCLUDE_DIR), -I$(dir))
+# Flags -mthumb -mthumb-interwork
+CFLAGS :=  -O2 -Wall -fno-strict-aliasing $(foreach dir, $(INCLUDE_DIR), -I$(dir))
 
 # Source files
 C_SOURCES := $(shell find $(C_SRC_DIR) -type f -name '*.c')
