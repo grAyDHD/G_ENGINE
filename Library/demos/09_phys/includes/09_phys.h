@@ -1,3 +1,4 @@
+#include "ecs/components.h"
 #include "math/math.h"
 #ifndef PHYS_H
 #include "ecs/ecs.h"
@@ -20,41 +21,30 @@ void applyGravity(ECS *obj) {
   obj->components->acceleration[0].ay = GRAVITY * gravityDirection;
 }
 
-void handleCollisions(ECS *obj, int BALL_SIZE) {
-  if (gravityDirection == 1) {
-    if (obj->components->position[0].y >= SH - BALL_SIZE) {
-      obj->components->position[0].y = SH - BALL_SIZE;
-      obj->components->velocity[0].dy = -(obj->components->velocity[0].dy / 2);
-      obj->entity[0].flag |= ON_GROUND;
-    } else if (obj->components->position[0].y <= 0) {
-      obj->components->velocity[0].dy = 0;
-      obj->entity[0].flag &= ~ON_GROUND; // Clear ON_GROUND flag
-    } else {
-      obj->entity[0].flag &= ~ON_GROUND; // Clear ON_GROUND flag
-    }
-  } else if (gravityDirection == -1) {
-    if (obj->components->position[0].y <= 0) {
-      obj->components->position[0].y = 0;
-      obj->components->velocity[0].dy = -(obj->components->velocity[0].dy / 2);
-      obj->entity[0].flag |= ON_GROUND;
-    } else if (obj->components->position[0].y >= SH - BALL_SIZE) {
-      obj->components->position[0].y = SH - BALL_SIZE;
-      obj->components->velocity[0].dy = 0;
+int initBall(ECS *ecs, ComponentStorage *components) {
+  int ball = createEntity(
+      ecs, POSITION_COMPONENT | VELOCITY_COMPONENT | ACCELERATION_COMPONENT |
+               INPUT_COMPONENT | HITBOX_COMPONENT | DRAWING_COMPONENT |
+               ENABLE_INPUT | ENABLE_PHYSICS | PHYSICS_FLAG |
+               DETECTS_COLLISIONS | TRIGGERS_COLLISIONS);
 
-      obj->entity[0].flag &= ~ON_GROUND; // Clear ON_GROUND flag
-    } else {
-      obj->entity[0].flag &= ~ON_GROUND; // Clear ON_GROUND flag
-    }
-  }
+  components->position[ball] =
+      (PositionComponent){.x = INT_TO_FIXED(120), .y = INT_TO_FIXED(80)};
+  components->velocity[ball] = (VelocityComponent){.dx = 0, .dy = 0};
+  components->acceleration[ball] = (AccelerationComponent){.ax = 0, .ay = 0};
+  components->input[ball].handleInput = playerInputHandler;
+  components->hitbox[ball] =
+      (HitboxComponent){.width = BALL_SIZE, .height = BALL_SIZE};
 
-  if (obj->components->position[0].x < 0) {
-    obj->components->position[0].x = 0;
-    obj->components->velocity[0].dx = 0;
-  }
-  if (obj->components->position[0].x >= SW - BALL_SIZE) {
-    obj->components->position[0].x = SW - BALL_SIZE;
-    obj->components->velocity[0].dx = 0;
-  }
+  //  ecs->components->draw[ball].drawingRoutine = drawBall;
+
+  return ball;
+}
+
+// void (*drawingRoutine)(ECS *ecs, int entityId);
+
+void drawBall(ECS *ecs, int entityId) {
+  // migrate drawing of ball into this function
 }
 
 void playerInput(ECS *ecs, int entityId) {
