@@ -6,20 +6,6 @@
 #define SHOOT_VEL 5  // Initial velocity when shooting with bumpers
 #define JUMP_VELOCITY -10
 
-extern int gravityDirection;
-
-struct Object {
-  int x;
-  int y;
-  int vx;
-  int vy;
-  int ax;
-  int ay;
-  int onGround;
-};
-
-void applyGravity(struct Object *obj);
-void updateMovement(struct Object *obj);
-void handleCollisions(struct Object *obj, int BALL_SIZE);
+extern int gravityDirection; // define as 1 in phys.c ?
 
 #endif

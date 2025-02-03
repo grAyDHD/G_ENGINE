@@ -11,11 +11,19 @@
 #include "math/math.h"
 #include "physics/phys.h"
 
+// goal for next commit:  implement single jump with on ground flag.
+// on input handler, only accept jump input if on ground flag is active
+// in input handler jump case, set velocity AND clear on ground flag
+// upon collision with GROUND ONLY, set on ground flag
+
 static ComponentStorage components;
 static ECS ecs;
 
 volatile fixed_s32 deltaTime = 0;
 
+// ball animation states
+// jump, land, squishLeft squishRight
+//
 int main() {
   DSPC = MODE3 | BG2;
   initializeVBI();
@@ -51,6 +59,7 @@ int main() {
     drawRect(corner, BALL_SIZE, BALL_SIZE, 0x03E0);
     previousCorner = corner;
     deltaTime = 0;
+
     //    simpleWait(25);
   }
   return 0;

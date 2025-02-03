@@ -8,49 +8,17 @@
 #define PHYS_H
 
 // #define GRAVITY 1    // Gravity constant
-#define MOVE_SPEED INT_TO_FIXED(20)
-#define SHOOT_VEL 10 // Initial velocity when shooting with bumpers
-#define JUMP_VELOCITY -10
-
-int BALL_SIZE = 4;
+#define MOVE_SPEED INT_TO_FIXED(90)
+#define SHOOT_VEL INT_TO_FIXED(120)
+#define JUMP_VEL INT_TO_FIXED(120)
 
 extern int gravityDirection;
-
 int gravityDirection = 1;
-void applyGravity(ECS *obj) {
-  obj->components->acceleration[0].ay = GRAVITY * gravityDirection;
-}
-
-int initBall(ECS *ecs, ComponentStorage *components) {
-  int ball = createEntity(
-      ecs, POSITION_COMPONENT | VELOCITY_COMPONENT | ACCELERATION_COMPONENT |
-               INPUT_COMPONENT | HITBOX_COMPONENT | DRAWING_COMPONENT |
-               ENABLE_INPUT | ENABLE_PHYSICS | PHYSICS_FLAG |
-               DETECTS_COLLISIONS | TRIGGERS_COLLISIONS);
-
-  components->position[ball] =
-      (PositionComponent){.x = INT_TO_FIXED(120), .y = INT_TO_FIXED(80)};
-  components->velocity[ball] = (VelocityComponent){.dx = 0, .dy = 0};
-  components->acceleration[ball] = (AccelerationComponent){.ax = 0, .ay = 0};
-  components->input[ball].handleInput = playerInputHandler;
-  components->hitbox[ball] =
-      (HitboxComponent){.width = BALL_SIZE, .height = BALL_SIZE};
-
-  //  ecs->components->draw[ball].drawingRoutine = drawBall;
-
-  return ball;
-}
-
-// void (*drawingRoutine)(ECS *ecs, int entityId);
-
-void drawBall(ECS *ecs, int entityId) {
-  // migrate drawing of ball into this function
-}
+int BALL_SIZE = 4;
 
 void playerInput(ECS *ecs, int entityId) {
-
   if (keyTapped(A)) {
-    ecs->components->velocity[0].dy = -SHOOT_VEL * gravityDirection;
+    ecs->components->velocity[0].dy = -JUMP_VEL;
   }
 
   if (keyDown(B)) {
@@ -64,7 +32,11 @@ void playerInput(ECS *ecs, int entityId) {
     ecs->components->velocity[0].dy = 0;
     ecs->components->acceleration[0].ax = 0;
     ecs->components->acceleration[0].ay = 0;
+    // disable gravity/physics flag
   }
+  // if (keyReleased) {
+  // set gravity/physics flag
+  // }
 
   if (keyDown(L)) {
     ecs->components->acceleration[0].ax = -MOVE_SPEED;
@@ -74,16 +46,38 @@ void playerInput(ECS *ecs, int entityId) {
     ecs->components->acceleration[0].ax = 0;
   }
 
-  if (keyDown(LT)) {
-    ecs->components->velocity[0].dx = -SHOOT_VEL;
-  } else if (keyDown(RT)) {
-    ecs->components->velocity[0].dx = SHOOT_VEL;
-  }
   if (keyTapped(LT)) {
+    ecs->components->velocity[0].dx = -SHOOT_VEL;
     ecs->components->velocity[0].dy = -SHOOT_VEL;
   } else if (keyTapped(RT)) {
+    ecs->components->velocity[0].dx = SHOOT_VEL;
     ecs->components->velocity[0].dy = -SHOOT_VEL;
   }
 }
+
+void drawBall(ECS *ecs, int entityId) {
+  // migrate drawing of ball into this function
+}
+
+int initBall(ECS *ecs, ComponentStorage *components) {
+  int ball = createEntity(
+      ecs, POSITION_COMPONENT | VELOCITY_COMPONENT | ACCELERATION_COMPONENT |
+               INPUT_COMPONENT | HITBOX_COMPONENT | DRAWING_COMPONENT |
+               ENABLE_INPUT | ENABLE_PHYSICS | PHYSICS_FLAG |
+               DETECTS_COLLISIONS | TRIGGERS_COLLISIONS);
+
+  components->position[ball] =
+      (PositionComponent){.x = INT_TO_FIXED(120), .y = INT_TO_FIXED(80)};
+  components->velocity[ball] = (VelocityComponent){.dx = 0, .dy = 0};
+  components->acceleration[ball] = (AccelerationComponent){.ax = 0, .ay = 0};
+  components->input[ball].handleInput = playerInput;
+  components->hitbox[ball] =
+      (HitboxComponent){.width = BALL_SIZE, .height = BALL_SIZE};
+  components->draw[ball].drawingRoutine = drawBall;
+
+  return ball;
+}
+
+// void (*drawingRoutine)(ECS *ecs, int entityId);
 
 #endif
