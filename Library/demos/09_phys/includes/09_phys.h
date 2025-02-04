@@ -1,4 +1,5 @@
 #include "ecs/components.h"
+#include "ecs/entities.h"
 #include "math/math.h"
 #ifndef PHYS_H
 #include "ecs/ecs.h"
@@ -17,8 +18,10 @@ int gravityDirection = 1;
 int BALL_SIZE = 4;
 
 void playerInput(ECS *ecs, int entityId) {
-  if (keyTapped(A)) {
+  if (keyTapped(A) && (ecs->entity[0].flag & ON_GROUND)) {
     ecs->components->velocity[0].dy = -JUMP_VEL;
+    // clear ON_GROUND
+    ecs->entity[0].flag &= ~ON_GROUND;
   }
 
   if (keyDown(B)) {

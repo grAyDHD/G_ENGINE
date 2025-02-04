@@ -99,7 +99,7 @@ void createScreenBorders(ECS *ecs) {
       (HitboxComponent){.width = 10, .height = SH};
 
   /*---Create Bottom Border---*/
-  boundaryId = createEntity(ecs, BOUNDARY_ENTITY);
+  boundaryId = createEntity(ecs, BOUNDARY_ENTITY | IS_GROUND);
   ecs->components->position[boundaryId] =
       (PositionComponent){.x = 0, .y = INT_TO_FIXED(SH)};
   ecs->components->hitbox[boundaryId] =

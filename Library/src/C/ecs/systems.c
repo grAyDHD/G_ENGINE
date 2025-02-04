@@ -6,7 +6,7 @@
 #include "ecs/entities.h"
 #include "math/math.h"
 
-static int gravityDirection = 1;
+// static int gravityDirection = 1;
 
 void updateInputSystem(ECS *ecs, Entity *entity, InputComponent *input,
                        fixed_s32 deltaTime) {
@@ -157,6 +157,50 @@ resolveDynamicCollisions(Entity *entity, VelocityComponent *velA,
   }
 }
 
+static inline int determineCollisionType(PositionComponent *posA,
+                                         VelocityComponent *velA,
+                                         PositionComponent *posB,
+                                         HitboxComponent *hitboxA,
+                                         HitboxComponent *hitboxB) {
+
+  // Get centers of both entities
+  fixed_s32 centerAx = posA->x + INT_TO_FIXED(hitboxA->width >> 1);
+  fixed_s32 centerAy = posA->y + INT_TO_FIXED(hitboxA->height >> 1);
+  fixed_s32 centerBx = posB->x + INT_TO_FIXED(hitboxB->width >> 1);
+  fixed_s32 centerBy = posB->y + INT_TO_FIXED(hitboxB->height >> 1);
+
+  // Get direction vector between centers
+  fixed_s32 dx = centerBx - centerAx;
+  fixed_s32 dy = centerBy - centerAy;
+
+  int collisionFlags = 0;
+
+  // Check horizontal collision
+  if ((dx > 0 && velA->dx > 0) || (dx < 0 && velA->dx < 0)) {
+    collisionFlags |= HORIZONTAL_COLLISION;
+  }
+
+  // Check vertical collision
+  if ((dy > 0 && velA->dy > 0) || (dy < 0 && velA->dy < 0)) {
+    collisionFlags |= VERTICAL_COLLISION;
+  }
+
+  // If no clear direction from velocity, use position
+  if (collisionFlags == 0) {
+    if (ABS(dx) > 0)
+      collisionFlags |= HORIZONTAL_COLLISION;
+    if (ABS(dy) > 0)
+      collisionFlags |= VERTICAL_COLLISION;
+  }
+
+  return collisionFlags;
+}
+
+// goal for next commit:  implement single jump with on ground flag.
+// on input handler, only accept jump input if on ground flag is active
+// in input handler jump case, set velocity AND clear on ground flag
+// upon collision with GROUND ONLY, set on ground flag
+
 void updateCollisionSystem(Entity *entity, PositionComponent *position,
                            VelocityComponent *velocity, HitboxComponent *hitbox,
                            fixed_s32 deltaTime) {
@@ -164,7 +208,11 @@ void updateCollisionSystem(Entity *entity, PositionComponent *position,
     if (!(entity[idA].flag & DETECTS_COLLISIONS))
       continue;
 
-    int hasCollision = 0; // track if collision this frame
+    // int hasCollision = 0; // track if collision this frame
+    // Clear previous collision flags at start of frame
+    entity[idA].flag &=
+        ~(HORIZONTAL_COLLISION | VERTICAL_COLLISION | ON_GROUND);
+
     for (int idB = idA + 1; idB < MAX_ENTITIES; idB++) {
       if (!(entity[idB].flag & TRIGGERS_COLLISIONS))
         continue;
@@ -175,8 +223,20 @@ void updateCollisionSystem(Entity *entity, PositionComponent *position,
       if (overlap.width < 0 || overlap.height < 0) {
         continue;
       }
+      //      hasCollision = 1;
 
-      hasCollision = 1;
+      // Determine collision type before resolution
+      int collisionFlag =
+          determineCollisionType(&position[idA], &velocity[idA], &position[idB],
+                                 &hitbox[idA], &hitbox[idB]);
+
+      // Set the collision flag
+      entity[idA].flag |= collisionFlag;
+      if (idA == 0 && (collisionFlag & VERTICAL_COLLISION) &&
+          (velocity[idA].dy > 0) && (entity[idB].flag & IS_GROUND) &&
+          (position[idA].y < position[idB].y)) {
+        entity[idA].flag |= ON_GROUND;
+      }
 
       if (entity[idB].flag & STATIC_COLLIDER) {
         resolveStaticCollisions(&position[idA], &velocity[idA], overlap);
@@ -185,20 +245,8 @@ void updateCollisionSystem(Entity *entity, PositionComponent *position,
                                  &velocity[idB], &position[idB], overlap);
       }
     }
-
-    if (!hasCollision) {
-      entity[idA].flag &= ~(HORIZONTAL_COLLISION | VERTICAL_COLLISION);
-    }
   }
 }
-
-// resets collision flags
-// for (int id = 0; id < max_entities; id++) {
-//  entity[id].flag &= ~collision_detected;
-//}
-
-// entity[id].flag &= ~(horizontal_collision | vertical_collision);
-//
 
 void updateAnimationSystem(Entity *entity, AnimationComponent *animation) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
