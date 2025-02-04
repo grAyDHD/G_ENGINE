@@ -23,7 +23,7 @@ volatile fixed_s32 deltaTime = 0;
 
 // ball animation states
 // jump, land, squishLeft squishRight
-//
+
 int main() {
   DSPC = MODE3 | BG2;
   initializeVBI();
@@ -31,7 +31,6 @@ int main() {
 
   int ball = initBall(&ecs, &components);
   createScreenBorders(&ecs);
-  // struct Object ball = {120, 80, 0, 0, 0, 0};
 
   Coordinate previousCorner = {
       .x = FIXED_TO_INT(components.position[ball].x),

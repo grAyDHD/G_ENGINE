@@ -53,7 +53,7 @@ void playerInputHandler(ECS *ecs, int entityId) {
 void patrolBehavior(ECS *ecs, int entityId) {
   // this should be a walking back and forth animagion.
   AIComponent *ai = &ecs->components->ai[entityId];
-  VelocityComponent *velocity = &ecs->components->velocity[entityId];
+  // VelocityComponent *velocity = &ecs->components->velocity[entityId];
   AccelerationComponent *acceleration =
       &ecs->components->acceleration[entityId];
   AnimationComponent *animation = &ecs->components->animation[entityId];
