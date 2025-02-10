@@ -51,6 +51,7 @@ void updateMovementSystem(Entity *entity, PositionComponent *position,
 
 static inline fixed_s32 ABS(fixed_s32 x) { return (x < 0) ? -x : x; }
 
+/*
 static inline int getCollisionPriority(Entity *entity) {
   if (entity->flag & STATIC_COLLIDER)
     return 3; // highest priority
@@ -60,6 +61,7 @@ static inline int getCollisionPriority(Entity *entity) {
     return 1; // low priority
   return 0;   // default/lowest priority
 }
+*/
 
 // example priority, can create new flags to balance priorities:
 //  if (entity->flag & AI_COMPONENT) {
@@ -266,7 +268,7 @@ void updateAnimationSystem(Entity *entity, AnimationComponent *animation) {
 void updateRenderSystem(ECS *ecs, Entity *entity, AnimationComponent *animation,
                         DrawingComponent *draw) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
-    if (entity[id].flag & ANIMATION_COMPONENT) {
+    if (entity[id].flag & SPRITE_FLAG) {
       renderEntity(ecs, id);
     }
 

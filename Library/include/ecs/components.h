@@ -31,7 +31,7 @@ typedef struct {
 } HitboxComponent;
 
 typedef enum : int { DOWN = 0, UP, LEFT, RIGHT } DIRECTION;
-typedef enum : int { IDLE = 0, WALK, TALK, RUN } STATE;
+typedef enum : int { IDLE = 0, WALK, TALK, RUN, STATIC = 10, JUMP, LAND } STATE;
 
 typedef struct {
   int frameNumber;

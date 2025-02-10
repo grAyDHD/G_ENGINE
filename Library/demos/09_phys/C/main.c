@@ -44,7 +44,7 @@ int main() {
     VBLANK();
 
     // clear previous position
-    drawRect(previousCorner, BALL_SIZE, BALL_SIZE, 0x0000);
+    //    drawRect(previousCorner, BALL_SIZE, BALL_SIZE, 0x0000);
 
     updateInputSystem(&ecs, ecs.entity, components.input, deltaTime);
     updatePhysicsSystem(ecs.entity, components.velocity,
@@ -53,10 +53,11 @@ int main() {
                          deltaTime);
     updateCollisionSystem(ecs.entity, components.position, components.velocity,
                           components.hitbox, deltaTime);
+    updateAnimationSystem(ecs.entity, components.animation);
+    updateRenderSystem(&ecs, ecs.entity, components.animation, components.draw);
     corner.x = FIXED_TO_INT(components.position[ball].x);
     corner.y = FIXED_TO_INT(components.position[ball].y);
 
-    drawRect(corner, BALL_SIZE, BALL_SIZE, 0x03E0);
     previousCorner = corner;
     deltaTime = 0;
 
