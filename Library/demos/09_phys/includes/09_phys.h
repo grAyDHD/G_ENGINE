@@ -75,14 +75,19 @@ void playerInput(ECS *ecs, int entityId) {
 void drawBall(ECS *ecs, int entityId) {
   AnimationComponent *animation = &ecs->components->animation[entityId];
   PositionComponent *position = &ecs->components->position[entityId];
+  PreviousPositionComponent *prevPos =
+      &ecs->components->previousPosition[entityId];
 
-  Coordinate corner = {0, 0};
+  Coordinate corner = {.x = FIXED_TO_INT(position->x),
+                       .y = FIXED_TO_INT(position->y)};
 
-  corner.x = FIXED_TO_INT(position->x);
-  corner.y = FIXED_TO_INT(position->y);
+  // Previous position
+  Coordinate prevCorner = {.x = FIXED_TO_INT(prevPos->x),
+                           .y = FIXED_TO_INT(prevPos->y)};
+
+  drawRect(prevCorner, BALL_SIZE, BALL_SIZE, 0x0000);
 
   switch (animation->state) {
-
   case JUMP:
     break;
   case LAND:
@@ -90,21 +95,29 @@ void drawBall(ECS *ecs, int entityId) {
   case STATIC:
     drawRect(corner, BALL_SIZE, BALL_SIZE, 0x8f3d);
     break;
-
   default:
     drawRect(corner, BALL_SIZE, BALL_SIZE, 0x8f3d);
     break;
   }
+
+  prevPos->x = position->x;
+  prevPos->y = position->y;
 }
 
 int initBall(ECS *ecs, ComponentStorage *components) {
   int ball = createEntity(
       ecs, POSITION_COMPONENT | VELOCITY_COMPONENT | ACCELERATION_COMPONENT |
                INPUT_COMPONENT | HITBOX_COMPONENT | ANIMATION_COMPONENT |
-               DRAWING_COMPONENT | ENABLE_INPUT | ENABLE_PHYSICS |
-               PHYSICS_FLAG | DETECTS_COLLISIONS | TRIGGERS_COLLISIONS);
+               DRAWING_COMPONENT | PREVIOUS_POSITION_COMPONENT | ENABLE_INPUT |
+               ENABLE_PHYSICS | PHYSICS_FLAG | DETECTS_COLLISIONS |
+               TRIGGERS_COLLISIONS);
+
   components->position[ball] =
       (PositionComponent){.x = INT_TO_FIXED(120), .y = INT_TO_FIXED(80)};
+
+  components->previousPosition[ball] = (PreviousPositionComponent){
+      .x = INT_TO_FIXED(120), .y = INT_TO_FIXED(80)};
+
   components->velocity[ball] = (VelocityComponent){.dx = 0, .dy = 0};
   components->acceleration[ball] = (AccelerationComponent){.ax = 0, .ay = 0};
   components->input[ball].handleInput = playerInput;
