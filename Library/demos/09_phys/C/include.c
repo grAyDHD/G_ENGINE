@@ -1,36 +1,22 @@
-#ifndef PHYS_H
-#define PHYS_H
-
-#include "core/typedefs.h"
-#include "ecs/components.h"
+#include "../includes/include.h"
 #include "ecs/ecs.h"
 #include "ecs/entities.h"
 #include "graphics/draw.h"
-#include "graphics/video.h"
 #include "input/in.h"
-#include "math/math.h"
 
-// #define GRAVITY 1    // Gravity constant
-#define MOVE_SPEED INT_TO_FIXED(90)
-#define SHOOT_VEL INT_TO_FIXED(120)
-#define JUMP_VEL INT_TO_FIXED(120)
-
-extern int gravityDirection;
 int gravityDirection = 1;
-int BALL_SIZE = 4;
+int ballSize = 6;
 
 void playerInput(ECS *ecs, int entityId) {
-  AnimationComponent *animation = &ecs->components->animation[entityId];
+  //  AnimationComponent *animation = &ecs->components->animation[entityId];
   VelocityComponent *velocity = &ecs->components->velocity[entityId];
   AccelerationComponent *acceleration =
       &ecs->components->acceleration[entityId];
 
   if (keyTapped(A) && (ecs->entity[0].flag & ON_GROUND)) {
     //    animation[0].state = JUMP;
-
     // will apply velocity later, checking for JUMP state and specific keyframe
-    //    velocity[0].dy = -JUMP_VEL;
-
+    velocity[0].dy = -JUMP_VEL;
     // clear ON_GROUND
     ecs->entity[0].flag &= ~ON_GROUND;
   }
@@ -85,7 +71,7 @@ void drawBall(ECS *ecs, int entityId) {
   Coordinate prevCorner = {.x = FIXED_TO_INT(prevPos->x),
                            .y = FIXED_TO_INT(prevPos->y)};
 
-  drawRect(prevCorner, BALL_SIZE, BALL_SIZE, 0x0000);
+  drawRect(prevCorner, ballSize, ballSize, 0x0000);
 
   switch (animation->state) {
   case JUMP:
@@ -93,10 +79,10 @@ void drawBall(ECS *ecs, int entityId) {
   case LAND:
     break;
   case STATIC:
-    drawRect(corner, BALL_SIZE, BALL_SIZE, 0x8f3d);
+    drawRect(corner, ballSize, ballSize, 0x8f3d);
     break;
   default:
-    drawRect(corner, BALL_SIZE, BALL_SIZE, 0x8f3d);
+    drawRect(corner, ballSize, ballSize, 0x8f3d);
     break;
   }
 
@@ -122,7 +108,7 @@ int initBall(ECS *ecs, ComponentStorage *components) {
   components->acceleration[ball] = (AccelerationComponent){.ax = 0, .ay = 0};
   components->input[ball].handleInput = playerInput;
   components->hitbox[ball] =
-      (HitboxComponent){.width = BALL_SIZE, .height = BALL_SIZE};
+      (HitboxComponent){.width = ballSize, .height = ballSize};
   components->animation[ball] = (AnimationComponent){.state = STATIC,
                                                      .keyframe = 0,
                                                      .direction = 0,
@@ -132,5 +118,3 @@ int initBall(ECS *ecs, ComponentStorage *components) {
 
   return ball;
 }
-
-#endif
