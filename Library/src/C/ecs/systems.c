@@ -22,15 +22,28 @@ void updateBehaviorSystem(ECS *ecs, Entity *entity, AIComponent *ai) {
   }
 };
 
+#define FRICTION_COEFFICIENT (INT_TO_FIXED(63) >> 6)
+
 void updatePhysicsSystem(Entity *entity, VelocityComponent *velocity,
                          AccelerationComponent *acceleration,
                          fixed_s32 deltaTime) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
-    if (entity[id].flag & PHYSICS_FLAG) {
+    if (!(entity[id].flag & PHYSICS_FLAG))
+      continue;
+
+    if (entity[id].flag & ENABLE_PHYSICS) {
       acceleration[id].ay += GRAVITY;
     }
+
+    if (entity[id].flag & ON_GROUND) {
+      velocity[id].dx = MULT(velocity[id].dx, FRICTION_COEFFICIENT);
+    }
+
+    // update velocity based on acceleration
     velocity[id].dx += MULT(acceleration[id].ax, deltaTime);
     velocity[id].dy += MULT(acceleration[id].ay, deltaTime);
+
+    // reset acceleration each frame after applying
     acceleration[id].ax = 0;
     acceleration[id].ay = 0;
   }
