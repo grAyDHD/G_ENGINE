@@ -22,15 +22,28 @@ void updateBehaviorSystem(ECS *ecs, Entity *entity, AIComponent *ai) {
   }
 };
 
+#define FRICTION_COEFFICIENT (INT_TO_FIXED(63) >> 6)
+
 void updatePhysicsSystem(Entity *entity, VelocityComponent *velocity,
                          AccelerationComponent *acceleration,
                          fixed_s32 deltaTime) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
-    if (entity[id].flag & PHYSICS_FLAG) {
+    if (!(entity[id].flag & PHYSICS_FLAG))
+      continue;
+
+    if (entity[id].flag & ENABLE_PHYSICS) {
       acceleration[id].ay += GRAVITY;
     }
+
+    if (entity[id].flag & ON_GROUND) {
+      velocity[id].dx = MULT(velocity[id].dx, FRICTION_COEFFICIENT);
+    }
+
+    // update velocity based on acceleration
     velocity[id].dx += MULT(acceleration[id].ax, deltaTime);
     velocity[id].dy += MULT(acceleration[id].ay, deltaTime);
+
+    // reset acceleration each frame after applying
     acceleration[id].ax = 0;
     acceleration[id].ay = 0;
   }
@@ -51,6 +64,7 @@ void updateMovementSystem(Entity *entity, PositionComponent *position,
 
 static inline fixed_s32 ABS(fixed_s32 x) { return (x < 0) ? -x : x; }
 
+/*
 static inline int getCollisionPriority(Entity *entity) {
   if (entity->flag & STATIC_COLLIDER)
     return 3; // highest priority
@@ -60,6 +74,7 @@ static inline int getCollisionPriority(Entity *entity) {
     return 1; // low priority
   return 0;   // default/lowest priority
 }
+*/
 
 // example priority, can create new flags to balance priorities:
 //  if (entity->flag & AI_COMPONENT) {
@@ -210,7 +225,8 @@ void updateCollisionSystem(Entity *entity, PositionComponent *position,
 
     // int hasCollision = 0; // track if collision this frame
     // Clear previous collision flags at start of frame
-    entity[idA].flag &= ~(HORIZONTAL_COLLISION | VERTICAL_COLLISION);
+    entity[idA].flag &=
+        ~(HORIZONTAL_COLLISION | VERTICAL_COLLISION | ON_GROUND);
 
     for (int idB = idA + 1; idB < MAX_ENTITIES; idB++) {
       if (!(entity[idB].flag & TRIGGERS_COLLISIONS))
@@ -231,6 +247,11 @@ void updateCollisionSystem(Entity *entity, PositionComponent *position,
 
       // Set the collision flag
       entity[idA].flag |= collisionFlag;
+      if (idA == 0 && (collisionFlag & VERTICAL_COLLISION) &&
+          (velocity[idA].dy > 0) && (entity[idB].flag & IS_GROUND) &&
+          (position[idA].y < position[idB].y)) {
+        entity[idA].flag |= ON_GROUND;
+      }
 
       if (entity[idB].flag & STATIC_COLLIDER) {
         resolveStaticCollisions(&position[idA], &velocity[idA], overlap);
@@ -241,14 +262,6 @@ void updateCollisionSystem(Entity *entity, PositionComponent *position,
     }
   }
 }
-
-// resets collision flags
-// for (int id = 0; id < max_entities; id++) {
-//  entity[id].flag &= ~collision_detected;
-//}
-
-// entity[id].flag &= ~(horizontal_collision | vertical_collision);
-//
 
 void updateAnimationSystem(Entity *entity, AnimationComponent *animation) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
@@ -268,7 +281,7 @@ void updateAnimationSystem(Entity *entity, AnimationComponent *animation) {
 void updateRenderSystem(ECS *ecs, Entity *entity, AnimationComponent *animation,
                         DrawingComponent *draw) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
-    if (entity[id].flag & ANIMATION_COMPONENT) {
+    if (entity[id].flag & SPRITE_FLAG) {
       renderEntity(ecs, id);
     }
 

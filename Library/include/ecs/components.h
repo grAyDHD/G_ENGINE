@@ -15,6 +15,11 @@ typedef struct {
 } PositionComponent;
 
 typedef struct {
+  fixed_s32 x;
+  fixed_s32 y;
+} PreviousPositionComponent;
+
+typedef struct {
   fixed_s32 dx;
   fixed_s32 dy;
 } VelocityComponent;
@@ -31,7 +36,7 @@ typedef struct {
 } HitboxComponent;
 
 typedef enum : int { DOWN = 0, UP, LEFT, RIGHT } DIRECTION;
-typedef enum : int { IDLE = 0, WALK, TALK, RUN } STATE;
+typedef enum : int { IDLE = 0, WALK, TALK, RUN, STATIC = 10, JUMP, LAND } STATE;
 
 typedef struct {
   int frameNumber;
@@ -61,6 +66,7 @@ typedef struct {
 
 typedef struct ComponentStorage {
   PositionComponent position[MAX_ENTITIES];
+  PreviousPositionComponent previousPosition[MAX_ENTITIES];
   VelocityComponent velocity[MAX_ENTITIES];
   AccelerationComponent acceleration[MAX_ENTITIES];
   HitboxComponent hitbox[MAX_ENTITIES];

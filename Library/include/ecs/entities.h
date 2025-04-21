@@ -17,9 +17,12 @@ typedef struct {
 #define AI_COMPONENT (1 << 6)
 #define HITBOX_COMPONENT (1 << 7)
 #define DRAWING_COMPONENT (1 << 8)
+#define PREVIOUS_POSITION_COMPONENT (1 << 9)
+
 // TIMER_COMPONENT
 // sound component?
 
+#define SPRITE_FLAG (1 << 15)
 #define ENABLE_INPUT (1 << 16)
 #define ENABLE_PHYSICS (1 << 17)
 #define ON_GROUND (1 << 18)
@@ -28,6 +31,8 @@ typedef struct {
 // #define COLLISION_DETECTED (1 << 21)
 #define PHYSICS_FLAG (1 << 22)
 #define STATIC_COLLIDER (1 << 23)
+#define IS_GROUND (1 << 24)
+
 #define HORIZONTAL_COLLISION (1 << 30)
 #define VERTICAL_COLLISION (1 << 31)
 
