@@ -7,10 +7,16 @@
 #include "math/math.h"
 #include "physics/phys.h"
 
-// goal for next commit:  implement single jump with on ground flag.
+// implement single jump with on ground flag.
 // on input handler, only accept jump input if on ground flag is active
 // in input handler jump case, set velocity AND clear on ground flag
 // upon collision with GROUND ONLY, set on ground flag
+
+// current commit goal:
+// determine cause of gravity pushing through floor and resetting position repeatedly, 
+// this will determine action for next commit.  idea: alternate planning and execution commits?
+
+
 
 static ComponentStorage components;
 static ECS ecs;
@@ -19,15 +25,22 @@ volatile fixed_s32 deltaTime = 0;
 
 // ball animation states
 // jump, land, squishLeft squishRight
-//
+
 int main() {
+  // been a while, review line by line.
+
+  // set display to mode 3, and background layer 2
   DSPC = MODE3 | BG2;
+
+  // initialiazes vblank interrupts for delta time
   initializeVBI();
+  // initializes entity system
   initEntitySystem(&ecs, &components);
 
+  // creates ball entity (player)
   int ball = initBall(&ecs, &components);
+  // creates borders at screen boundary to keep the player within bounds of
   createScreenBorders(&ecs);
-  // struct Object ball = {120, 80, 0, 0, 0, 0};
 
   Coordinate previousCorner = {
       .x = FIXED_TO_INT(components.position[ball].x),
@@ -36,20 +49,30 @@ int main() {
       .x = FIXED_TO_INT(components.position[ball].x),
       .y = FIXED_TO_INT(components.position[ball].y)}; // Track the previous
 
+  previousCorner.x = corner.x;
+  previousCorner.y = corner.y;
+
   while (1) {
+
+    //wait for VBLANK to draw
     VBLANK();
 
-    // clear previous position
-    //    drawRect(previousCorner, BALL_SIZE, BALL_SIZE, 0x0000);
-
+    // updates input system, input working as expected
     updateInputSystem(&ecs, ecs.entity, components.input, deltaTime);
+    // updates physics system, seems likely to be working as intended
     updatePhysicsSystem(ecs.entity, components.velocity,
                         components.acceleration, deltaTime);
+    // not sure if this checks next boundary, issue likely in collision system.
     updateMovementSystem(ecs.entity, components.position, components.velocity,
                          deltaTime);
+    // when player is pushed by gravity when on floor, it is pushed past the floor
+    // is this issue with gravity in physics system, timing in movement system, or with resolutions handled
+    // by collision system
     updateCollisionSystem(ecs.entity, components.position, components.velocity,
                           components.hitbox, deltaTime);
+    // reflects appropriate updates to animation system
     updateAnimationSystem(ecs.entity, components.animation);
+    // reflects appropriate updates to rendering system- used for various drawing functions
     updateRenderSystem(&ecs, ecs.entity, components.animation, components.draw);
     corner.x = FIXED_TO_INT(components.position[ball].x);
     corner.y = FIXED_TO_INT(components.position[ball].y);
@@ -61,3 +84,6 @@ int main() {
   }
   return 0;
 }
+
+// Commit plan:
+// ensure gravity always applies, and collision system sets on ground flag and resolves movement
