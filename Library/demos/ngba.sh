@@ -56,14 +56,6 @@ cat > "$PROJECT_HEADER_H" << EOL
 #ifndef ${PROJECT_NAME^^}_H
 #define ${PROJECT_NAME^^}_H
 
-// Project-specific constants and declarations
-#define PROJECT_NAME "${PROJECT_NAME}"
-
-// Video mode configuration
-#define PROJECT_VIDEO_MODE ${VIDEO_MODE}
-
-// Add more project-specific macros or declarations here
-
 #endif // ${PROJECT_NAME^^}_H
 EOL
 
@@ -76,7 +68,7 @@ fi
 # Create the main C file with a basic template
 cat > "$PROJECT_MAIN_C" << EOL
 #include "../includes/${PROJECT_NAME}.h"
-#include "gfx.h"
+#include "graphics/video.h"
 
 int main() {
     DSPC = ${VIDEO_MODE};
