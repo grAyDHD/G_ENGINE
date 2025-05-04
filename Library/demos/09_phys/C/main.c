@@ -6,6 +6,7 @@
 #include "graphics/video.h"
 #include "math/math.h"
 #include "physics/phys.h"
+#include "core/timer.h"
 
 // implement single jump with on ground flag.
 // on input handler, only accept jump input if on ground flag is active
@@ -23,23 +24,13 @@ static ECS ecs;
 
 volatile fixed_s32 deltaTime = 0;
 
-// ball animation states
-// jump, land, squishLeft squishRight
-
 int main() {
-  // been a while, review line by line.
-
-  // set display to mode 3, and background layer 2
   DSPC = MODE3 | BG2;
 
-  // initialiazes vblank interrupts for delta time
   initializeVBI();
-  // initializes entity system
   initEntitySystem(&ecs, &components);
 
-  // creates ball entity (player)
   int ball = initBall(&ecs, &components);
-  // creates borders at screen boundary to keep the player within bounds of
   createScreenBorders(&ecs);
 
   Coordinate previousCorner = {
@@ -53,16 +44,14 @@ int main() {
   previousCorner.y = corner.y;
 
   while (1) {
-
-    //wait for VBLANK to draw
+    // vblank interrupts calculate delta time in background, for accurate calculations should the processer/cpu be stressed
+    // VBLANK waits for the next drawing period 
     VBLANK();
 
-    // updates input system, input working as expected
     updateInputSystem(&ecs, ecs.entity, components.input, deltaTime);
-    // updates physics system, seems likely to be working as intended
+    // applies gravity every frame
     updatePhysicsSystem(ecs.entity, components.velocity,
                         components.acceleration, deltaTime);
-    // not sure if this checks next boundary, issue likely in collision system.
     updateMovementSystem(ecs.entity, components.position, components.velocity,
                          deltaTime);
     // when player is pushed by gravity when on floor, it is pushed past the floor
@@ -80,7 +69,6 @@ int main() {
     previousCorner = corner;
     deltaTime = 0;
 
-    //    simpleWait(25);
   }
   return 0;
 }

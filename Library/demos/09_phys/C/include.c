@@ -13,7 +13,8 @@ void playerInput(ECS *ecs, int entityId) {
   AccelerationComponent *acceleration =
       &ecs->components->acceleration[entityId];
 
-  if (keyTapped(A) && (ecs->entity[0].flag & ON_GROUND)) {
+  if (keyTapped(A) && (ecs->entity[0].flag & ON_GROUND)
+    ) {
     //    animation[0].state = JUMP;
     // will apply velocity later, checking for JUMP state and specific keyframe
     velocity[0].dy = -JUMP_VEL;
@@ -95,7 +96,7 @@ int initBall(ECS *ecs, ComponentStorage *components) {
       ecs, POSITION_COMPONENT | VELOCITY_COMPONENT | ACCELERATION_COMPONENT |
                INPUT_COMPONENT | HITBOX_COMPONENT | ANIMATION_COMPONENT |
                DRAWING_COMPONENT | PREVIOUS_POSITION_COMPONENT | ENABLE_INPUT |
-               ENABLE_PHYSICS | PHYSICS_FLAG | DETECTS_COLLISIONS |
+               ENABLE_GRAVITY | PHYSICS_FLAG | DETECTS_COLLISIONS |
                TRIGGERS_COLLISIONS);
 
   components->position[ball] =

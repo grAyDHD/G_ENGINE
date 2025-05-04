@@ -24,7 +24,7 @@ typedef struct {
 
 #define SPRITE_FLAG (1 << 15)
 #define ENABLE_INPUT (1 << 16)
-#define ENABLE_PHYSICS (1 << 17)
+#define ENABLE_GRAVITY (1 << 17)
 #define ON_GROUND (1 << 18)
 #define TRIGGERS_COLLISIONS (1 << 19)
 #define DETECTS_COLLISIONS (1 << 20)

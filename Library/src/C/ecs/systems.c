@@ -6,8 +6,6 @@
 #include "ecs/entities.h"
 #include "math/math.h"
 
-// static int gravityDirection = 1;
-
 void updateInputSystem(ECS *ecs, Entity *entity, InputComponent *input,
                        fixed_s32 deltaTime) {
   updateKeys();
@@ -31,7 +29,7 @@ void updatePhysicsSystem(Entity *entity, VelocityComponent *velocity,
     if (!(entity[id].flag & PHYSICS_FLAG))
       continue;
 
-    if (entity[id].flag & ENABLE_PHYSICS) {
+    if ((entity[id].flag & ENABLE_GRAVITY) && !(entity[id].flag & ON_GROUND)) {
       acceleration[id].ay += GRAVITY;
     }
 
@@ -39,11 +37,9 @@ void updatePhysicsSystem(Entity *entity, VelocityComponent *velocity,
       velocity[id].dx = MULT(velocity[id].dx, FRICTION_COEFFICIENT);
     }
 
-    // update velocity based on acceleration
     velocity[id].dx += MULT(acceleration[id].ax, deltaTime);
     velocity[id].dy += MULT(acceleration[id].ay, deltaTime);
 
-    // reset acceleration each frame after applying
     acceleration[id].ax = 0;
     acceleration[id].ay = 0;
   }
@@ -226,7 +222,8 @@ void updateCollisionSystem(Entity *entity, PositionComponent *position,
     // int hasCollision = 0; // track if collision this frame
     // Clear previous collision flags at start of frame
     entity[idA].flag &=
-        ~(HORIZONTAL_COLLISION | VERTICAL_COLLISION | ON_GROUND);
+        ~(HORIZONTAL_COLLISION | VERTICAL_COLLISION);
+
 
     for (int idB = idA + 1; idB < MAX_ENTITIES; idB++) {
       if (!(entity[idB].flag & TRIGGERS_COLLISIONS))
@@ -238,15 +235,13 @@ void updateCollisionSystem(Entity *entity, PositionComponent *position,
       if (overlap.width < 0 || overlap.height < 0) {
         continue;
       }
-      //      hasCollision = 1;
 
-      // Determine collision type before resolution
       int collisionFlag =
           determineCollisionType(&position[idA], &velocity[idA], &position[idB],
                                  &hitbox[idA], &hitbox[idB]);
 
-      // Set the collision flag
       entity[idA].flag |= collisionFlag;
+
       if (idA == 0 && (collisionFlag & VERTICAL_COLLISION) &&
           (velocity[idA].dy > 0) && (entity[idB].flag & IS_GROUND) &&
           (position[idA].y < position[idB].y)) {
