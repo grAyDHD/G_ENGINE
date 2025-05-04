@@ -12,7 +12,7 @@ void playerInputHandler(ECS *ecs, int entityId) {
       &ecs->components->acceleration[entityId];
 
   if (keyDown(U)) {
-    if (!(ecs->entity[entityId].flag & PHYSICS_FLAG)) {
+    if (!(ecs->entity[entityId].flag & ENABLE_GRAVITY)) {
 
       acceleration->ay -= INT_TO_FIXED(256);
       animation->direction = UP;
@@ -32,7 +32,7 @@ void playerInputHandler(ECS *ecs, int entityId) {
     animation->state = WALK;
   }
 
-  if (keyTapped(A)) {
+  if (keyTapped(A) && (ecs->entity[entityId].flag & ENABLE_GRAVITY & ON_GROUND)) {
     velocity->dy = -INT_TO_FIXED(64);
   }
 

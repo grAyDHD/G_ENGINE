@@ -42,7 +42,7 @@ typedef struct {
 #define PLAYER_ENTITY                                                          \
   (POSITION_COMPONENT | VELOCITY_COMPONENT | ANIMATION_COMPONENT |             \
    SPRITE_COMPONENT | INPUT_COMPONENT | HITBOX_COMPONENT | ENABLE_INPUT |      \
-   DETECTS_COLLISIONS | TRIGGERS_COLLISIONS)
+   DETECTS_COLLISIONS | TRIGGERS_COLLISIONS | SPRITE_FLAG)
 
 #define NPC_ENTITY                                                             \
   (POSITION_COMPONENT | VELOCITY_COMPONENT | ANIMATION_COMPONENT |             \

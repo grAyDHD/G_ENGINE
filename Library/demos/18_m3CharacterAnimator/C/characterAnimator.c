@@ -12,7 +12,6 @@ static ECS ecs;
 
 volatile fixed_s32 deltaTime;
 
-//  ecs.entity[0].flag |= PHYSICS_FLAG;
 
 int main() {
   DSPC = MODE3 | BG2;
@@ -20,7 +19,8 @@ int main() {
   m3_Background(BedroomBitmap);
   initEntitySystem(&ecs, &components);
   createPlayer(&ecs, RoboBitmap);
-  createNPC(&ecs, RoboBitmap);
+  ecs.entity[0].flag |= PHYSICS_FLAG;
+  //createNPC(&ecs, RoboBitmap);
   createScreenBorders(&ecs);
 
   while (1) {
