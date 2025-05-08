@@ -1,5 +1,4 @@
-#include "../includes/21_m3printf.h"
-#include "gfx.h"
+#include "graphics/video.h"
 
 int main() {
     DSPC = MODE3 | BG2;
