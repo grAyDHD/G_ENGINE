@@ -4,6 +4,7 @@
 #include "graphics/video.h"
 
 int getFontDataIndex(char c);
+void renderChar(int *x, int *y, char c);
 void printString(int x, int y, const char *text);
 void gprintf(int x, int y, const char* format, int arg);
 
@@ -15,38 +16,32 @@ int main() {
   const char *text = "Hello World!";
   int x = 20;
   int y = 20;
-  printString(x, y, "0123");
-//  gprintf(x, y, "hello %d", 0);
+//  printString(x, y, text);
+  gprintf(x, y, "hello %d", 4009);
   while (1) {
   }
   return 0;
 }
 
+//in future, also pass font struct with bitmap and fontdata 
 void printString(int x, int y, const char *text) {
-  int glyphIndex;
   for (int i = 0; text[i] != '\0'; i++) {
-    char c = text[i];
-
-    if (c == ' ') {
-      x += 5;
-      continue;
-    }
-    glyphIndex = getFontDataIndex(c);
-    if (glyphIndex >= 0) {
-      copyGlyphToVRAM(x, y, &PeaberryBitmap, &fontData[glyphIndex]);
-      x += fontData[glyphIndex].width + 1;
-    }
+    renderChar(&x, &y, text[i]);
   }
 };
 
-//printing an int value, if < 0 and > -10, print '-' and digit
-//if > 0 < 10, print digit
-//if > 9 < 100, print 2 digits, etc.
+void renderChar(int *x, int *y, char c) {
+  if (c == ' ') {
+    x += 5;
+    return;
+  }
+
+  int glyphIndex = getFontDataIndex(c);
+  copyGlyphToVRAM(*x, *y, &PeaberryBitmap, &fontData[glyphIndex]);  *x += fontData[glyphIndex].width + 1; 
+};
 
 void gprintf(int x, int y, const char *fmt, int arg) {
-  int glyphIndex;
-  char c;
-  char buf[8] = {0};
+  int started = 0;
   int counter;
   int powers[] = {10000, 1000, 100, 10, 1};
   int leadingZero = 0; 
@@ -59,78 +54,49 @@ void gprintf(int x, int y, const char *fmt, int arg) {
       case ('d'): 
 
         if (arg == 0) {
-            // Special case for zero
-          buf[0] = '1';
-          glyphIndex = getFontDataIndex('0');
-          if (glyphIndex >= 0) {
-            copyGlyphToVRAM(x, y, &PeaberryBitmap, &fontData[glyphIndex]);
-            x += fontData[glyphIndex].width + 1;
-          }
+            renderChar(&x, &y, '0');
+          return;
+        }
 
-        } else if (arg < 0) {
-          c = '-';
-          glyphIndex = getFontDataIndex(c);
-          if (glyphIndex >= 0) {
-            copyGlyphToVRAM(x, y, &PeaberryBitmap, &fontData[glyphIndex]);
-            x += fontData[glyphIndex].width + 1;
-          }
+        if (arg < 0) {
+          renderChar(&x, &y, '-');
           arg = -arg;
+        }
 
+        for (int j = 0; j < 5; j++) {
+          counter = 0;
+          while (arg >= powers[j]) {
+            arg -= powers[j];
+            counter++;
+          }
+
+          if (!(counter | started)) {
+            leadingZero++;
           } else {
-            for (int j = 0; j < 5; j++) {
-              counter = 0;
-              while (arg > powers[j]) {
-                arg -= powers[j];
-                counter++;
-              }
-              if (!(counter | buf[0])) {
-                leadingZero++;
-              } else {
-                buf[j - leadingZero] = '0' + counter;
-              }
-            }
-
-            for (int j = 0; j < (5 - leadingZero); j++) {
-                glyphIndex = getFontDataIndex(buf[j]);
-                if (glyphIndex >= 0) {
-                  copyGlyphToVRAM(x, y, &PeaberryBitmap, &fontData[glyphIndex]);
-                  x += fontData[glyphIndex].width + 1;
-              }
-            }
+              started++;
+            renderChar(&x, &y, '0' + counter);
           }
+        }
+        break;
 
-          i++;
-          break;
-
-        case ('x'):
-        
-           // i++
-          break;
-        default:
-          c = '%';
-          glyphIndex = getFontDataIndex(c);
-          if (glyphIndex >= 0) {
-            copyGlyphToVRAM(x, y, &PeaberryBitmap, &fontData[glyphIndex]);
-            x += fontData[glyphIndex].width + 1;
-          }
-          break;
+      default:
+          renderChar(&x, &y, '%');
+        break;
       }
-    }
+    } else {
+      char c = fmt[i];
+      if (c == ' ') {
+        x += 5;
+        continue;
+      }
 
-    char c = fmt[i];
-    if (c == ' ') {
-      x += 5;
-      continue;
-    }
-
-    glyphIndex = getFontDataIndex(c);
-    if (glyphIndex >= 0) {
-      copyGlyphToVRAM(x, y, &PeaberryBitmap, &fontData[glyphIndex]);
-      x += fontData[glyphIndex].width + 1;
+    renderChar(&x, &y, fmt[i]);
     }
   }
 }
 
+/*
+*/
 
 int getFontDataIndex(char c) {
   if (c >= 'A' && c <= 'Z') {
