@@ -6,21 +6,60 @@
 int getFontDataIndex(char c);
 void renderChar(int *x, int *y, char c);
 void printString(int x, int y, const char *text);
-void gprintf(int x, int y, const char* format, int arg);
+void gprintf(int x, int y, const char *format, int arg);
+
 
 int main() {
   DSPC = MODE3 | BG2;
   int bgColor = dblClr(RGB(17, 13, 28));
   fillScreen(bgColor);
 
-  const char *text = "Hello World!";
   int x = 20;
-  int y = 20;
-//  printString(x, y, text);
-  gprintf(x, y, "hello %d", 4009);
-  while (1) {
-  }
+  int y = 25;
+  gprintf(x, y, "hello %d goodbye", x + y);
+  while (1) {}
   return 0;
+}
+
+void gprintf(int x, int y, const char *fmt, int arg) {
+  int started = 0;
+  int counter;
+  int powers[] = {10000, 1000, 100, 10, 1};
+
+  for (int i = 0; fmt[i] != '\0'; i++) {
+    if (fmt[i] == '%') {
+      i++;
+      switch (fmt[i]) {
+      case ('d'): 
+        if (arg == 0) {
+          renderChar(&x, &y, '0');
+          continue;
+        }
+        if (arg < 0) {
+          renderChar(&x, &y, '-');
+          arg = -arg;
+        }
+        for (int j = 0; j < 5; j++) {
+          counter = 0;
+          while (arg >= powers[j]) {
+            arg -= powers[j];
+            counter++;
+          }
+          if (counter | started) {
+            started = 1;
+            renderChar(&x, &y, '0' + counter);
+          }
+        }
+        break;
+      default:
+          renderChar(&x, &y, '%');
+          renderChar(&x, &y, fmt[i]);
+        break;
+      }
+    } else {
+    renderChar(&x, &y, fmt[i]);
+    }
+  }
 }
 
 //in future, also pass font struct with bitmap and fontdata 
@@ -32,71 +71,13 @@ void printString(int x, int y, const char *text) {
 
 void renderChar(int *x, int *y, char c) {
   if (c == ' ') {
-    x += 5;
+    *x += 5;
     return;
   }
 
   int glyphIndex = getFontDataIndex(c);
   copyGlyphToVRAM(*x, *y, &PeaberryBitmap, &fontData[glyphIndex]);  *x += fontData[glyphIndex].width + 1; 
 };
-
-void gprintf(int x, int y, const char *fmt, int arg) {
-  int started = 0;
-  int counter;
-  int powers[] = {10000, 1000, 100, 10, 1};
-  int leadingZero = 0; 
-
-  for (int i = 0; fmt[i] != '\0'; i++) {
-    if (fmt[i] == '%') {
-      i++;
-
-      switch (fmt[i]) {
-      case ('d'): 
-
-        if (arg == 0) {
-            renderChar(&x, &y, '0');
-          return;
-        }
-
-        if (arg < 0) {
-          renderChar(&x, &y, '-');
-          arg = -arg;
-        }
-
-        for (int j = 0; j < 5; j++) {
-          counter = 0;
-          while (arg >= powers[j]) {
-            arg -= powers[j];
-            counter++;
-          }
-
-          if (!(counter | started)) {
-            leadingZero++;
-          } else {
-              started++;
-            renderChar(&x, &y, '0' + counter);
-          }
-        }
-        break;
-
-      default:
-          renderChar(&x, &y, '%');
-        break;
-      }
-    } else {
-      char c = fmt[i];
-      if (c == ' ') {
-        x += 5;
-        continue;
-      }
-
-    renderChar(&x, &y, fmt[i]);
-    }
-  }
-}
-
-/*
-*/
 
 int getFontDataIndex(char c) {
   if (c >= 'A' && c <= 'Z') {
@@ -176,4 +157,5 @@ int getFontDataIndex(char c) {
     }
   }
 }
+
 
