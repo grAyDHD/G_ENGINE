@@ -3,10 +3,11 @@
 #include "graphics/draw.h"
 #include "graphics/video.h"
 
+// GIT: next commit will be a refactor of text functions into library
 int getFontDataIndex(char c);
 void renderChar(int *x, int *y, char c);
 void printString(int x, int y, const char *text);
-void gprintf(int x, int y, const char *format, int arg);
+void gprintf(int x, int y, const char *format, u32 arg);
 
 
 int main() {
@@ -16,33 +17,34 @@ int main() {
 
   int x = 20;
   int y = 25;
-  gprintf(x, y, "hello %d goodbye", x + y);
+  gprintf(x, y, "hello %x goodbye", 0xDEADBEAF);
   while (1) {}
   return 0;
 }
 
-void gprintf(int x, int y, const char *fmt, int arg) {
+void gprintf(int x, int y, const char *fmt, u32 arg) {
   int started = 0;
   int counter;
   int powers[] = {10000, 1000, 100, 10, 1};
 
+  s32 val = arg;
   for (int i = 0; fmt[i] != '\0'; i++) {
     if (fmt[i] == '%') {
       i++;
       switch (fmt[i]) {
       case ('d'): 
-        if (arg == 0) {
+        if (val == 0) {
           renderChar(&x, &y, '0');
           continue;
         }
-        if (arg < 0) {
+        if (val < 0) {
           renderChar(&x, &y, '-');
-          arg = -arg;
+          val = -val;
         }
         for (int j = 0; j < 5; j++) {
           counter = 0;
-          while (arg >= powers[j]) {
-            arg -= powers[j];
+          while (val >= powers[j]) {
+            val -= powers[j];
             counter++;
           }
           if (counter | started) {
@@ -51,18 +53,33 @@ void gprintf(int x, int y, const char *fmt, int arg) {
           }
         }
         break;
-      default:
+
+        case ('x'):
+          renderChar(&x, &y, '0');
+          renderChar(&x, &y, 'x');
+          int digits[8];
+          int nibble;
+          for (int i = 0; i < 8; i++) {
+            nibble = ((arg >> (i * 4)) & 0xF);
+            if (nibble < 10) {
+              renderChar(&x, &y, '0' + nibble);
+            } else {
+              renderChar(&x, &y, 'A' + (nibble - 10));
+            }
+          }
+          break;
+        default:
           renderChar(&x, &y, '%');
           renderChar(&x, &y, fmt[i]);
         break;
       }
     } else {
-    renderChar(&x, &y, fmt[i]);
+      renderChar(&x, &y, fmt[i]);
     }
   }
 }
 
-//in future, also pass font struct with bitmap and fontdata 
+// in future, also pass font struct with bitmap and fontdata 
 void printString(int x, int y, const char *text) {
   for (int i = 0; text[i] != '\0'; i++) {
     renderChar(&x, &y, text[i]);
