@@ -57,9 +57,8 @@ void gprintf(int x, int y, const char *fmt, u32 arg) {
         case ('x'):
           renderChar(&x, &y, '0');
           renderChar(&x, &y, 'x');
-          int digits[8];
           int nibble;
-          for (int i = 0; i < 8; i++) {
+          for (int i = 7; i >= 0; i--) {
             nibble = ((arg >> (i * 4)) & 0xF);
             if (nibble < 10) {
               renderChar(&x, &y, '0' + nibble);
