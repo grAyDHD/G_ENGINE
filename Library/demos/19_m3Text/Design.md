@@ -68,7 +68,7 @@ or... Coordinate, image pointer, glyph
 - [ ] Test all alignment combinations with multi-line text.
 
     Advanced Features
-- [ ] Implement printf
+- [x] Implement printf
 - [ ] Implement text scaling (e.g., 2x or 4x size).
 - [ ] Add gradient text coloring options.
 - [ ] Create a text shadow/outline effect.

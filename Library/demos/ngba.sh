@@ -76,7 +76,7 @@ fi
 # Create the main C file with a basic template
 cat > "$PROJECT_MAIN_C" << EOL
 #include "../includes/${PROJECT_NAME}.h"
-#include "gfx.h"
+#include "graphics/video.h"
 
 int main() {
     DSPC = ${VIDEO_MODE};

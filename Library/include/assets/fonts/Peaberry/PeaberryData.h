@@ -1,4 +1,4 @@
-#include "../includes/fontData.h"
+#include "graphics/text.h"
 
 GlyphInfo fontData[94] = {
     {0, 10},    // 'A'
@@ -19,7 +19,7 @@ GlyphInfo fontData[94] = {
     {284, 8},   // 'P'
     {302, 10},  // 'Q'
     {324, 8},   // 'R'
-    {342, 8},   // 'S' double all from here
+    {342, 8},   // 'S'
     {358, 8},   // 'T'
     {376, 8},   // 'U'
     {394, 10},  // 'V'

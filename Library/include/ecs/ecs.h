@@ -10,6 +10,7 @@ extern void SpriteFrame32Bit(PositionComponent *positionData,
                              const void *image);
 
 int initEntitySystem(ECS *ecs, ComponentStorage *world);
+
 void renderEntity(ECS *ecs, int entityId);
 void clearSpriteFrames(ECS *system, ComponentStorage *world, const void *image);
 
