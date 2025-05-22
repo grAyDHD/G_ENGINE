@@ -40,12 +40,12 @@ Pressing A when text speed selected will highlight selected speed
 
 ### Required Assets:
     Graphics
--[ ] 4 direction sprite sheets for 9 characters
+-[x] 4 direction sprite sheets for multiple characters (use robo sheet as 4 characters with color selection, smiley for one, and chocobo)
 -[ ] Menu UI elements
-  -[ ] Bordered frame
-  -[ ] Borderless frame
-  -[ ] Grid UI
-  -[ ] Slider bar
+  -[ ] Bordered frame (1 image each corner, vertical frame, horizontal frame, and internal frame)
+  -[ ] Borderless frame (start only with one frame type, just swap assets)
+  -[ ] Card UI (like smash bros character selection cards)
+  -[ ] Slider bar ()
   -[ ] Checkbox
   -[ ] Highlight graphics?
   -[ ] New Font implementation?

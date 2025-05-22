@@ -1,6 +1,7 @@
 // createNPC(&ecs, RoboBitmap);
 //
 #include "../includes/characterAnimator.h"
+//#include "assets/sprites/animated/Sonic.h"
 #include "Robo.h"
 #include "core/interrupts.h"
 #include "ecs/components.h"
