@@ -12,26 +12,28 @@ void playerInputHandler(ECS *ecs, int entityId) {
       &ecs->components->acceleration[entityId];
 
   if (keyDown(U)) {
+    //if NOT a platformer
     if (!(ecs->entity[entityId].flag & ENABLE_GRAVITY)) {
 
-      acceleration->ay -= INT_TO_FIXED(256);
+      acceleration->ay -= INT_TO_FIXED(2048);
       animation->direction = UP;
       animation->state = WALK;
     }
   } else if (keyDown(D)) {
-    acceleration->ay += INT_TO_FIXED(256);
+    acceleration->ay += INT_TO_FIXED(2048);
     animation->direction = DOWN;
     animation->state = WALK;
   } else if (keyDown(L)) {
-    acceleration->ax -= INT_TO_FIXED(256);
+    acceleration->ax -= INT_TO_FIXED(2048);
     animation->direction = LEFT;
     animation->state = WALK;
   } else if (keyDown(R)) {
-    acceleration->ax += INT_TO_FIXED(256);
+    acceleration->ax += INT_TO_FIXED(2048);
     animation->direction = RIGHT;
     animation->state = WALK;
   }
 
+  //if platformer
   if (keyTapped(A) && (ecs->entity[entityId].flag & ENABLE_GRAVITY & ON_GROUND)) {
     velocity->dy = -INT_TO_FIXED(64);
   }

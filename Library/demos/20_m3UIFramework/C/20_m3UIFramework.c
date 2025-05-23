@@ -1,4 +1,5 @@
 #include "../includes/ui.h"
+#include "ecs/entities.h"
 
 static ComponentStorage components;
 static ECS ecs;
@@ -12,7 +13,7 @@ int main() {
  // m3_Background(BedroomBitmap);
   initEntitySystem(&ecs, &components);
   createPlayer(&ecs, SonicBitmap);
-  ecs.entity[0].flag |= PHYSICS_FLAG;
+  ecs.entity[0].flag |= PHYSICS_FLAG | ON_GROUND;
   //createNPC(&ecs, RoboBitmap);
   createScreenBorders(&ecs);
 

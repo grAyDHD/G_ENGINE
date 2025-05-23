@@ -20,7 +20,8 @@ void updateBehaviorSystem(ECS *ecs, Entity *entity, AIComponent *ai) {
   }
 };
 
-#define FRICTION_COEFFICIENT (INT_TO_FIXED(63) >> 6)
+#define FRICTION_COEFFICIENT 0x0000B000 
+// (INT_TO_FIXED(63) >> 7)
 
 void updatePhysicsSystem(Entity *entity, VelocityComponent *velocity,
                          AccelerationComponent *acceleration,
@@ -33,9 +34,16 @@ void updatePhysicsSystem(Entity *entity, VelocityComponent *velocity,
       acceleration[id].ay += GRAVITY;
     }
 
+    // below, if platformer
+    /*
     if (entity[id].flag & ON_GROUND) {
       velocity[id].dx = MULT(velocity[id].dx, FRICTION_COEFFICIENT);
     }
+    */
+
+    // if not platformer:
+    velocity[id].dx = MULT(velocity[id].dx, FRICTION_COEFFICIENT);
+    velocity[id].dy = MULT(velocity[id].dy, FRICTION_COEFFICIENT);
 
     velocity[id].dx += MULT(acceleration[id].ax, deltaTime);
     velocity[id].dy += MULT(acceleration[id].ay, deltaTime);
