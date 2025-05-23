@@ -1,4 +1,5 @@
 #include "../includes/ui.h"
+#include "../build/Bedroom.h"
 #include "ecs/entities.h"
 
 static ComponentStorage components;
@@ -10,7 +11,7 @@ volatile fixed_s32 deltaTime;
 int main() {
   DSPC = MODE3 | BG2;
   initializeVBI();
- // m3_Background(BedroomBitmap);
+  m3_Background(BedroomBitmap);
   initEntitySystem(&ecs, &components);
   createPlayer(&ecs, SonicBitmap);
   ecs.entity[0].flag |= PHYSICS_FLAG | ON_GROUND;
@@ -19,7 +20,7 @@ int main() {
 
   while (1) {
     VBLANK();
-    clearSpriteFrames(&ecs, &components, 0);
+    clearSpriteFrames(&ecs, &components, BedroomBitmap);
     updateInputSystem(&ecs, ecs.entity, ecs.components->input, deltaTime);
     updateBehaviorSystem(&ecs, ecs.entity, ecs.components->ai);
     updatePhysicsSystem(ecs.entity, ecs.components->velocity,

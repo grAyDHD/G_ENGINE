@@ -54,14 +54,16 @@ Pressing A when text speed selected will highlight selected speed
 
 ## Implementation Phases
 
-next commit: add friction to physics.
+commit: add NPC with collisions
+commit: interaction detection zone
+commit: add player states?
+
 ### Phase 1: 
     Base Game Environment
 [x] Decide on assets to use (player, npc, background)
 [x] Implement player sprite
 [x] 4 directional movement/animation
-[ ] Static NPC
-[ ] Basic collision detection
+[ ] Static NPC with basic collision detection
 [ ] Implement interaction detection zone
 [ ] Set up state machine- SPEAKING, IDLE, MOVEMENT, MENU (separate player from game state- SPEAKING IDLE and MOVEMENT are player states, MENU will be a game state)
 [ ] Switch to SPEAKING on interaction with NPC
