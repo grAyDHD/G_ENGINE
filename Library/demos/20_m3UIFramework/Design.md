@@ -54,41 +54,23 @@ Pressing A when text speed selected will highlight selected speed
 
 ## Implementation Phases
 
-commit: add NPC with collisions
-commit: interaction detection zone
-commit: add player states?
-
 ### Phase 1: 
     Base Game Environment
 [x] Decide on assets to use (player, npc, background)
 [x] Implement player sprite
 [x] 4 directional movement/animation
-[ ] Static NPC with basic collision detection
-[ ] Implement interaction detection zone
-[ ] Set up state machine- SPEAKING, IDLE, MOVEMENT, MENU (separate player from game state- SPEAKING IDLE and MOVEMENT are player states, MENU will be a game state)
-[ ] Switch to SPEAKING on interaction with NPC
+[ ] Player movement states: IDLE, MOVING
+[ ] Set up game state machine-  MENU, GAME_LOOP
+[ ] Set up sub menu states: one for each adjustable parameter
 [ ] Switch to MENU on pressing START
 
-### Phase 2: 
-    Add new font
-[ ] Create new font sprite sheet
-[ ] Write program to scan bitmap and generate font data table
-
 ### Phase 2:
-    NPC interactions
-[ ] Add graphics for text box
-[ ] Show sprite of speaking character
-[ ] First time talking w/NPC, have NPC ask for name
-[ ] Implement character input box for player to enter name 
-[ ] Subsequent NPC interactions will remember your name
-
-### Phase 3:
     Non interactive iteration of of PAUSE menu
 [ ] on pressing start, darken screen
 [ ] Draw menu list with options
 [ ] Add highlighting to current selection, change on UP/DOWN
 
-### Phase 4: 
+### Phase 3: 
     Implement character selection    
 [ ] Change to grid system when pressing A on Select Character
 [ ] Ensure having 9 sets of animation sprite sheets
@@ -97,15 +79,15 @@ commit: add player states?
 [ ] Press A to set player sprite to selected character
 [ ] Press B to return to menu, START to return to gameplay
 
-### Phase 5:
+### Phase 4:
     Implement sliders
 [ ] Draw slider for movement speed
 [ ] Press A to highlight slider
 [ ] When slider highlighted, L/R dpad to adjust value
 [ ] Update movement speed
 
-### Phase 6:
-    Add final menu parameter
+### Phase 5:
+   Add final menu parameter
 [ ] Current text speed brighter color than others
 [ ] Press A to highlight current speed, allowing selection
 [ ] L/R dpad to change speed, A or B to return to menu item

@@ -47,7 +47,7 @@ typedef struct {
 #define NPC_ENTITY                                                             \
   (POSITION_COMPONENT | VELOCITY_COMPONENT | ANIMATION_COMPONENT |             \
    SPRITE_COMPONENT | AI_COMPONENT | HITBOX_COMPONENT | DETECTS_COLLISIONS |   \
-   TRIGGERS_COLLISIONS)
+   TRIGGERS_COLLISIONS | SPRITE_FLAG)
 
 #define BOUNDARY_ENTITY                                                        \
   (POSITION_COMPONENT | HITBOX_COMPONENT | TRIGGERS_COLLISIONS |               \

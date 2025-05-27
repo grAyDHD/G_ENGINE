@@ -1,5 +1,3 @@
-// createNPC(&ecs, RoboBitmap);
-//
 #include "../includes/characterAnimator.h"
 //#include "assets/sprites/animated/Sonic.h"
 #include "Robo.h"
@@ -21,7 +19,7 @@ int main() {
   initEntitySystem(&ecs, &components);
   createPlayer(&ecs, RoboBitmap);
   ecs.entity[0].flag |= PHYSICS_FLAG;
-  //createNPC(&ecs, RoboBitmap);
+  createNPC(&ecs, RoboBitmap);
   createScreenBorders(&ecs);
 
   while (1) {

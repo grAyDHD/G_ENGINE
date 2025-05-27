@@ -13,6 +13,7 @@ int initEntitySystem(ECS *ecs, ComponentStorage *components) {
   // Initialize Entity array
   for (int i = 0; i < MAX_ENTITIES; i++) {
     ecs->entity[i].ID = -1;  // Mark as unused
+
     ecs->entity[i].flag = 0; // No components attached
   }
 
