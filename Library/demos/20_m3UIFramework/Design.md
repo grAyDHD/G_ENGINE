@@ -64,13 +64,18 @@ Pressing A when text speed selected will highlight selected speed
 [ ] Set up sub menu states: one for each adjustable parameter
 [ ] Switch to MENU on pressing START
 
-### Phase 2:
+### Phase 2: 
+    Add new font
+[ ] Create new font sprite sheet
+[ ] Write program to scan bitmap and generate font data table
+
+### Phase 3:
     Non interactive iteration of of PAUSE menu
 [ ] on pressing start, darken screen
 [ ] Draw menu list with options
 [ ] Add highlighting to current selection, change on UP/DOWN
 
-### Phase 3: 
+### Phase 4: 
     Implement character selection    
 [ ] Change to grid system when pressing A on Select Character
 [ ] Ensure having 9 sets of animation sprite sheets
@@ -79,14 +84,14 @@ Pressing A when text speed selected will highlight selected speed
 [ ] Press A to set player sprite to selected character
 [ ] Press B to return to menu, START to return to gameplay
 
-### Phase 4:
+### Phase 5:
     Implement sliders
 [ ] Draw slider for movement speed
 [ ] Press A to highlight slider
 [ ] When slider highlighted, L/R dpad to adjust value
 [ ] Update movement speed
 
-### Phase 5:
+### Phase 6:
    Add final menu parameter
 [ ] Current text speed brighter color than others
 [ ] Press A to highlight current speed, allowing selection
