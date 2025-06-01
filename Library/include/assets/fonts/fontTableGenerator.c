@@ -11,6 +11,17 @@
 int main() {
   int arrangedTable[ROW_LENGTH][COL_HEIGHT];
 
+  //for (int i = 0; i < (ROW_LENGTH * COL_HEIGHT); i++) {}
+  for (int i = 0; i < ROW_LENGTH; i++) {
+    for (int j = 0; j < COL_HEIGHT; j++) {
+      arrangedTable[i][j] = MiniGBABitmap[i + (j * ROW_LENGTH)];
+      printf("original: %x, copy: %x \n", MiniGBABitmap[i + (j * ROW_LENGTH)],arrangedTable[i][j]);
+    }
+  }
+
+  
+
+
   return 0;
 }
 
