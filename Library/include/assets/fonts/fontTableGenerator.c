@@ -1,10 +1,16 @@
+#include <stdio.h>
 #define ROW_LENGTH 633
 #define COL_HEIGHT 11 // once generator works, use scanf for w/h
+#include "MiniGBA/MiniGBA.c"
 
   // Program creation steps:
   // Load in data table
+  // Create empty 2d array
+  // iterate through MiniGBABitmap, copying through all of Row Length, resetting to zero and COL_HEIGHT++ 
 
 int main() {
+  int arrangedTable[ROW_LENGTH][COL_HEIGHT];
+
   return 0;
 }
 
