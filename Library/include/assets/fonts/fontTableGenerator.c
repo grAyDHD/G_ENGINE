@@ -1,15 +1,23 @@
 #include <stdio.h>
+#include "MiniGBA/MiniGBA.c"
+//#include "../../graphics/text.h"
+
+typedef unsigned short u16;
+
+typedef struct {
+  u16 xOffset;
+  u16 width;
+} GlyphInfo;
+
 #define ROW_LENGTH 633
 #define COL_HEIGHT 11 // once generator works, use scanf for w/h
-#include "MiniGBA/MiniGBA.c"
-#include "graphics/text.h"
-
   // Program creation steps:
   // Load in data table
   // Create empty 2d array
   // iterate through MiniGBABitmap, copying through all of Row Length, resetting to zero and COL_HEIGHT++ 
   // create fontDataTable
   // scan bitmap copy column by column UNTIL finding column where EVERY value = 0x7C1F
+  //
 
 int main() {
   int arrangedTable[ROW_LENGTH][COL_HEIGHT];
@@ -18,7 +26,7 @@ int main() {
   for (int i = 0; i < ROW_LENGTH; i++) {
     for (int j = 0; j < COL_HEIGHT; j++) {
       arrangedTable[i][j] = MiniGBABitmap[i + (j * ROW_LENGTH)];
-      printf("original: %x, copy: %x \n", MiniGBABitmap[i + (j * ROW_LENGTH)], arrangedTable[i][j]);
+//      printf("original: %x, copy: %x \n", MiniGBABitmap[i + (j * ROW_LENGTH)], arrangedTable[i][j]);
     }
   }
 
@@ -26,9 +34,9 @@ int main() {
   
 
   int width = 1;
+  int fontDataIndex = 0;
   for (int i = 0; i < ROW_LENGTH; i++) { 
     int bgMatch = 0;
-    int fontDataIndex = 0;
     for (int j = 0; j < COL_HEIGHT; j++) {
       if (arrangedTable[i][j] == 0x7C1F) {
         bgMatch++;
@@ -37,7 +45,7 @@ int main() {
      if (bgMatch == COL_HEIGHT) {
         fontData[fontDataIndex].width = width;
         fontData[fontDataIndex].xOffset = (i - width);
-
+        fontDataIndex++;
         width = 0;
       }
 
@@ -45,6 +53,9 @@ int main() {
     width++;
   }
 
+  for (int i = 0; i < 94; i++) {
+    printf("fontData[%d]: { xOffset: %d, width: %d}\n ", i, fontData[i].xOffset, fontData[i].width);
+  }
   return 0;
 }
 
