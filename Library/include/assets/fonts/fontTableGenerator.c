@@ -9,37 +9,47 @@ typedef struct {
   u16 width;
 } GlyphInfo;
 
-#define ROW_LENGTH 634
-#define COL_HEIGHT 11 // once generator works, use scanf for w/h
+#define ROW_LENGTH 633
+#define COL_HEIGHT 11 
+#define STRIDE (ROW_LENGTH + 1)
+  // once generator works, use scanf for w/h?
+
   // Program creation steps:
   // Load in data table
   // Create empty 2d array
   // iterate through MiniGBABitmap, copying through all of Row Length, resetting to zero and COL_HEIGHT++ 
   // create fontDataTable
   // scan bitmap copy column by column UNTIL finding column where EVERY value = 0x7C1F
-  //
 
 int main() {
-  int arrangedTable[ROW_LENGTH][COL_HEIGHT];
+  
+  int arrangedTable[COL_HEIGHT][ROW_LENGTH];  // [row][column]
+  for (int j = 0; j < COL_HEIGHT; j++) {      // j = row
+    for (int i = 0; i < ROW_LENGTH; i++) {    // i = column  
+      arrangedTable[j][i] = MiniGBABitmap[i + (j * STRIDE)];
+    }
+  }
 
-  //for (int i = 0; i < (ROW_LENGTH * COL_HEIGHT); i++) {}
+  /*
+  int arrangedTable[ROW_LENGTH][COL_HEIGHT];
   for (int i = 0; i < ROW_LENGTH; i++) {
     for (int j = 0; j < COL_HEIGHT; j++) {
       arrangedTable[i][j] = MiniGBABitmap[i + (j * ROW_LENGTH)];
     }
   }
+  */
 
-  // Prints 
+  // Prints table copy row by row, verified correct
   for (int j = 0; j < COL_HEIGHT; j++) {
+    printf("Row %d:\n ", j);
     for (int i = 0; i < ROW_LENGTH; i++) {
-      printf("%x ", arrangedTable[i][j]);
+      printf("%d: %x ", i, arrangedTable[j][i]);
     }
     printf("\n\n");
 
   }
 
   
-/*
   GlyphInfo fontData[94];
   int width = 1;
   int fontDataIndex = 0;
@@ -64,7 +74,6 @@ int main() {
   for (int i = 0; i < 94; i++) {
 //    printf("fontData[%d]: { xOffset: %d, width: %d}\n ", i, fontData[i].xOffset, fontData[i].width);
   }
-  */
 
   return 0;
 }
