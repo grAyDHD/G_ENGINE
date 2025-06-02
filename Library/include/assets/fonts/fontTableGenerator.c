@@ -9,7 +9,7 @@ typedef struct {
   u16 width;
 } GlyphInfo;
 
-#define ROW_LENGTH 633
+#define ROW_LENGTH 634
 #define COL_HEIGHT 11 // once generator works, use scanf for w/h
   // Program creation steps:
   // Load in data table
@@ -26,13 +26,21 @@ int main() {
   for (int i = 0; i < ROW_LENGTH; i++) {
     for (int j = 0; j < COL_HEIGHT; j++) {
       arrangedTable[i][j] = MiniGBABitmap[i + (j * ROW_LENGTH)];
-//      printf("original: %x, copy: %x \n", MiniGBABitmap[i + (j * ROW_LENGTH)], arrangedTable[i][j]);
     }
   }
 
-  GlyphInfo fontData[94];
-  
+  // Prints 
+  for (int j = 0; j < COL_HEIGHT; j++) {
+    for (int i = 0; i < ROW_LENGTH; i++) {
+      printf("%x ", arrangedTable[i][j]);
+    }
+    printf("\n\n");
 
+  }
+
+  
+/*
+  GlyphInfo fontData[94];
   int width = 1;
   int fontDataIndex = 0;
   for (int i = 0; i < ROW_LENGTH; i++) { 
@@ -54,8 +62,10 @@ int main() {
   }
 
   for (int i = 0; i < 94; i++) {
-    printf("fontData[%d]: { xOffset: %d, width: %d}\n ", i, fontData[i].xOffset, fontData[i].width);
+//    printf("fontData[%d]: { xOffset: %d, width: %d}\n ", i, fontData[i].xOffset, fontData[i].width);
   }
+  */
+
   return 0;
 }
 
