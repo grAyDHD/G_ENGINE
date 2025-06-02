@@ -1,4 +1,4 @@
-# GBA UI Framework Interactive Demo
+ GBA UI Framework Interactive Demo
 
 ## Project Overview
 This program is an interactive demo of a dynamic menu system.
@@ -59,15 +59,15 @@ Pressing A when text speed selected will highlight selected speed
 [x] Decide on assets to use (player, npc, background)
 [x] Implement player sprite
 [x] 4 directional movement/animation
-[ ] Player movement states: IDLE, MOVING
+[x] Player movement states: IDLE, MOVING
 [ ] Set up game state machine-  MENU, GAME_LOOP
 [ ] Set up sub menu states: one for each adjustable parameter
 [ ] Switch to MENU on pressing START
 
 ### Phase 2: 
     Add new font
-[ ] Create new font sprite sheet
-[ ] Write program to scan bitmap and generate font data table
+[x] Create new font sprite sheet
+[x] Write program to scan bitmap and generate font data table
 
 ### Phase 3:
     Non interactive iteration of of PAUSE menu

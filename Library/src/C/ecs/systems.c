@@ -3,7 +3,7 @@
 #include "../../include/input/in.h"
 #include "core/typedefs.h"
 #include "ecs/components.h"
-#include "ecs/entities.h"
+
 #include "math/math.h"
 
 void updateInputSystem(ECS *ecs, Entity *entity, InputComponent *input,
@@ -262,7 +262,8 @@ void updateCollisionSystem(Entity *entity, PositionComponent *position,
         resolveDynamicCollisions(&entity[idA], &velocity[idA], &position[idA],
                                  &velocity[idB], &position[idB], overlap);
       }
-    } }
+    } 
+  }
 }
 
 void updateAnimationSystem(Entity *entity, AnimationComponent *animation) {
