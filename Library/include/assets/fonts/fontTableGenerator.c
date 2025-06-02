@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "MiniGBA/MiniGBA.c"
-//#include "../../graphics/text.h"
 
 typedef unsigned short u16;
 
@@ -21,58 +20,55 @@ typedef struct {
   // create fontDataTable
   // scan bitmap copy column by column UNTIL finding column where EVERY value = 0x7C1F
 
-int main() {
-  
-  int arrangedTable[COL_HEIGHT][ROW_LENGTH];  // [row][column]
-  for (int j = 0; j < COL_HEIGHT; j++) {      // j = row
-    for (int i = 0; i < ROW_LENGTH; i++) {    // i = column  
-      arrangedTable[j][i] = MiniGBABitmap[i + (j * STRIDE)];
-    }
-  }
 
   /*
-  int arrangedTable[ROW_LENGTH][COL_HEIGHT];
-  for (int i = 0; i < ROW_LENGTH; i++) {
-    for (int j = 0; j < COL_HEIGHT; j++) {
-      arrangedTable[i][j] = MiniGBABitmap[i + (j * ROW_LENGTH)];
+  // Prints table copy row by row, verified correct
+  for (int i = 0; i < COL_HEIGHT; i++) {
+    printf("Row %d:\n ", i);
+    for (int j = 0; j < ROW_LENGTH; j++) {
+      printf("%d: %x ", j, arrangedTable[i][j]);
     }
+    printf("\n\n");
   }
   */
 
-  // Prints table copy row by row, verified correct
-  for (int j = 0; j < COL_HEIGHT; j++) {
-    printf("Row %d:\n ", j);
-    for (int i = 0; i < ROW_LENGTH; i++) {
-      printf("%d: %x ", i, arrangedTable[j][i]);
+int main() {
+  
+  int arrangedTable[COL_HEIGHT][ROW_LENGTH];  // [row][column]
+  for (int i = 0; i < COL_HEIGHT; i++) {      // j = row
+    for (int j = 0; j < ROW_LENGTH; j++) {    // i = column  
+      arrangedTable[i][j] = MiniGBABitmap[j + (i * STRIDE)];
     }
-    printf("\n\n");
-
   }
 
-  
+
+
   GlyphInfo fontData[94];
   int width = 1;
   int fontDataIndex = 0;
+  int glyphStartX = 0;
+  
   for (int i = 0; i < ROW_LENGTH; i++) { 
     int bgMatch = 0;
     for (int j = 0; j < COL_HEIGHT; j++) {
-      if (arrangedTable[i][j] == 0x7C1F) {
+      if (arrangedTable[j][i] == 0x7C1F) {
         bgMatch++;
       }
-  
-     if (bgMatch == COL_HEIGHT) {
+    }
+
+    if (bgMatch == COL_HEIGHT) {
         fontData[fontDataIndex].width = width;
-        fontData[fontDataIndex].xOffset = (i - width);
+        fontData[fontDataIndex].xOffset = (glyphStartX);
         fontDataIndex++;
         width = 0;
-      }
-
+        glyphStartX = i + 1;
+    } else {
+      width++;
     }
-    width++;
   }
 
   for (int i = 0; i < 94; i++) {
-//    printf("fontData[%d]: { xOffset: %d, width: %d}\n ", i, fontData[i].xOffset, fontData[i].width);
+    printf("fontData[%d]: { xOffset: %d, width: %d}\n ", i, fontData[i].xOffset, fontData[i].width);
   }
 
   return 0;
