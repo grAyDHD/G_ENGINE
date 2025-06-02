@@ -58,7 +58,7 @@ int main() {
 
     if (bgMatch == COL_HEIGHT) {
         fontData[fontDataIndex].width = width;
-        fontData[fontDataIndex].xOffset = (glyphStartX);
+        fontData[fontDataIndex].xOffset = (glyphStartX * 2);
         fontDataIndex++;
         width = 0;
         glyphStartX = i + 1;

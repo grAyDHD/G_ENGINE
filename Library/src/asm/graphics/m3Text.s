@@ -30,7 +30,7 @@ printGlyph:
   sub r5, r5, r4 
 
   @ image row offset
-  ldr r6, =2048       
+  ldr r6, =1268     @Peaberry = 2048, MiniGBA = 1266? 
   sub r6, r6, r4
   sub r6, r6, r4
  
@@ -38,7 +38,7 @@ printGlyph:
   @ Load transparency value
   ldr r10, =0x7C1F    @ Magenta color (RGB(31,0,31))
   @ Initialize row counter, ultimately set as char height
-  mov r7, #16 
+  mov r7, #11 @Peaberry = 16, MiniGBA = 12
 
   @ Get xOffset from struct into r9
   ldrh r9, [r3, #0]                                 @ glyph xOffset

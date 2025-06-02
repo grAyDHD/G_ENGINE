@@ -7,7 +7,7 @@ int main() {
   int bgColor = dblClr(RGB(17, 13, 28));
   fillScreen(bgColor);
 
-  gprintf(20, 25, "hello %x goodbye", 0xDEADBEAF);
+  gprintf(20, 25, "ABC %x abc {1, 2, 3, 0 }", 0xDEADBEAF);
   while (1) {}
   return 0;
 }
