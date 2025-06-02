@@ -24,10 +24,12 @@ CFLAGS :=  -O2 -Wall -fno-strict-aliasing $(foreach dir, $(INCLUDE_DIR), -I$(dir
 # Source files
 C_SOURCES := $(shell find $(C_SRC_DIR) -type f -name '*.c')
 ASM_SOURCES := $(shell find $(ASM_SRC_DIR) -type f -name '*.s')
+ASSET_ASM_SOURCES := $(shell find include/assets -type f -name '*.s' 2>/dev/null || true)
 
 # Object files (mirror source structure in build directory)
 OBJ_FILES := $(C_SOURCES:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o) \
-             $(ASM_SOURCES:$(SRC_DIR)/%.s=$(BUILD_DIR)/%.o)
+             $(ASM_SOURCES:$(SRC_DIR)/%.s=$(BUILD_DIR)/%.o) \
+						 $(ASSET_ASM_SOURCES:include/%.s=$(BUILD_DIR)/%.o)
 
 all: $(LIBRARY)
 
@@ -43,6 +45,11 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 
 # Rule for ASM source files
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.s
+	@[ -d $(dir $@) ] || mkdir -p $(dir $@)
+	$(AS) -o $@ $<
+
+# Rule for asset ASM source files
+$(BUILD_DIR)/%.o: include/%.s
 	@[ -d $(dir $@) ] || mkdir -p $(dir $@)
 	$(AS) -o $@ $<
 

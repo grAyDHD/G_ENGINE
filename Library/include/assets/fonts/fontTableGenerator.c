@@ -67,9 +67,51 @@ int main() {
     }
   }
 
+  /*
   for (int i = 0; i < 94; i++) {
     printf("fontData[%d]: { xOffset: %d, width: %d}\n ", i, fontData[i].xOffset, fontData[i].width);
   }
+  */
+
+// After your fontData array is populated, add this:
+
+FILE *outputFile = fopen("data.h", "w");
+if (outputFile == NULL) {
+    printf("Error: Could not create output file data.h\n");
+    return 1;
+}
+
+// Write the header content
+fprintf(outputFile, "#include \"graphics/text.h\"\n");
+fprintf(outputFile, "GlyphInfo fontData[94] = {\n");
+
+// Character mapping for comments (ASCII 32-125, which is 94 characters)
+char charMap[] = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+
+for (int i = 0; i < 94; i++) {
+    fprintf(outputFile, "    {%d, %d}", fontData[i].xOffset, fontData[i].width);
+    
+    // Add comma if not the last element
+    if (i < 93) {
+        fprintf(outputFile, ",");
+    }
+    
+    // Add character comment
+    if (charMap[i] == '\\') {
+        fprintf(outputFile, "   // '\\\\'");
+    } else if (charMap[i] == '\'') {
+        fprintf(outputFile, "   // '\\''");
+    } else {
+        fprintf(outputFile, "   // '%c'", charMap[i]);
+    }
+    
+    fprintf(outputFile, "\n");
+}
+
+fprintf(outputFile, "};\n");
+fclose(outputFile);
+
+printf("Successfully generated data.h\n");
 
   return 0;
 }

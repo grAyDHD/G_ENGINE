@@ -1,5 +1,5 @@
-#include "assets/fonts/Peaberry/Peaberry.h"
-#include "assets/fonts/Peaberry/PeaberryData.h"
+#include "assets/fonts/MiniGBA/MiniGBA.h"
+#include "assets/fonts/MiniGBA/MiniGBAData.h"
 
 // upcoming features: variable text size, current font sctruct/pointer, can change to another font at whim. Use library to only include fonts directly used by given project in compilation. text color change if font is monocolor, with shadow settings?
 
@@ -78,7 +78,7 @@ void renderChar(int *x, int *y, char c) {
   }
 
   int glyphIndex = getFontDataIndex(c);
-  printGlyph(*x, *y, &PeaberryBitmap, &fontData[glyphIndex]);  *x += fontData[glyphIndex].width + 1; 
+  printGlyph(*x, *y, &MiniGBABitmap, &fontData[glyphIndex]);  *x += fontData[glyphIndex].width + 1; 
 };
 
 int getFontDataIndex(char c) {

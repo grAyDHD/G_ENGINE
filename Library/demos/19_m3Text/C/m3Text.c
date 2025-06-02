@@ -1,6 +1,6 @@
 #include "graphics/draw.h"
 #include "graphics/video.h"
-#include "graphics/text.h"
+#include "graphics/m3Text.h"
 
 int main() {
   DSPC = MODE3 | BG2;
