@@ -3,6 +3,7 @@
 
 #include "assets/fonts/MiniGBA/MiniGBA.h"
 #include "assets/fonts/MiniGBA/MiniGBAData.h"
+#include "graphics/draw.h"
 
 // upcoming features: variable text size, current font sctruct/pointer, can change to another font at whim. Use library to only include fonts directly used by given project in compilation. text color change if font is monocolor, with shadow settings?
 
@@ -11,6 +12,12 @@ int getFontDataIndex(char c);
 void renderChar(int *x, int *y, char c);
 void printString(int x, int y, const char *text);
 void gprintf(int x, int y, const char *format, u32 arg);
+
+static u16 currentTextColor = 0xFFFF;
+
+void setTextColor(int r, int g, int b) {
+  currentTextColor = RGB(r, g, b);
+}
 
 void gprintf(int x, int y, const char *fmt, u32 arg) {
   int started = 0;
@@ -76,12 +83,14 @@ void printString(int x, int y, const char *text) {
 
 void renderChar(int *x, int *y, char c) {
   if (c == ' ') {
-    *x += 5;
+    *x += 2;
     return;
   }
 
   int glyphIndex = getFontDataIndex(c);
-  printGlyph(*x, *y, &MiniGBABitmap, &fontData[glyphIndex]);  *x += fontData[glyphIndex].width + 1; 
+  printGlyphColored(*x, *y, &MiniGBABitmap, &fontData[glyphIndex], currentTextColor);
+
+  *x += fontData[glyphIndex].width + 1; 
 };
 
 int getFontDataIndex(char c) {

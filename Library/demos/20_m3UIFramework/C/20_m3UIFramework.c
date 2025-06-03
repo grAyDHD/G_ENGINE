@@ -6,6 +6,9 @@
 #include "graphics/draw.h"
 #include "input/in.h"
 
+// Commits:
+// must implement text functions to change color of text
+
 static ComponentStorage components;
 static ECS ecs;
 

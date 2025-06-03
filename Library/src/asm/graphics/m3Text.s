@@ -30,7 +30,7 @@ printGlyph:
   sub r5, r5, r4 
 
   @ image row offset
-  ldr r6, =1268     @Peaberry = 2048, MiniGBA = 1266? 
+  ldr r6, =1268     @Peaberry = 2048, MiniGBA = 1268 (1px padding) 
   sub r6, r6, r4
   sub r6, r6, r4
  
@@ -88,3 +88,70 @@ printGlyph:
                   @r10 = transparency value
 
 .size printGlyph, .-printGlyph
+
+.global printGlyphColored
+.type printGlyphColored, %function
+@ printGlyphColored(int x, int y, const void *fontBitmap, GlyphInfo *fontDataIndex, u16 textColor);
+@ r0 = x
+@ r1 = y
+@ r2 = image base address
+@ r3 = GlyphInfo struct address
+@ [sp] = textColor (5th parameter on stack)
+printGlyphColored:
+  push {r4-r11}       @ Save registers on the stack
+  
+  @ Load the text color from stack into r11
+  ldr r11, [sp, #32]  @ Load textColor parameter (32 bytes offset due to pushed registers)
+  
+@ Step 1: Calculate VRAM xy offset address
+  mov r4, #240        @ Screen width in bytes
+  mul r5, r1, r4      @ y * 240
+  add r0, r0, r5      @ x + y * 240
+  add r0, r0, r0      @ Double for 16-bit color mode
+  ldr r1, =0x6000000  @ Base VRAM address
+  add r1, r1, r0      @ VRAM address for the top-left corner of the sprite
+  
+  @ Initialize constants for character width and row offsets
+  @ get glyph width from struct into r4
+  ldrh r4, [r3, #2]  
+  @ VRAM row offset
+  mov r5, #480        
+  sub r5, r5, r4
+  sub r5, r5, r4 
+  @ image row offset
+  ldr r6, =1268       @ MiniGBA row offset
+  sub r6, r6, r4
+  sub r6, r6, r4
+ 
+  @ Load transparency value
+  ldr r10, =0x7C1F    @ Magenta color (RGB(31,0,31))
+  @ Initialize row counter
+  mov r7, #11         @ MiniGBA height
+  @ Get xOffset from struct into r9
+  ldrh r9, [r3, #0]   @ glyph xOffset
+  add r2, r2, r9      @ image position + xOffset for glyph
+  
+.LoopRowColored:
+  mov r8, r4          @ initialize width/column counter, resets every row
+.LoopPixelColored:
+  ldrh r9, [r2], #2   @ Load 1 pixel, increment image address
+  cmp r9, r10         @ Compare with transparency color
+  beq .SkipPixelColored
+  strh r11, [r1], #2  @ Store TEXT COLOR instead of original pixel!
+  subs r8, r8, #1
+  bne .LoopPixelColored
+  b .NewRowColored
+  
+.SkipPixelColored: 
+  subs r8, r8, #1
+  add r1, r1, #2      @ Skip VRAM pixel (don't write anything)
+  bne .LoopPixelColored
+.NewRowColored:
+  add r1, r1, r5      @ Add VRAM row offset to VRAM address
+  add r2, r2, r6      @ Add image row offset to image address  
+  subs r7, r7, #1     @ Decrement row counter
+  bne .LoopRowColored @ Repeat until all rows are processed
+.DoneColored:
+  pop {r4-r11}        @ Restore registers
+  bx lr               @ Return
+.size printGlyphColored, .-printGlyphColored

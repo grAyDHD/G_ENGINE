@@ -9,12 +9,13 @@ typedef struct {
 } GlyphInfo;
 
 extern GlyphInfo fontData[94];
-extern void printGlyph(int x, int y, const void *fontBitmap, GlyphInfo *fontDataIndex);
+extern void printGlyphColored(int x, int y, const void *fontBitmap, GlyphInfo *fontDataIndex, u16 currentTextColor);
 
-int getFontDataIndex(char c);
+void setTextColor(int r, int g, int b);
 void renderChar(int *x, int *y, char c);
 void printString(int x, int y, const char *text);
 void gprintf(int x, int y, const char *format, u32 arg);
+int getFontDataIndex(char c);
 
 #endif
 
