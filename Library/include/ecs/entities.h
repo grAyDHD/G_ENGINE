@@ -39,6 +39,7 @@ typedef struct {
 // #define PLAYER_FLAG (1 << 19)
 //  define PLAYER_ENTITY ENEMY_ENTITY INTERACTABLE_ENTITY
 
+// todo: does player need acceleration? check physics demo as well for comparison
 #define PLAYER_ENTITY                                                          \
   (POSITION_COMPONENT | VELOCITY_COMPONENT | ANIMATION_COMPONENT |             \
    SPRITE_COMPONENT | INPUT_COMPONENT | HITBOX_COMPONENT | ENABLE_INPUT |      \

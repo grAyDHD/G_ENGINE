@@ -6,6 +6,7 @@
 #define MAX_ENTITIES 10
 #define MAX_INPUT_ENTITIES 4
 
+// todo: move
 typedef s32 fixed_s32;
 typedef struct ECS ECS;
 
@@ -32,16 +33,17 @@ typedef struct {
 typedef struct {
   int width;
   int height;
+  // todo: determine if offset is warranted
   //  int offset; // y * image pixel width * 2 + x
 } HitboxComponent;
 
-typedef enum : int { DOWN = 0, UP, LEFT, RIGHT } DIRECTION;
-typedef enum : int { IDLE = 0, WALK, TALK, RUN, STATIC = 10, JUMP, LAND } STATE;
+typedef enum : int { DOWN = 0, UP, LEFT, RIGHT } AnimationDirection;
+typedef enum : int { IDLE = 0, WALK, TALK, RUN, STATIC = 10, JUMP, LAND } AnimationType;
 
 typedef struct {
   int frameNumber;
-  DIRECTION direction;
-  STATE state;
+  AnimationDirection direction;
+  AnimationType currentAnimation;
   int keyframe;
   int keyframeInterval;
 } AnimationComponent;
