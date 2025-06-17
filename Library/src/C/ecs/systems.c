@@ -4,7 +4,9 @@
 #include "core/typedefs.h"
 #include "ecs/components.h"
 
+#include "ecs/entities.h"
 #include "math/math.h"
+#include "graphics/m3Text.h"
 
 void updateInputSystem(ECS *ecs, Entity *entity, InputComponent *input,
                        fixed_s32 deltaTime) {
@@ -282,14 +284,16 @@ void updateAnimationSystem(Entity *entity, AnimationComponent *animation) {
 }
 
 void updateRenderSystem(ECS *ecs, Entity *entity, AnimationComponent *animation,
-                        DrawingComponent *draw) {
+                        DrawingComponent *draw, TextComponent *text) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
     if (entity[id].flag & SPRITE_FLAG) {
       renderEntity(ecs, id);
     }
-
     if (entity[id].flag & DRAWING_COMPONENT) {
       draw[id].drawingRoutine(ecs, id);
+    }
+    if (entity[id].flag & TEXT_COMPONENT) {
+      renderEntityText(ecs, id);
     }
   }
 };

@@ -12,6 +12,8 @@ extern void SpriteFrame32Bit(PositionComponent *positionData,
 int initEntitySystem(ECS *ecs, ComponentStorage *world);
 
 void renderEntity(ECS *ecs, int entityId);
+void renderEntityText(ECS *ecs, int entityId);
+
 void clearSpriteFrames(ECS *system, ComponentStorage *world, const void *image);
 
 int createEntity(ECS *ecs, int activeComponentMask);
@@ -21,10 +23,5 @@ void createScreenBorders(ECS *ecs);
 
 void playerInputHandler(ECS *ecs, int entityId);
 void patrolBehavior(ECS *ecs, int entityId);
-
-// void patrolBehavior(AnimationComponent *animation, VelocityComponent
-// *velocity,
-//                   AIComponent *ai);
-//
 
 #endif // ECS_H

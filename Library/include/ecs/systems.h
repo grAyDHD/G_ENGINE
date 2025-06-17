@@ -33,6 +33,6 @@ void updateMovementSystem(Entity *entity, PositionComponent *position,
 void updateAnimationSystem(Entity *entity, AnimationComponent *animation);
 
 void updateRenderSystem(ECS *ecs, Entity *entity, AnimationComponent *animation,
-                        DrawingComponent *draw);
+                        DrawingComponent *draw, TextComponent *text);
 
 #endif // !SYSTEMS_H

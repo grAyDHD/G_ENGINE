@@ -66,6 +66,11 @@ typedef struct {
   void (*drawingRoutine)(ECS *ecs, int entityId);
 } DrawingComponent;
 
+typedef struct {
+  char *text;
+  int color;
+} TextComponent;
+
 typedef struct ComponentStorage {
   PositionComponent position[MAX_ENTITIES];
   PreviousPositionComponent previousPosition[MAX_ENTITIES];
@@ -77,6 +82,7 @@ typedef struct ComponentStorage {
   InputComponent input[MAX_INPUT_ENTITIES];
   AIComponent ai[MAX_ENTITIES];
   DrawingComponent draw[MAX_ENTITIES];
+  TextComponent text[MAX_ENTITIES];
 } ComponentStorage;
 
 #endif // !COMPONENTS_H
