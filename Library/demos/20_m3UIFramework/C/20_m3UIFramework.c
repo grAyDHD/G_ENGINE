@@ -42,19 +42,6 @@ int main() {
     fillScreen(0x0000);
 
 
-    if(keyTapped(ST)) {
-//      ecs.entity[0].flag &= ~ENABLE_INPUT;
-      state = PAUSE_MENU;
-      // if game PLAYING, set state to PAUSE_MENU  
-      //   disable player input by removing INPUT_ENABLED flag
-      // else if game state PAUSE_MENU, set state to PLAYING
-      //   enable player input again 
-
-    }
-
-    //  Main PLAYING loop below
-    switch(state) {
-      case(PLAYING):
       updateInputSystem(&ecs, ecs.entity, ecs.components->input, deltaTime);
       updateBehaviorSystem(&ecs, ecs.entity, ecs.components->ai);
       updatePhysicsSystem(ecs.entity, ecs.components->velocity,
@@ -68,7 +55,6 @@ int main() {
       updateRenderSystem(&ecs, ecs.entity, ecs.components->animation,
                        ecs.components->draw);
       deltaTime = 0;
-    }
   }
 
   return 0;
