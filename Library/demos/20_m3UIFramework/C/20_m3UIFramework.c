@@ -17,7 +17,7 @@ int main() {
   fillScreen(0x0000);
   initEntitySystem(&ecs, &components);
   createPlayer(&ecs, SonicBitmap);
-//  ecs.entity[0].flag |= PHYSICS_FLAG; //ON_GROUND;
+  ecs.entity[0].flag |= PHYSICS_FLAG;
   createScreenBorders(&ecs);
 
   while (1) {
