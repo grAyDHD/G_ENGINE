@@ -6,25 +6,10 @@
 #include "graphics/draw.h"
 #include "input/in.h"
 
-// Commits:
-// must implement text functions to change color of text
-
 static ComponentStorage components;
 static ECS ecs;
 
 volatile fixed_s32 deltaTime;
-
-typedef enum {
-  PLAYING,
-  PAUSE_MENU
-} GameState;
-
-typedef enum {
-  VOLUME,
-  CHARACTER_SELECTION,
-  // etc.
-
-} MenuState;
 
 int main() {
   DSPC = MODE3 | BG2;
@@ -32,10 +17,8 @@ int main() {
   fillScreen(0x0000);
   initEntitySystem(&ecs, &components);
   createPlayer(&ecs, SonicBitmap);
-  ecs.entity[0].flag |= PHYSICS_FLAG; //ON_GROUND;
+//  ecs.entity[0].flag |= PHYSICS_FLAG; //ON_GROUND;
   createScreenBorders(&ecs);
-
-  GameState state = PLAYING;
 
   while (1) {
     VBLANK();
