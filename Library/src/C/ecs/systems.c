@@ -234,6 +234,8 @@ void updateCollisionSystem(Entity *entity, PositionComponent *position,
                            VelocityComponent *velocity, HitboxComponent *hitbox,
                            fixed_s32 deltaTime) {
   for (int idA = 0; idA < MAX_ENTITIES; idA++) {
+    if (!(entity[idA].flag & ACTIVE)) 
+      continue;
     if (!(entity[idA].flag & DETECTS_COLLISIONS))
       continue;
 
@@ -244,7 +246,9 @@ void updateCollisionSystem(Entity *entity, PositionComponent *position,
 
 
     for (int idB = idA + 1; idB < MAX_ENTITIES; idB++) {
-      if (!(entity[idB].flag & (TRIGGERS_COLLISIONS & ACTIVE)))
+      if (!(entity[idB].flag & ACTIVE)) 
+        continue;
+      if (!(entity[idB].flag & TRIGGERS_COLLISIONS))
         continue; 
 
       HitboxComponent overlap = getOverlap(&position[idA], &hitbox[idA],

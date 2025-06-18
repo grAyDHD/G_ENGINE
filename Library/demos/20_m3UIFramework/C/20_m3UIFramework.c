@@ -10,7 +10,19 @@ static ECS ecs;
 
 volatile fixed_s32 deltaTime;
 
-// Next commit:
+// Next commit: Flag for entity type: GAME_ENTITY PAUSE_UI HUD_UI MENU_UI 
+// Following commit: add start button behavior to call pause/resume game state.  Player retains it's own input, but it's input is not checked if the player entity is not active, such as when paused.  I may need to additionally have a check for INPUT_DISABLED or something similar for cutscenes that use the player sprite/entity but dont want player interference with scripted behavior
+
+void pauseGameState(ECS *ecs) {
+  // disableGameEntities
+  // enablePauseEntities
+}
+
+void resumeGameState(ECS *ecs) {
+  // enableGameEntities
+  // disablePauseEntities
+
+}
 
 int main() {
   DSPC = MODE3 | BG2;
@@ -18,7 +30,6 @@ int main() {
   initEntitySystem(&ecs, &components);
 
   createPlayer(&ecs, SonicBitmap);
-  ecs.entity[0].flag |= (PHYSICS_FLAG | ACTIVE);
   createScreenBorders(&ecs);
 
   int textEntityId = createEntity(&ecs, POSITION_COMPONENT | TEXT_COMPONENT);

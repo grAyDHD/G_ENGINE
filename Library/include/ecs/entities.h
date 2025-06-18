@@ -34,6 +34,10 @@ typedef struct {
 #define STATIC_COLLIDER (1 << 23)
 #define IS_GROUND (1 << 24)
 #define ACTIVE (1 << 25)
+#define GAME_ENTITY (1 << 26)
+#define PAUSE_UI (1 << 27)
+#define HUD_UI (1 << 28)
+#define MENU_UI (1 << 29)
 
 #define HORIZONTAL_COLLISION (1 << 30)
 #define VERTICAL_COLLISION (1 << 31)
@@ -43,9 +47,9 @@ typedef struct {
 
 // todo: does player need acceleration? check physics demo as well for comparison
 #define PLAYER_ENTITY                                                          \
-  (POSITION_COMPONENT | VELOCITY_COMPONENT | ANIMATION_COMPONENT |             \
-   SPRITE_COMPONENT | INPUT_COMPONENT | HITBOX_COMPONENT | ENABLE_INPUT |      \
-   DETECTS_COLLISIONS | TRIGGERS_COLLISIONS | SPRITE_FLAG)
+  (POSITION_COMPONENT | PREVIOUS_POSITION_COMPONENT | VELOCITY_COMPONENT | ANIMATION_COMPONENT |             \
+   SPRITE_COMPONENT | INPUT_COMPONENT | HITBOX_COMPONENT | PHYSICS_FLAG | \
+   DETECTS_COLLISIONS | TRIGGERS_COLLISIONS | SPRITE_FLAG | GAME_ENTITY | ACTIVE)
 
 #define NPC_ENTITY                                                             \
   (POSITION_COMPONENT | VELOCITY_COMPONENT | ANIMATION_COMPONENT |             \
@@ -54,6 +58,6 @@ typedef struct {
 
 #define BOUNDARY_ENTITY                                                        \
   (POSITION_COMPONENT | HITBOX_COMPONENT | TRIGGERS_COLLISIONS |               \
-   STATIC_COLLIDER)
+   STATIC_COLLIDER | GAME_ENTITY | ACTIVE)
 
 #endif // !ENTITIES_H
