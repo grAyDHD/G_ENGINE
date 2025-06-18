@@ -15,6 +15,10 @@ void updateInputSystem(ECS *ecs, Entity *entity, InputComponent *input,
   if (entity[0].flag & ACTIVE) {
     input[0].handleInput(ecs, 0);
   }
+
+  if (entity[1].flag & ACTIVE) {
+    input[1].handleInput(ecs, 1);
+  }
 }
 
 void updateBehaviorSystem(ECS *ecs, Entity *entity, AIComponent *ai) {

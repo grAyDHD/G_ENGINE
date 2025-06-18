@@ -4,24 +4,64 @@
 #include "ecs/entities.h"
 #include "graphics/draw.h"
 #include "graphics/m3Text.h"
+#include "input/in.h"
+
+typedef enum { PLAYING, PAUSED } GameState;
 
 static ComponentStorage components;
 static ECS ecs;
 
+static GameState gameState = PLAYING;
+
 volatile fixed_s32 deltaTime;
 
-// Next commit: Flag for entity type: GAME_ENTITY PAUSE_UI HUD_UI MENU_UI 
-// Following commit: add start button behavior to call pause/resume game state.  Player retains it's own input, but it's input is not checked if the player entity is not active, such as when paused.  I may need to additionally have a check for INPUT_DISABLED or something similar for cutscenes that use the player sprite/entity but dont want player interference with scripted behavior
+// Next commit:
+//    create global input entity, only has INPUT_COMPONENT and ACTIVE, maybe GAME_ENTITY?
+
+//    assign it an input handler that handles start button
+//    on global input handler, press start runs pause or resume
 
 void pauseGameState(ECS *ecs) {
-  // disableGameEntities
-  // enablePauseEntities
+  for (int i = 0; i < 10; i++) {
+    if (ecs->entity[i].flag & GAME_ENTITY) {
+      ecs->entity[i].flag &= ~ACTIVE; 
+    }
+    if (ecs->entity[i].flag & PAUSE_UI) {
+      ecs->entity[i].flag |= ACTIVE; 
+    }
+  }
+  gameState = PAUSED;
 }
 
 void resumeGameState(ECS *ecs) {
-  // enableGameEntities
-  // disablePauseEntities
+  for (int i = 0; i < 10; i++) {
+    if (ecs->entity[i].flag & GAME_ENTITY) {
+      ecs->entity[i].flag |= ACTIVE; 
+    }
+    if (ecs->entity[i].flag & PAUSE_UI) {
+      ecs->entity[i].flag &= ~ACTIVE; 
+    }
+  }
+  gameState = PLAYING;
 
+}
+
+void globalInputHandler(ECS *ecs, int entityId) {
+  if (keyTapped(ST)) {
+    switch (gameState) {
+      case PLAYING:
+        pauseGameState(ecs); break;
+      case PAUSED:
+        resumeGameState(ecs);
+        break;
+    }
+  }
+}
+
+int createGlobalInputEntity(ECS *ecs) {
+  int id = createEntity(ecs, INPUT_COMPONENT | ACTIVE);
+  ecs->components->input[id].handleInput = globalInputHandler;  
+  return id;
 }
 
 int main() {
@@ -30,12 +70,13 @@ int main() {
   initEntitySystem(&ecs, &components);
 
   createPlayer(&ecs, SonicBitmap);
+  createGlobalInputEntity(&ecs);
   createScreenBorders(&ecs);
 
-  int textEntityId = createEntity(&ecs, POSITION_COMPONENT | TEXT_COMPONENT);
+  int textEntityId = createEntity(&ecs, POSITION_COMPONENT | TEXT_COMPONENT | PAUSE_UI);
   ecs.components->position[textEntityId].x = 100;
   ecs.components->position[textEntityId].y = 100;
-  ecs.components->text[textEntityId].text = "goodbye";
+  ecs.components->text[textEntityId].text = "PAUSED";
 
   // todo: have rendering of text from text components handle setting color  and setting it back to original color before and after text render
   setTextColor(31, 31, 31);
@@ -43,11 +84,6 @@ int main() {
   while (1) {
     VBLANK();
     fillScreen(0x0000);
-
-  //int x = ecs.components->position[5].x;
-  //int y = ecs.components->position[5].y;
-  //gprintf(x, y, ecs.components->text[5].text, 0);
-
 
       updateInputSystem(&ecs, ecs.entity, ecs.components->input, deltaTime);
       updateBehaviorSystem(&ecs, ecs.entity, ecs.components->ai);
