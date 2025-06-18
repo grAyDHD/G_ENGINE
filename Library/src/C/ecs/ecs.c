@@ -1,6 +1,7 @@
 #include "../../include/ecs/ecs.h"
 #include "entities.c"
 #include "graphics/m3Text.h"
+#include "graphics/draw.h"
 
 int initEntitySystem(ECS *ecs, ComponentStorage *components) {
   if (!ecs || !components) {
@@ -32,11 +33,12 @@ void inline renderEntity(ECS *ecs, int entityId) {
                    ecs->components->sprite[entityId].spriteSheet);
 }
 
-void inline renderEntityText(ECS *ecs, int entityId) {
+void renderEntityText(ECS *ecs, int entityId) {
   int x = ecs->components->position[entityId].x;
   int y = ecs->components->position[entityId].y;
   gprintf(x, y, ecs->components->text[entityId].text, 0);
 }
+
 // todo: don't hardcode entities
 void inline clearSpriteFrames(ECS *system, ComponentStorage *world,
                               const void *image) {

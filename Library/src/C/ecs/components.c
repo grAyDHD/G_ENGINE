@@ -17,20 +17,20 @@ void playerInputHandler(ECS *ecs, int entityId) {
 
       acceleration->ay -= INT_TO_FIXED(2048);
       animation->direction = UP;
-      animation->state = WALK;
+      animation->currentAnimation = WALK;
     }
   } else if (keyDown(D)) {
     acceleration->ay += INT_TO_FIXED(2048);
     animation->direction = DOWN;
-    animation->state = WALK;
+    animation->currentAnimation = WALK;
   } else if (keyDown(L)) {
     acceleration->ax -= INT_TO_FIXED(2048);
     animation->direction = LEFT;
-    animation->state = WALK;
+    animation->currentAnimation = WALK;
   } else if (keyDown(R)) {
     acceleration->ax += INT_TO_FIXED(2048);
     animation->direction = RIGHT;
-    animation->state = WALK;
+    animation->currentAnimation = WALK;
   }
 
   //if platformer
@@ -40,7 +40,7 @@ void playerInputHandler(ECS *ecs, int entityId) {
 
   if (keyReleased(U | D | L | R)) {
     animation->frameNumber = 0;
-    animation->state = IDLE;
+    animation->currentAnimation = IDLE;
     animation->keyframe = 0;
 
     acceleration->ax = 0;

@@ -14,7 +14,7 @@ volatile fixed_s32 deltaTime;
 // on pause, hardcode change in player coordinates off fillScreen// disable player input
 // create entity for pause text with input to re enable player input and revert player coordinates
 
-// Current commit: create text component and entity, and render text
+// Current commit: resolve linking of gprintf to allow calling from other headers by the ecs
 
 int main() {
   DSPC = MODE3 | BG2;
@@ -31,16 +31,20 @@ int main() {
   createScreenBorders(&ecs);
 
   int textEntityId = createEntity(&ecs, POSITION_COMPONENT | TEXT_COMPONENT);
-  ecs.components->position[textEntityId].x = 20;
-  ecs.components->position[textEntityId].y = 20;
-  ecs.components->text[textEntityId].text = "hello";
+  ecs.components->position[textEntityId].x = 100;
+  ecs.components->position[textEntityId].y = 100;
+  ecs.components->text[textEntityId].text = "goodbye";
 
+  // todo: have rendering of text from text components handle setting color  and setting it back to original color before and after text render
   setTextColor(31, 31, 31);
-//  gprintf(20, 20, "hello", 0);
+
   while (1) {
     VBLANK();
     fillScreen(0x0000);
-    gprintf(20, 20, "hello", 0);
+
+  //int x = ecs.components->position[5].x;
+  //int y = ecs.components->position[5].y;
+  //gprintf(x, y, ecs.components->text[5].text, 0);
 
 
       updateInputSystem(&ecs, ecs.entity, ecs.components->input, deltaTime);
@@ -55,6 +59,7 @@ int main() {
       updateAnimationSystem(ecs.entity, ecs.components->animation);
       updateRenderSystem(&ecs, ecs.entity, ecs.components->animation,
                        ecs.components->draw, ecs.components->text);
+
       deltaTime = 0;
   }
 

@@ -4,6 +4,7 @@
 #include "core/typedefs.h"
 #include "ecs/components.h"
 
+#include "graphics/draw.h"
 #include "ecs/entities.h"
 #include "math/math.h"
 #include "graphics/m3Text.h"

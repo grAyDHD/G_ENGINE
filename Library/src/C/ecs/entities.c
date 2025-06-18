@@ -41,7 +41,7 @@ int createPlayer(ECS *ecs, const void *spriteSheet) {
   ecs->components->animation[playerId] =
       (AnimationComponent){.frameNumber = 0,
                            .direction = LEFT,
-                           .state = WALK,
+                           .currentAnimation = WALK,
                            .keyframe = 0,
                            .keyframeInterval = 8};
 
@@ -67,7 +67,7 @@ int createNPC(ECS *ecs, const void *spriteSheet) {
   ecs->components->animation[npcId] =
       (AnimationComponent){.frameNumber = 0,
                            .direction = RIGHT,
-                           .state = WALK,
+                           .currentAnimation = WALK,
                            .keyframe = 0,
                            .keyframeInterval = 8};
   ecs->components->sprite[npcId] =

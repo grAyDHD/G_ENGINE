@@ -14,7 +14,7 @@ extern void printGlyphColored(int x, int y, const void *fontBitmap, GlyphInfo *f
 void setTextColor(int r, int g, int b);
 void renderChar(int *x, int *y, char c);
 void printString(int x, int y, const char *text);
-void gprintf(int x, int y, const char *format, u32 arg);
+extern void gprintf(int x, int y, const char *format, u32 arg);
 int getFontDataIndex(char c);
 
 #endif
