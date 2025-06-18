@@ -12,12 +12,14 @@
 void updateInputSystem(ECS *ecs, Entity *entity, InputComponent *input,
                        fixed_s32 deltaTime) {
   updateKeys();
-  input[0].handleInput(ecs, 0);
+  if (entity[0].flag & ACTIVE) {
+    input[0].handleInput(ecs, 0);
+  }
 }
 
 void updateBehaviorSystem(ECS *ecs, Entity *entity, AIComponent *ai) {
   for (int i = 0; i < MAX_ENTITIES; i++) {
-    if (entity[i].flag & AI_COMPONENT) {
+    if (entity[i].flag & (AI_COMPONENT & ACTIVE)) {
       ai[i].aiBehavior(ecs, i);
     }
   }
@@ -30,6 +32,9 @@ void updatePhysicsSystem(Entity *entity, VelocityComponent *velocity,
                          AccelerationComponent *acceleration,
                          fixed_s32 deltaTime) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
+    if (!(entity[id].flag & ACTIVE))
+      continue;
+
     if (!(entity[id].flag & PHYSICS_FLAG))
       continue;
 
@@ -58,7 +63,9 @@ void updatePhysicsSystem(Entity *entity, VelocityComponent *velocity,
 
 void updateMovementSystem(Entity *entity, PositionComponent *position,
                           VelocityComponent *velocity, fixed_s32 deltaTime) {
+  
   for (int id = 0; id < MAX_ENTITIES; id++) {
+    if (!(entity[id].flag & ACTIVE)) continue;
     if (entity[id].flag & VELOCITY_COMPONENT) {
       position[id].x += (MULT(velocity[id].dx, deltaTime));
       position[id].y += (MULT(velocity[id].dy, deltaTime));
@@ -237,8 +244,8 @@ void updateCollisionSystem(Entity *entity, PositionComponent *position,
 
 
     for (int idB = idA + 1; idB < MAX_ENTITIES; idB++) {
-      if (!(entity[idB].flag & TRIGGERS_COLLISIONS))
-        continue;
+      if (!(entity[idB].flag & (TRIGGERS_COLLISIONS & ACTIVE)))
+        continue; 
 
       HitboxComponent overlap = getOverlap(&position[idA], &hitbox[idA],
                                            &position[idB], &hitbox[idB]);
@@ -271,6 +278,7 @@ void updateCollisionSystem(Entity *entity, PositionComponent *position,
 
 void updateAnimationSystem(Entity *entity, AnimationComponent *animation) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
+    if (!(entity[id].flag & ACTIVE)) continue;
     if (entity[id].flag & ANIMATION_COMPONENT) {
       animation[id].keyframe++;
       if (animation[id].keyframe >= animation->keyframeInterval) {
@@ -287,6 +295,8 @@ void updateAnimationSystem(Entity *entity, AnimationComponent *animation) {
 void updateRenderSystem(ECS *ecs, Entity *entity, AnimationComponent *animation,
                         DrawingComponent *draw, TextComponent *text) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
+    if (!(entity[id].flag & ACTIVE)) continue;
+
     if (entity[id].flag & SPRITE_FLAG) {
       renderEntity(ecs, id);
     }

@@ -10,24 +10,15 @@ static ECS ecs;
 
 volatile fixed_s32 deltaTime;
 
-// Commits: create entity with pause behavior - player for simplicity???
-// on pause, hardcode change in player coordinates off fillScreen// disable player input
-// create entity for pause text with input to re enable player input and revert player coordinates
-
-// Current commit: resolve linking of gprintf to allow calling from other headers by the ecs
+// Next commit:
 
 int main() {
   DSPC = MODE3 | BG2;
-
   initializeVBI();
-
-  fillScreen(0x0000);
-  
-
   initEntitySystem(&ecs, &components);
 
   createPlayer(&ecs, SonicBitmap);
-  ecs.entity[0].flag |= PHYSICS_FLAG;
+  ecs.entity[0].flag |= (PHYSICS_FLAG | ACTIVE);
   createScreenBorders(&ecs);
 
   int textEntityId = createEntity(&ecs, POSITION_COMPONENT | TEXT_COMPONENT);

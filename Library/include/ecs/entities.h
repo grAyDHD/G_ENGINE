@@ -33,6 +33,7 @@ typedef struct {
 #define PHYSICS_FLAG (1 << 22)
 #define STATIC_COLLIDER (1 << 23)
 #define IS_GROUND (1 << 24)
+#define ACTIVE (1 << 25)
 
 #define HORIZONTAL_COLLISION (1 << 30)
 #define VERTICAL_COLLISION (1 << 31)
