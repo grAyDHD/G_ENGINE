@@ -52,7 +52,6 @@ Pressing A when text speed selected will highlight selected speed
 
 --- 
 
-// Next commit: create text entities for all menu parameters.  How to arrange in a grid layout?
 ## Implementation Phases
 
 ### Phase 1: 
@@ -72,7 +71,8 @@ Pressing A when text speed selected will highlight selected speed
 ### Phase 3:
     Non interactive iteration of of PAUSE menu
 [x] Draw menu list with options
-[ ] Optimize rendering pipeline with dirty flags
+[x] Optimize rendering pipeline with dirty flags
+[ ] Complete basic rendering pipeline with clear sprite frame
 [ ] Add highlighting to current selection, change on UP/DOWN
 [ ] Set up sub menu states: one for each adjustable parameter
 [ ] Current text speed brighter color than others
