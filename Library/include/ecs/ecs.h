@@ -3,8 +3,11 @@
 #include "ecs/components.h"
 #include "systems.h"
 
+// todo: clearSpriteFrame vs clearSpriteFrames? remove SpriteFrame32Bit? ensure clearSpriteFrame handles edge cases
+//clears variable width sprite
 extern void clearSpriteFrame(fixed_s32 x, fixed_s32 y, int size,
                              const void *image);
+// draws 32x32 sprite
 extern void SpriteFrame32Bit(PositionComponent *positionData,
                              AnimationComponent *animationData,
                              const void *image);

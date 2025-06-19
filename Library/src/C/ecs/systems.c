@@ -71,9 +71,12 @@ void updateMovementSystem(Entity *entity, PositionComponent *position,
     if (!(entity[id].flag & ACTIVE)) continue;
     if (entity[id].flag & VELOCITY_COMPONENT) {
       if (velocity[id].dx != 0 || velocity[id].dy != 0) {
-        entity[id].flag |= DIRTY;
+        position[id].prevX = position[id].x;
+        position[id].prevY = position[id].y;
+        
         position[id].x += (MULT(velocity[id].dx, deltaTime));
         position[id].y += (MULT(velocity[id].dy, deltaTime));
+        entity[id].flag |= DIRTY;
       }
     }
   }
@@ -285,18 +288,21 @@ void updateAnimationSystem(Entity *entity, AnimationComponent *animation) {
 }
 
 void updateRenderSystem(ECS *ecs, Entity *entity, AnimationComponent *animation,
-                        DrawingComponent *draw, TextComponent *text) {
+                        DrawingComponent *draw, TextComponent *text, const void *image) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
     if (!(entity[id].flag & DIRTY)) continue;
     if (!(entity[id].flag & ACTIVE)) continue;
     
     if (entity[id].flag & SPRITE_FLAG) {
+      clearSpriteFrame(ecs->components->position[id].prevX, ecs->components->position[id].prevY, 32, image);
+
       renderEntity(ecs, id);
     }
     if (entity[id].flag & DRAWING_COMPONENT) {
       draw[id].drawingRoutine(ecs, id);
     }
     if (entity[id].flag & TEXT_COMPONENT) {
+      // todo: handle text clearing?  only necessary for changing text, like dialog. can be simple as clearing monocolor text box
       renderEntityText(ecs, id);
     }
 

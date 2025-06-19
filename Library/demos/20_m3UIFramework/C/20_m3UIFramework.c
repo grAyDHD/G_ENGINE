@@ -101,7 +101,7 @@ int main() {
 
   while (1) {
     VBLANK();
-    fillScreen(0x0000);
+//    fillScreen(0x0000);
 
       updateInputSystem(&ecs, ecs.entity, ecs.components->input, deltaTime);
       updateBehaviorSystem(&ecs, ecs.entity, ecs.components->ai);
@@ -114,7 +114,7 @@ int main() {
                           deltaTime);
       updateAnimationSystem(ecs.entity, ecs.components->animation);
       updateRenderSystem(&ecs, ecs.entity, ecs.components->animation,
-                       ecs.components->draw, ecs.components->text);
+                       ecs.components->draw, ecs.components->text, &BedroomBitmap);
 
       deltaTime = 0;
 

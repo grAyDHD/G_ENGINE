@@ -10,7 +10,7 @@
 //#include "ecs/components.h"
 //#include "ecs/ecs.h"
 
-//#include "../build/Bedroom.h"
+#include "../build/Bedroom.h"
 #include "../build/Sonic.h"
 #include "core/timer.h"
 #include "ecs/ecs.h"
