@@ -6,10 +6,12 @@
 #include "ecs/systems.h"
 #include "graphics/video.h"
 
+
 //#include "core/interrupts.h"
 //#include "ecs/components.h"
 //#include "ecs/ecs.h"
 
+#include "../build/genericBitmap.h"
 #include "../build/Bedroom.h"
 #include "../build/Sonic.h"
 #include "core/timer.h"

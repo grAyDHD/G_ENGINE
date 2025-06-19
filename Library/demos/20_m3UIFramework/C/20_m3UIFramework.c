@@ -20,13 +20,12 @@ static GameState gameState = PLAYING;
 
 volatile fixed_s32 deltaTime;
 
-// Next commit: incorporate clearSpriteFrame, 16 or 32?  Not now, but eventually add case handling that checks sprite sizes
 void createPauseMenu(ECS *ecs) {
   MenuItem pauseMenuItems[] = {
     {"Select Character",  80, 60, PAUSE_UI | MENU_UI | DIRTY},
-    {"Movement Speed",    80, 80, PAUSE_UI | MENU_UI},
-    {"Text Speed",        80, 100, PAUSE_UI | MENU_UI},
-    {"Invert Green",      80, 120, PAUSE_UI | MENU_UI}
+    {"Movement Speed",    80, 80, PAUSE_UI | MENU_UI | DIRTY},
+    {"Text Speed",        80, 100, PAUSE_UI | MENU_UI | DIRTY},
+    {"Invert Green",      80, 120, PAUSE_UI | MENU_UI | DIRTY}
   };
 
 // Generate entities from data
@@ -44,7 +43,7 @@ void pauseGameState(ECS *ecs) {
       ecs->entity[i].flag &= ~ACTIVE; 
     }
     if (ecs->entity[i].flag & PAUSE_UI) {
-      ecs->entity[i].flag |= ACTIVE; 
+      ecs->entity[i].flag |= ACTIVE | DIRTY; 
     }
   }
   gameState = PAUSED;
@@ -60,6 +59,7 @@ void resumeGameState(ECS *ecs) {
     }
   }
   gameState = PLAYING;
+  m3_Background(genericBitmapBitmap);
 
 }
 
@@ -86,10 +86,12 @@ int main() {
   initializeVBI();
   initEntitySystem(&ecs, &components);
 
+  m3_Background(genericBitmapBitmap);
+
   createPlayer(&ecs, SonicBitmap);
   createGlobalInputEntity(&ecs);
   createScreenBorders(&ecs);
-//  createPauseMenu(&ecs);
+  createPauseMenu(&ecs);
 
   int textEntityId = createEntity(&ecs, POSITION_COMPONENT | TEXT_COMPONENT | PAUSE_UI);
   ecs.components->position[textEntityId].x = 100;
@@ -101,7 +103,6 @@ int main() {
 
   while (1) {
     VBLANK();
-//    fillScreen(0x0000);
 
       updateInputSystem(&ecs, ecs.entity, ecs.components->input, deltaTime);
       updateBehaviorSystem(&ecs, ecs.entity, ecs.components->ai);
@@ -114,7 +115,7 @@ int main() {
                           deltaTime);
       updateAnimationSystem(ecs.entity, ecs.components->animation);
       updateRenderSystem(&ecs, ecs.entity, ecs.components->animation,
-                       ecs.components->draw, ecs.components->text, &BedroomBitmap);
+                       ecs.components->draw, ecs.components->text, &genericBitmapBitmap);
 
       deltaTime = 0;
 
