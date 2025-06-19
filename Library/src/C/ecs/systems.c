@@ -67,12 +67,14 @@ void updatePhysicsSystem(Entity *entity, VelocityComponent *velocity,
 
 void updateMovementSystem(Entity *entity, PositionComponent *position,
                           VelocityComponent *velocity, fixed_s32 deltaTime) {
-  
   for (int id = 0; id < MAX_ENTITIES; id++) {
     if (!(entity[id].flag & ACTIVE)) continue;
     if (entity[id].flag & VELOCITY_COMPONENT) {
-      position[id].x += (MULT(velocity[id].dx, deltaTime));
-      position[id].y += (MULT(velocity[id].dy, deltaTime));
+      if (velocity[id].dx != 0 || velocity[id].dy != 0) {
+        entity[id].flag |= DIRTY;
+        position[id].x += (MULT(velocity[id].dx, deltaTime));
+        position[id].y += (MULT(velocity[id].dy, deltaTime));
+      }
     }
   }
 }
@@ -81,25 +83,6 @@ void updateMovementSystem(Entity *entity, PositionComponent *position,
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
 static inline fixed_s32 ABS(fixed_s32 x) { return (x < 0) ? -x : x; }
-
-/*
-static inline int getCollisionPriority(Entity *entity) {
-  if (entity->flag & STATIC_COLLIDER)
-    return 3; // highest priority
-  if (entity->flag & AI_COMPONENT)
-    return 2; // medium priority
-  if (entity->flag & INPUT_COMPONENT)
-    return 1; // low priority
-  return 0;   // default/lowest priority
-}
-*/
-
-// example priority, can create new flags to balance priorities:
-//  if (entity->flag & AI_COMPONENT) {
-//  if (entity->flag & PUSHABLE_NPC)
-//   return 1;  // if pushable, return same/lower priority as player
-// return 2;
-//  }
 
 static inline HitboxComponent getOverlap(PositionComponent *posA,
                                          HitboxComponent *hitA,
@@ -289,7 +272,8 @@ void updateAnimationSystem(Entity *entity, AnimationComponent *animation) {
     if (!(entity[id].flag & ACTIVE)) continue;
     if (entity[id].flag & ANIMATION_COMPONENT) {
       animation[id].keyframe++;
-      if (animation[id].keyframe >= animation->keyframeInterval) {
+      if (animation[id].keyframe >= animation[id].keyframeInterval) {
+        entity[id].flag |= DIRTY;
         animation[id].keyframe = 0;
         animation[id].frameNumber++;
         if (animation[id].frameNumber == 4) {
@@ -303,8 +287,9 @@ void updateAnimationSystem(Entity *entity, AnimationComponent *animation) {
 void updateRenderSystem(ECS *ecs, Entity *entity, AnimationComponent *animation,
                         DrawingComponent *draw, TextComponent *text) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
+    if (!(entity[id].flag & DIRTY)) continue;
     if (!(entity[id].flag & ACTIVE)) continue;
-
+    
     if (entity[id].flag & SPRITE_FLAG) {
       renderEntity(ecs, id);
     }
@@ -314,5 +299,7 @@ void updateRenderSystem(ECS *ecs, Entity *entity, AnimationComponent *animation,
     if (entity[id].flag & TEXT_COMPONENT) {
       renderEntityText(ecs, id);
     }
+
+    entity[id].flag &= ~DIRTY;
   }
 };

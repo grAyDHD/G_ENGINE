@@ -20,12 +20,10 @@ static GameState gameState = PLAYING;
 
 volatile fixed_s32 deltaTime;
 
-// next commit, dirty flags for all renderable entities so pause screen does not flicker
-// extra: check asm routine for efficiency, and general text rendering to see if can be simplified
-
+// Next commit: incorporate clearSpriteFrame, 16 or 32?  Not now, but eventually add case handling that checks sprite sizes
 void createPauseMenu(ECS *ecs) {
   MenuItem pauseMenuItems[] = {
-    {"Select Character",  80, 60, PAUSE_UI | MENU_UI},
+    {"Select Character",  80, 60, PAUSE_UI | MENU_UI | DIRTY},
     {"Movement Speed",    80, 80, PAUSE_UI | MENU_UI},
     {"Text Speed",        80, 100, PAUSE_UI | MENU_UI},
     {"Invert Green",      80, 120, PAUSE_UI | MENU_UI}

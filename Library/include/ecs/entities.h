@@ -1,12 +1,13 @@
 #ifndef ENTITIES_H
 #define ENTITIES_H
 
+// todo: separate component flags and state flags
+// maybe add type flag?  npc, menu item, etc.
 typedef struct {
   int ID;
   int flag;
 } Entity;
 
-// position velocity acceleration
 
 #define POSITION_COMPONENT (1 << 0)
 #define VELOCITY_COMPONENT (1 << 1)
@@ -23,6 +24,7 @@ typedef struct {
 // TIMER_COMPONENT
 // sound component?
 
+#define DIRTY (1 << 14)
 #define SPRITE_FLAG (1 << 15)
 #define ENABLE_INPUT (1 << 16)
 #define ENABLE_GRAVITY (1 << 17)
@@ -45,7 +47,7 @@ typedef struct {
 // #define PLAYER_FLAG (1 << 19)
 //  define PLAYER_ENTITY ENEMY_ENTITY INTERACTABLE_ENTITY
 
-// todo: does player need acceleration? check physics demo as well for comparison
+// todo: does player need acceleration or previous position? check physics demo as well for comparison
 #define PLAYER_ENTITY                                                          \
   (POSITION_COMPONENT | PREVIOUS_POSITION_COMPONENT | VELOCITY_COMPONENT | ANIMATION_COMPONENT |             \
    SPRITE_COMPONENT | INPUT_COMPONENT | HITBOX_COMPONENT | PHYSICS_FLAG | \
@@ -54,7 +56,7 @@ typedef struct {
 #define NPC_ENTITY                                                             \
   (POSITION_COMPONENT | VELOCITY_COMPONENT | ANIMATION_COMPONENT |             \
    SPRITE_COMPONENT | AI_COMPONENT | HITBOX_COMPONENT | DETECTS_COLLISIONS |   \
-   TRIGGERS_COLLISIONS | SPRITE_FLAG)
+   TRIGGERS_COLLISIONS | SPRITE_FLAG | DIRTY)
 
 #define BOUNDARY_ENTITY                                                        \
   (POSITION_COMPONENT | HITBOX_COMPONENT | TRIGGERS_COLLISIONS |               \
