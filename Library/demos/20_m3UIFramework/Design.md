@@ -52,6 +52,7 @@ Pressing A when text speed selected will highlight selected speed
 
 --- 
 
+// Next commit: create text entities for all menu parameters.  How to arrange in a grid layout?
 ## Implementation Phases
 
 ### Phase 1: 
@@ -60,9 +61,8 @@ Pressing A when text speed selected will highlight selected speed
 [x] Implement player sprite
 [x] 4 directional movement/animation
 [x] Player movement states: IDLE, MOVING
-[ ] Set up game state machine-  MENU, GAME_LOOP
-[ ] Set up sub menu states: one for each adjustable parameter
-[ ] Switch to MENU on pressing START
+[x] Set up game state machine- PLAYING, PAUSED
+[x] Switch to MENU on pressing START
 
 ### Phase 2: 
     Add new font
@@ -71,9 +71,11 @@ Pressing A when text speed selected will highlight selected speed
 
 ### Phase 3:
     Non interactive iteration of of PAUSE menu
-[ ] on pressing start, darken screen
-[ ] Draw menu list with options
+[x] Draw menu list with options
+[ ] Optimize rendering pipeline with dirty flags
 [ ] Add highlighting to current selection, change on UP/DOWN
+[ ] Set up sub menu states: one for each adjustable parameter
+[ ] Current text speed brighter color than others
 
 ### Phase 4: 
     Implement character selection    
@@ -93,7 +95,6 @@ Pressing A when text speed selected will highlight selected speed
 
 ### Phase 6:
    Add final menu parameter
-[ ] Current text speed brighter color than others
 [ ] Press A to highlight current speed, allowing selection
 [ ] L/R dpad to change speed, A or B to return to menu item
 [ ] Pressing A on Invert green will toggle checkbox

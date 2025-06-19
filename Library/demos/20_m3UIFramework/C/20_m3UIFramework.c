@@ -6,20 +6,39 @@
 #include "graphics/m3Text.h"
 #include "input/in.h"
 
+typedef struct {
+    char* text;
+    int x, y;           // Position
+    int flags;          // PAUSE_UI | MENU_UI, etc.
+} MenuItem;
+
 typedef enum { PLAYING, PAUSED } GameState;
 
 static ComponentStorage components;
 static ECS ecs;
-
 static GameState gameState = PLAYING;
 
 volatile fixed_s32 deltaTime;
 
-// Next commit:
-//    create global input entity, only has INPUT_COMPONENT and ACTIVE, maybe GAME_ENTITY?
+// next commit, dirty flags for all renderable entities so pause screen does not flicker
+// extra: check asm routine for efficiency, and general text rendering to see if can be simplified
 
-//    assign it an input handler that handles start button
-//    on global input handler, press start runs pause or resume
+void createPauseMenu(ECS *ecs) {
+  MenuItem pauseMenuItems[] = {
+    {"Select Character",  80, 60, PAUSE_UI | MENU_UI},
+    {"Movement Speed",    80, 80, PAUSE_UI | MENU_UI},
+    {"Text Speed",        80, 100, PAUSE_UI | MENU_UI},
+    {"Invert Green",      80, 120, PAUSE_UI | MENU_UI}
+  };
+
+// Generate entities from data
+  for (int i = 0; i < 4; i++) {
+    int id = createEntity(ecs, POSITION_COMPONENT | TEXT_COMPONENT | pauseMenuItems[i].flags);
+    ecs->components->position[id].x = pauseMenuItems[i].x;
+    ecs->components->position[id].y = pauseMenuItems[i].y;
+    ecs->components->text[id].text = pauseMenuItems[i].text;
+  }
+}
 
 void pauseGameState(ECS *ecs) {
   for (int i = 0; i < 10; i++) {
@@ -72,13 +91,14 @@ int main() {
   createPlayer(&ecs, SonicBitmap);
   createGlobalInputEntity(&ecs);
   createScreenBorders(&ecs);
+//  createPauseMenu(&ecs);
 
   int textEntityId = createEntity(&ecs, POSITION_COMPONENT | TEXT_COMPONENT | PAUSE_UI);
   ecs.components->position[textEntityId].x = 100;
   ecs.components->position[textEntityId].y = 100;
   ecs.components->text[textEntityId].text = "PAUSED";
 
-  // todo: have rendering of text from text components handle setting color  and setting it back to original color before and after text render
+// todo: have rendering of text from text components handle setting color  and setting it back to original color before and after text render
   setTextColor(31, 31, 31);
 
   while (1) {
@@ -99,7 +119,7 @@ int main() {
                        ecs.components->draw, ecs.components->text);
 
       deltaTime = 0;
-  }
 
+  }
   return 0;
 }
