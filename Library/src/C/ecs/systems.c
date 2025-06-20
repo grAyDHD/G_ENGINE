@@ -287,6 +287,7 @@ void updateAnimationSystem(Entity *entity, AnimationComponent *animation) {
   }
 }
 
+// todo: optimize clearing of text, contemplate where this is handled
 void updateRenderSystem(ECS *ecs, Entity *entity, AnimationComponent *animation,
                         DrawingComponent *draw, TextComponent *text, const void *image) {
   for (int id = 0; id < MAX_ENTITIES; id++) {

@@ -1,6 +1,7 @@
 //#include "assets/fonts/Peaberry/Peaberry.h"
 //#include "assets/fonts/Peaberry/PeaberryData.h"
 
+#include "graphics/m3Text.h"
 #include "assets/fonts/MiniGBA/MiniGBA.h"
 #include "assets/fonts/MiniGBA/MiniGBAData.h"
 #include "graphics/draw.h"
@@ -13,10 +14,18 @@ void renderChar(int *x, int *y, char c);
 void printString(int x, int y, const char *text);
 void gprintf(int x, int y, const char *format, u32 arg);
 
-static u16 currentTextColor = 0xFFFF;
+static u16 currentTextColor = RGB(31, 31, 31);
 
-void setTextColor(int r, int g, int b) {
+int getCurrentTextColor() {
+  return currentTextColor;
+}
+
+void setTextColorRGB(int r, int g, int b) {
   currentTextColor = RGB(r, g, b);
+}
+
+void setTextColor(u16 color) {
+  currentTextColor = color;
 }
 
 void gprintf(int x, int y, const char *fmt, u32 arg) {

@@ -24,6 +24,7 @@ typedef struct {
 // TIMER_COMPONENT
 // sound component?
 
+#define SELECTED (1 << 13)
 #define DIRTY (1 << 14)
 #define SPRITE_FLAG (1 << 15)
 #define ENABLE_INPUT (1 << 16)

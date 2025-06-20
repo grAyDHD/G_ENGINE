@@ -36,7 +36,11 @@ void inline renderEntity(ECS *ecs, int entityId) {
 void renderEntityText(ECS *ecs, int entityId) {
   int x = ecs->components->position[entityId].x;
   int y = ecs->components->position[entityId].y;
+  int originalTextColor = getCurrentTextColor(); 
+
+  setTextColor(ecs->components->text[entityId].color);
   gprintf(x, y, ecs->components->text[entityId].text, 0);
+  setTextColor(originalTextColor);
 }
 
 // todo: don't hardcode entities

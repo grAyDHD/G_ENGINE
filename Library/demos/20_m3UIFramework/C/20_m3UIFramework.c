@@ -6,6 +6,9 @@
 #include "graphics/m3Text.h"
 #include "input/in.h"
 
+
+// next commit, highlight selected text entity in pause menu
+
 typedef struct {
     char* text;
     int x, y;           // Position
@@ -18,11 +21,14 @@ static ComponentStorage components;
 static ECS ecs;
 static GameState gameState = PLAYING;
 
+static int pauseMenuEntityIds[4];
+static int selectedMenuIndex = 0;
+
 volatile fixed_s32 deltaTime;
 
 void createPauseMenu(ECS *ecs) {
   MenuItem pauseMenuItems[] = {
-    {"Select Character",  80, 60, PAUSE_UI | MENU_UI | DIRTY},
+    {"Select Character",  80, 60, PAUSE_UI | MENU_UI | SELECTED | DIRTY},
     {"Movement Speed",    80, 80, PAUSE_UI | MENU_UI | DIRTY},
     {"Text Speed",        80, 100, PAUSE_UI | MENU_UI | DIRTY},
     {"Invert Green",      80, 120, PAUSE_UI | MENU_UI | DIRTY}
@@ -30,10 +36,16 @@ void createPauseMenu(ECS *ecs) {
 
 // Generate entities from data
   for (int i = 0; i < 4; i++) {
-    int id = createEntity(ecs, POSITION_COMPONENT | TEXT_COMPONENT | pauseMenuItems[i].flags);
+    pauseMenuEntityIds[i] = createEntity(ecs, POSITION_COMPONENT | TEXT_COMPONENT | pauseMenuItems[i].flags);
+    int id = pauseMenuEntityIds[i];
     ecs->components->position[id].x = pauseMenuItems[i].x;
     ecs->components->position[id].y = pauseMenuItems[i].y;
     ecs->components->text[id].text = pauseMenuItems[i].text;
+    if (ecs->entity[id].flag & SELECTED) {
+      ecs->components->text[id].color = RGB(0, 0, 0); 
+    } else {
+      ecs->components->text[id].color = RGB(31, 31, 31);
+    }
   }
 }
 
@@ -73,6 +85,18 @@ void globalInputHandler(ECS *ecs, int entityId) {
         break;
     }
   }
+  if (gameState == PAUSED) {
+    if (keyTapped(D) && selectedMenuIndex < 4) {
+      // set current and new index DIRTY flag for rerender       
+      selectedMenuIndex++;
+    }
+
+    if (keyTapped(U) && selectedMenuIndex > 0) {
+      // set current and new index DIRTY flag for rerender 
+      selectedMenuIndex--;
+
+    }
+  }
 }
 
 int createGlobalInputEntity(ECS *ecs) {
@@ -97,9 +121,6 @@ int main() {
   ecs.components->position[textEntityId].x = 100;
   ecs.components->position[textEntityId].y = 100;
   ecs.components->text[textEntityId].text = "PAUSED";
-
-// todo: have rendering of text from text components handle setting color  and setting it back to original color before and after text render
-  setTextColor(31, 31, 31);
 
   while (1) {
     VBLANK();

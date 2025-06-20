@@ -65,7 +65,7 @@ typedef struct {
 
 typedef struct {
   char *text;
-  int color;
+  u16 color;
 } TextComponent;
 
 typedef struct ComponentStorage {
