@@ -73,11 +73,23 @@ Pressing A when text speed selected will highlight selected speed
 [x] Draw menu list with options
 [x] Optimize rendering pipeline with dirty flags
 [x] Complete basic rendering pipeline with clear sprite frame
-[ ] Add highlighting to current selection, change on UP/DOWN
+[x] Add highlighting to current selection, change on UP/DOWN
 [ ] Set up sub menu states: one for each adjustable parameter
-[ ] Current text speed brighter color than others
 
 ### Phase 4: 
+    Implement sliders
+[ ] Draw slider for movement speed
+[ ] Press A to highlight slider
+[ ] When slider highlighted, L/R dpad to adjust value
+[ ] Update movement speed
+
+### Phase 5:
+    Implement Checkbox
+[ ] Press A to highlight current speed, allowing selection
+[ ] L/R dpad to change speed, A or B to return to menu item
+[ ] Pressing A on Invert green will toggle checkbox
+
+### Phase 6:
     Implement character selection    
 [ ] Change to grid system when pressing A on Select Character
 [ ] Ensure having 9 sets of animation sprite sheets
@@ -85,17 +97,4 @@ Pressing A when text speed selected will highlight selected speed
 [ ] Draw highlighted border to select new character
 [ ] Press A to set player sprite to selected character
 [ ] Press B to return to menu, START to return to gameplay
-
-### Phase 5:
-    Implement sliders
-[ ] Draw slider for movement speed
-[ ] Press A to highlight slider
-[ ] When slider highlighted, L/R dpad to adjust value
-[ ] Update movement speed
-
-### Phase 6:
-   Add final menu parameter
-[ ] Press A to highlight current speed, allowing selection
-[ ] L/R dpad to change speed, A or B to return to menu item
-[ ] Pressing A on Invert green will toggle checkbox
 
