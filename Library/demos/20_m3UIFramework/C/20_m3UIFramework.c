@@ -85,15 +85,32 @@ void globalInputHandler(ECS *ecs, int entityId) {
         break;
     }
   }
+
   if (gameState == PAUSED) {
-    if (keyTapped(D) && selectedMenuIndex < 4) {
-      // set current and new index DIRTY flag for rerender       
+    if (keyTapped(D) && selectedMenuIndex < 3) {
+      int currentEntityId = pauseMenuEntityIds[selectedMenuIndex];
+
+      ecs->entity[currentEntityId].flag &= ~SELECTED;
+      ecs->entity[currentEntityId].flag |= DIRTY;
+      ecs->components->text[currentEntityId].color = RGB(31, 31, 31);
       selectedMenuIndex++;
+
+      int newEntityId = pauseMenuEntityIds[selectedMenuIndex];
+      ecs->entity[newEntityId].flag |= SELECTED | DIRTY;
+      ecs->components->text[newEntityId].color = RGB(0, 0, 0);
     }
 
     if (keyTapped(U) && selectedMenuIndex > 0) {
-      // set current and new index DIRTY flag for rerender 
+      int currentEntityId = pauseMenuEntityIds[selectedMenuIndex];
+
+      ecs->entity[currentEntityId].flag &= ~SELECTED;
+      ecs->entity[currentEntityId].flag |= DIRTY;
+      ecs->components->text[currentEntityId].color = RGB(31, 31, 31);
       selectedMenuIndex--;
+
+      int newEntityId = pauseMenuEntityIds[selectedMenuIndex];
+      ecs->entity[newEntityId].flag |= SELECTED | DIRTY;
+      ecs->components->text[newEntityId].color = RGB(0, 0, 0);
 
     }
   }
@@ -117,10 +134,10 @@ int main() {
   createScreenBorders(&ecs);
   createPauseMenu(&ecs);
 
-  int textEntityId = createEntity(&ecs, POSITION_COMPONENT | TEXT_COMPONENT | PAUSE_UI);
-  ecs.components->position[textEntityId].x = 100;
-  ecs.components->position[textEntityId].y = 100;
-  ecs.components->text[textEntityId].text = "PAUSED";
+//  int textEntityId = createEntity(&ecs, POSITION_COMPONENT// | TEXT_COMPONENT | PAUSE_UI);
+//  ecs.components->position[textEntityId].x = 100;
+//  ecs.components->position[textEntityId].y = 100;
+//  ecs.components->text[textEntityId].text = "PAUSED";
 
   while (1) {
     VBLANK();
