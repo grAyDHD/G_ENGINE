@@ -18,7 +18,6 @@ typedef struct {
 #define AI_COMPONENT (1 << 6)
 #define HITBOX_COMPONENT (1 << 7)
 #define DRAWING_COMPONENT (1 << 8)
-#define PREVIOUS_POSITION_COMPONENT (1 << 9)
 #define TEXT_COMPONENT (1 << 10)
 
 // TIMER_COMPONENT
@@ -50,7 +49,7 @@ typedef struct {
 
 // todo: does player need acceleration or previous position? check physics demo as well for comparison
 #define PLAYER_ENTITY                                                          \
-  (POSITION_COMPONENT | PREVIOUS_POSITION_COMPONENT | VELOCITY_COMPONENT | ANIMATION_COMPONENT |             \
+  (POSITION_COMPONENT | VELOCITY_COMPONENT | ANIMATION_COMPONENT |             \
    SPRITE_COMPONENT | INPUT_COMPONENT | HITBOX_COMPONENT | PHYSICS_FLAG | \
    DETECTS_COLLISIONS | TRIGGERS_COLLISIONS | SPRITE_FLAG | GAME_ENTITY | ACTIVE | DIRTY)
 

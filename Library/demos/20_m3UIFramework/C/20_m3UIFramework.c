@@ -6,9 +6,8 @@
 #include "graphics/m3Text.h"
 #include "input/in.h"
 
-
-// next commit, highlight selected text entity in pause menu
-
+// next commit: refactor bit flags. then, add UIComponent, and add the checkbox first, as it will be the easisest UI element to make functional.
+// this will require UI rendering routines.  Therefore, first commit is flag refactor, and contemplate from there
 typedef struct {
     char* text;
     int x, y;           // Position

@@ -77,17 +77,17 @@ Pressing A when text speed selected will highlight selected speed
 [ ] Set up sub menu states: one for each adjustable parameter
 
 ### Phase 4: 
+    Implement Checkbox
+[ ] Press A to highlight current speed, allowing selection
+[ ] L/R dpad to change speed, A or B to return to menu item
+[ ] Pressing A on Invert green will toggle checkbox
+
+### Phase 5:
     Implement sliders
 [ ] Draw slider for movement speed
 [ ] Press A to highlight slider
 [ ] When slider highlighted, L/R dpad to adjust value
 [ ] Update movement speed
-
-### Phase 5:
-    Implement Checkbox
-[ ] Press A to highlight current speed, allowing selection
-[ ] L/R dpad to change speed, A or B to return to menu item
-[ ] Pressing A on Invert green will toggle checkbox
 
 ### Phase 6:
     Implement character selection    
