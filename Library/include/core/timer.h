@@ -2,9 +2,6 @@
 #define TIMER_H
 #include "core/typedefs.h"
 
-#define TIMER_DATA(timer) *(volatile u16 *)(0x04000100 + (timer << 2))
-#define TIMER_CONTROL(timer) *(volatile u16 *)(0x04000102 + (timer << 2))
-
 // Timer control bitfields
 #define TM_FREQ_1 0x0000     // No prescaling
 #define TM_FREQ_64 0x0001    // Timer frequency 64 cycles

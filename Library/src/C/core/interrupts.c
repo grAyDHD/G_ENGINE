@@ -1,12 +1,16 @@
 #include "core/interrupts.h"
 
+// todo: give better name showing delta time
 void vblankISR() {
+  // todo: create constant so 1092 is more clear
   deltaTime += 1092; // 60 fps fixed constant value for seconds/frame
-  REG_IF = 1;
+  // todo: I have no clue what the fuck this is doing
+  REG_IF = 1;//IF interrupt flag, acknowledge
 }
 
-extern void initializeVBI() {
 
+// todo: reconsider approach, look into switch table
+extern void initializeVBI() {
   ISR = vblankISR;   // tell the GBA where my isr is
   DISPSTAT = 1 << 3; // tell display to fire vblank interrupts
   REG_IE |= 1;       // tell GBA to accept vblank interrupts
