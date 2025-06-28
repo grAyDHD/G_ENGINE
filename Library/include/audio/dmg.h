@@ -7,6 +7,7 @@
 #define SOUND_SYSTEM *(volatile u16 *)0x04000084
 #define ENABLE_SOUND() (SOUND_SYSTEM |= 0x0080)
 #define DISABLE_SOUND() (SOUND_SYSTEM &= 0xFF7F);
+
 // 0-2 DMG Left vol, 3: vin/unused, 4-6 DMG Right vol, 7: vin/unused
 // 89AB DMG 1-4 Left enable; CDEF DMG 1-4 Right enable
 #define DMG_STEREO_OUTPUT *(volatile u16 *)0x04000080

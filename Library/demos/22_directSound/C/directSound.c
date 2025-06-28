@@ -3,6 +3,8 @@
 
 int main() {
   irqMaster(ON);
+  initializeTMRI();
+  
 
   while(1) {
     VBLANK();
