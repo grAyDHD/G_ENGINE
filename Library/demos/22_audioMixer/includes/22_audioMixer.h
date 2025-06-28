@@ -94,7 +94,7 @@ void vblankAudioISR(){
     DMA[1].control = 0;
     DMA[1].source = (u32)sndVars.mixBufferBase;
     DMA[1].control =
-        DMA_DEST_FIXED | DMA_REPEAT | DMA_WORD | DMA_MODE_FIFO | DMA_ENABLE;
+        FIXED_DESTINATION | INCREMENT_SOURCE | REPEAT | WORD | SPECIAL_MODE | ENABLE;
 
     // Set the current buffer pointer to the start of buffer 1
     sndVars.curMixBuffer = sndVars.mixBufferBase + sndVars.mixBufferSize;
@@ -108,6 +108,38 @@ void vblankAudioISR(){
   }
 }
 
+void timerISR() {
+
+  REG_IF = 1; //Acknowledge interrupt
+  if (sndVars.activeBuffer == 1) // buffer 1 just got over
+  {
+    // Start playing buffer 0
+    DMA[1].control = 0;
+    DMA[1].source = (u32)sndVars.mixBufferBase;
+    DMA[1].control =
+        FIXED_DESTINATION | INCREMENT_SOURCE | REPEAT | WORD | SPECIAL_MODE | ENABLE;
+
+    // Set the current buffer pointer to the start of buffer 1
+    sndVars.curMixBuffer = sndVars.mixBufferBase + sndVars.mixBufferSize;
+    sndVars.activeBuffer = 0;
+  } else // buffer 0 just got over
+  {
+
+    // Set the current buffer pointer to the start of buffer 0
+    sndVars.curMixBuffer = sndVars.mixBufferBase;
+    sndVars.activeBuffer = 1;
+  }
+
+}
+
+void initializeTMRI() {
+  ISR = timerISR;
+  // have timer fire interrupts
+  // URGENT: set to timer, not vblank
+  REG_IE |= 1;
+
+}
+
 void initializeVBI() {
   ISR = vblankAudioISR;   // tell the GBA where my isr is
   DISPSTAT = 1 << 3; // tell display to fire vblank interrupts
@@ -119,6 +151,7 @@ void SndMix() {
   s16 tempBuffer[304];
 
   i = 0;
+
   Dma3(tempBuffer, &i, sndVars.mixBufferSize * sizeof(s16) / 4, DMA_MEMSET32);
 
   for (curChn = 0; curChn < 2; curChn++) {
