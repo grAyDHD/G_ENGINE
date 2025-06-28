@@ -10,9 +10,10 @@
 #include "core/dma.h"
 // todo: split audio headers up, dmg, direct sound, and possibly a more general file
 #include "audio/dmg.h"
+#include "core/interrupts.h"
 
 
-// Direct Sound control and Sound 1-4 output ratio
+// todo: refactor defines into lib headers.  WIP
 #define SOUNDCNT_H *(volatile u16 *)0x04000082
 
 #define REG_SGFIFOA *(volatile u32 *)0x40000A0
@@ -57,6 +58,7 @@ void soundInit() {
   s32 i;
 
   // todo: wtf is this lol
+  // I think it enables/sets direct sound channels 
   SOUNDCNT_H = 0x0B04;
   ENABLE_SOUND();
 
@@ -75,8 +77,9 @@ void soundInit() {
     sndChannel[i].loopLength = 0;
   }
 
+  // todo: make clear why using timer, as special mode is set elsewhere
   TIMER[0].value = 64612; //vblank length
-  TIMER[0].control = TIMER_ENABLE; 
+  TIMER[0].control |= TIMER_ENABLE; // |= to not overwrite interrupt enable flag
 
   DMA[1].wordCount = 0;
   DMA[1].control = 0;
@@ -84,7 +87,6 @@ void soundInit() {
 }
 
 void IrqNull() {}
-
 void vblankAudioISR(){ 
   REG_IF = 1;
 
@@ -109,7 +111,7 @@ void vblankAudioISR(){
 
 void timerISR() {
 
-  REG_IF = 1; //Acknowledge interrupt
+  REG_IF = ACKNOWLEDGE_TIMER1_IRQ; //Acknowledge interrupt
   if (sndVars.activeBuffer == 1) // buffer 1 just got over
   {
     // Start playing buffer 0
@@ -133,13 +135,16 @@ void timerISR() {
 void initializeTMRI() {
   ISR = timerISR;
   // have timer fire interrupts
-  // URGENT: set to timer, not vblank
-  REG_IE |= 1;
+  // have timer fire interrupts, have gba accept timer interrups (REG_IE)
+  TIMER[1].value = 65257;
+  TIMER[1].control |= TIMER_ENABLE | TIMER_IRQ_ENABLE;
 
+  REG_IE |= IRQ_TMR1;
 }
 
 void initializeVBI() {
   ISR = vblankAudioISR;   // tell the GBA where my isr is
+  // todo: swap with proper usage from interrupt header or display header
   DISPSTAT = 1 << 3; // tell display to fire vblank interrupts
   REG_IE |= 1;       // tell GBA to accept vblank interrupts
 }

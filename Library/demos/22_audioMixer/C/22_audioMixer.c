@@ -1,8 +1,8 @@
 #include "../includes/22_audioMixer.h"
 
 int main() { 
-  initializeVBI();
-  //initializeTMRI();
+ // initializeVBI();
+ // initializeTMRI();
   soundInit();
 
   REG_IME |= 1;      // tell GBA to enable intterupts
@@ -18,7 +18,7 @@ int main() {
       sndChannel[0].pos = 0; //set to beginning?
       sndChannel[0].inc = 4096;
       sndChannel[0].vol = 64;
-      sndChannel[0].length = 28419 << 12;
+      sndChannel[0].length = 48419 << 12;
       sndChannel[0].loopLength = 0; // no loop
       sndChannel[0].data = (s8 *)guitarData;
     }
