@@ -7,42 +7,17 @@
 #include "graphics/video.h"
 #include "core/timer.h"
 #include "input/in.h"
+#include "core/dma.h"
+// todo: split audio headers up, dmg, direct sound, and possibly a more general file
+#include "audio/dmg.h"
 
 
 // Direct Sound control and Sound 1-4 output ratio
 #define SOUNDCNT_H *(volatile u16 *)0x04000082
-#define MASTER_SOUND_SYSTEM *(volatile u16 *)0x04000084
-#define ENABLE_SOUND() (MASTER_SOUND_SYSTEM |= 0x0080)
 
 #define REG_SGFIFOA *(volatile u32 *)0x40000A0
 #define REG_SGFIFOA_L *(volatile u16 *)0x40000A0
 #define REG_SGFIFOA_H *(volatile u16 *)0x40000A2
-
-#define REG_DM1SAD *(volatile u32 *)0x40000BC
-#define REG_DM1SAD_L *(volatile u16 *)0x40000BC
-#define REG_DM1SAD_H *(volatile u16 *)0x40000BE
-
-#define REG_DM1DAD *(volatile u32 *)0x40000C0
-#define REG_DM1DAD_L *(volatile u16 *)0x40000C0
-#define REG_DM1DAD_H *(volatile u16 *)0x40000C2
-
-#define REG_DM1CNT *(volatile u32 *)0x40000C4
-#define REG_DM1CNT_L *(volatile u16 *)0x40000C4
-#define REG_DM1CNT_H *(volatile u16 *)0x40000C6
-
-#define REG_DM3SAD *(volatile u32 *)0x40000D4
-#define REG_DM3SAD_L *(volatile u16 *)0x40000D4
-#define REG_DM3SAD_H *(volatile u16 *)0x40000D6
-#define REG_DM3DAD *(volatile u32 *)0x40000D8
-#define REG_DM3DAD_L *(volatile u16 *)0x40000D8
-#define REG_DM3DAD_H *(volatile u16 *)0x40000DA
-#define REG_DM3CNT *(volatile u32 *)0x40000DC
-#define REG_DM3CNT_L *(volatile u16 *)0x40000DC
-#define REG_DM3CNT_H *(volatile u16 *)0x40000DE
-
-#define DMA_DEST_FIXED (1 << 6)
-#define DMA_REPEAT (1 << 9)
-#define DMA_MODE_FIFO (1 << 12 | 1 << 13)
 
 #define ISR *(fnptr *)0x03007FFC   // put function address
 #define DISPSTAT *(u16 *)0x4000004 // bit three vblank timer
@@ -50,27 +25,8 @@
 #define REG_IE *(u16 *)0x4000200   // first bit for vblank, |= 1
 #define REG_IF *(u16 *)0x4000202   // set first bit to acknowledge interrupt |= 1
 
-#define DMA_ENABLE (1 << 15)
-#define DMA_WORD (1 << 10)
-#define DMA_SRC_FIXED (1 << 8)
-#define DMA_MEMCPY16 (DMA_ENABLE)
-#define DMA_MEMCPY32 (DMA_WORD | DMA_ENABLE)
-#define DMA_MEMSET16 (DMA_SRC_FIXED | DMA_ENABLE)
-#define DMA_MEMSET32 (DMA_SRC_FIXED | DMA_WORD | DMA_ENABLE)
-
-inline void Dma3(void *dest, const void *src, u32 count, u16 flags) {
-  REG_DM3SAD = (u32)src;
-  REG_DM3DAD = (u32)dest;
-  REG_DM3CNT_L = count;
-  REG_DM3CNT_H = flags;
-}
-
-
-
-
 // todo: set up VSync, looks straightforward
-// functions in Math.s
-//extern void VSync();
+// functions in Math.s of deku tutorial
 
 typedef struct _SOUND_CHANNEL {
   s8 *data;
@@ -95,12 +51,12 @@ s8 sndMixBuffer[304 * 2]; //IN_EWRAM;
 SOUND_CHANNEL sndChannel[2];
 SOUND_VARS sndVars;
 
-
 void soundInit() {
 //timer length, frequency, buffer size
-//65612, 18157, 304
+//64612, 18157, 304
   s32 i;
 
+  // todo: wtf is this lol
   SOUNDCNT_H = 0x0B04;
   ENABLE_SOUND();
 
@@ -119,25 +75,25 @@ void soundInit() {
     sndChannel[i].loopLength = 0;
   }
 
-
-  TIMER[0].count = 64612; //vblank length???
+  TIMER[0].count = 64612; //vblank length
   TIMER[0].control = TM_ENABLE; // 0x0080 
 
-  REG_DM1CNT = 0; //clear DMA 1 register?
-  REG_DM1DAD = (u32)&REG_SGFIFOA; // destination address, FIFO register
+  DMA[1].wordCount = 0;
+  DMA[1].control = 0;
+  DMA[1].destination = (u32)&REG_SGFIFOA;
 }
 
 void IrqNull() {}
 
-void vblankAudioISR(){
+void vblankAudioISR(){ 
   REG_IF = 1;
 
   if (sndVars.activeBuffer == 1) // buffer 1 just got over
   {
     // Start playing buffer 0
-    REG_DM1CNT = 0;
-    REG_DM1SAD = (u32)sndVars.mixBufferBase;
-    REG_DM1CNT_H =
+    DMA[1].control = 0;
+    DMA[1].source = (u32)sndVars.mixBufferBase;
+    DMA[1].control =
         DMA_DEST_FIXED | DMA_REPEAT | DMA_WORD | DMA_MODE_FIFO | DMA_ENABLE;
 
     // Set the current buffer pointer to the start of buffer 1

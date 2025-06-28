@@ -1,20 +1,18 @@
 #include "../includes/22_audioMixer.h"
+
 int main() { 
   initializeVBI();
   soundInit();
 
   REG_IME |= 1;      // tell GBA to enable intterupts
   DSPC = MODE3 | BG2;
-
  
   while(1) {
     VBLANK();
     SndMix();
     updateKeys();
 
-
-    if (keyTapped(LT)) {
-        
+    if (keyTapped(LT)) {  
       sndChannel[0].data = 0; // clear channel
       sndChannel[0].pos = 0; //set to beginning?
       sndChannel[0].inc = 4096;
