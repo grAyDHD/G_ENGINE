@@ -3,62 +3,88 @@
 
 #include "core/typedefs.h"
 
-// Pointer to dma as array
-#define DMA ((DMA_DATA *)0x040000B0)
+#define ALIGN4 __attribute__((aligned(4)))
 
-//--- Destination Address Controls ---//
-#define INCREMENT_DESTINATION (0 << 5) 
-#define DECREMENT_DESTINATION (1 << 5)
-#define FIXED_DESTINATION     (2 << 5) 
-#define RELOAD                (3 << 5) 
+//-------------------------------------//
+//           DMA Control Flags         //
+//-------------------------------------//
 
-//--- Source Address Controls ---//
-#define INCREMENT_SOURCE      (0 << 7)
-#define DECREMENT_SOURCE      (1 << 7)
-#define FIXED_SOURCE          (2 << 7)
+//--- Destination Address Control (Bits 5-6) ---//
+#define DMA_DEST_INCREMENT   (0 << 5)
+#define DMA_DEST_DECREMENT   (1 << 5)
+#define DMA_DEST_FIXED       (2 << 5)
+#define DMA_DEST_RESET       (3 << 5) // Used with repeat (only for DMA0/1/2)
 
-//--- DMA Repeat ---//
-#define REPEAT                (1 << 9)
+//--- Source Address Control (Bits 7-8) ---//
+#define DMA_SRC_INCREMENT    (0 << 7)
+#define DMA_SRC_DECREMENT    (1 << 7)
+#define DMA_SRC_FIXED        (2 << 7)
 
-//--- DMA Transfer Type ---//
-#define HALFWORD              (0 << 10)
-#define WORD                  (1 << 10)
+//--- DMA Repeat Mode (Bit 9) ---//
+#define DMA_REPEAT           (1 << 9)
 
-//todo: add game pak
+//--- Transfer Size (Bit 10) ---//
+#define DMA_16BIT            (0 << 10) // Default
+#define DMA_32BIT            (1 << 10)
 
-//--- DMA Start Timing ---//
-#define IMMEDIATE             (0 << 12) 
-#define WITH_VBLANK           (1 << 12)
-#define WITH_HBLANK           (2 << 12)
-#define SPECIAL_MODE          (3 << 12)
-// SPECIAL_MODE: 
-// DMA0=Prohibited, DMA1/DMA2=Sound FIFO, DMA3=Video Capture
+//--- DMA Timing / Start Type (Bits 12–13) ---//
+#define DMA_START_NOW        (0 << 12)
+#define DMA_START_VBLANK     (1 << 12)
+#define DMA_START_HBLANK     (2 << 12)
+#define DMA_START_SPECIAL    (3 << 12) // Sound FIFO (DMA1/2), Video Capture (DMA3)
 
-//--- DMA Interrupt ---//
-#define DMA_INTERRUPT_ENABLE (1 << 14)
+//--- IRQ on Completion (Bit 14) ---//
+#define DMA_IRQ_ENABLE       (1 << 14)
 
-//--- DMA ENABLE ---//
-#define ENABLE (1 << 15)
+//--- DMA Enable (Bit 15) ---//
+#define DMA_ENABLE           (1 << 15)
 
-#define DMA_MEMCPY16 (ENABLE)
-#define DMA_MEMCPY32 (WORD | ENABLE)
-#define DMA_MEMSET16 (FIXED_SOURCE | ENABLE)
-#define DMA_MEMSET32 (FIXED_SOURCE | WORD | ENABLE)
+//-------------------------------------//
+//        DMA Composite Modes          //
+//-------------------------------------//
+
+#define DMA_MEMCPY16         (DMA_ENABLE)
+#define DMA_MEMCPY32         (DMA_ENABLE | DMA_32BIT)
+#define DMA_MEMSET16         (DMA_ENABLE | DMA_SRC_FIXED)
+#define DMA_MEMSET32         (DMA_ENABLE | DMA_SRC_FIXED | DMA_32BIT)
 
 
-typedef struct __attribute__((packed)) {
+//-------------------------------------//
+//           DMA Struct                //
+//-------------------------------------//
+
+typedef struct {
   volatile u32 source;
   volatile u32 destination;
   volatile u16 wordCount;
   volatile u16 control;
-} DMA_DATA;
+} ALIGN4 DMA_DATA;
 
+
+// Pointer to DMA channels as array
+#define DMA ((DMA_DATA *)0x040000B0)
+
+
+//-------------------------------------//
+//         DMA Utility Function        //
+//-------------------------------------//
 
 inline void Dma3(void *dest, const void *src, u16 count, u16 flags) {
   DMA[3].source = (u32)src;
   DMA[3].destination = (u32)dest;
   DMA[3].wordCount = count;
   DMA[3].control = flags;
+}
+
+static inline void dmaStart(int channel, void *dst, const void *src, u16 count, u16 flags) {
+  DMA[channel].source = (u32)src;
+  DMA[channel].destination = (u32)dst;
+  DMA[channel].wordCount = count;
+  DMA[channel].control = flags;
+}
+
+static inline void dmaStop(int channel) {
+  DMA[channel].control = 0; // Clear all flags to disable DMA
 }
 
 #endif // DMA_H

@@ -2,6 +2,7 @@
 
 int main() { 
   initializeVBI();
+  //initializeTMRI();
   soundInit();
 
   REG_IME |= 1;      // tell GBA to enable intterupts

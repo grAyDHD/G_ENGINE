@@ -75,8 +75,8 @@ void soundInit() {
     sndChannel[i].loopLength = 0;
   }
 
-  TIMER[0].count = 64612; //vblank length
-  TIMER[0].control = TM_ENABLE; // 0x0080 
+  TIMER[0].value = 64612; //vblank length
+  TIMER[0].control = TIMER_ENABLE; 
 
   DMA[1].wordCount = 0;
   DMA[1].control = 0;
@@ -93,8 +93,7 @@ void vblankAudioISR(){
     // Start playing buffer 0
     DMA[1].control = 0;
     DMA[1].source = (u32)sndVars.mixBufferBase;
-    DMA[1].control =
-        FIXED_DESTINATION | INCREMENT_SOURCE | REPEAT | WORD | SPECIAL_MODE | ENABLE;
+    DMA[1].control = DMA_DEST_FIXED | DMA_SRC_INCREMENT | DMA_REPEAT | DMA_32BIT | DMA_START_SPECIAL | DMA_ENABLE;
 
     // Set the current buffer pointer to the start of buffer 1
     sndVars.curMixBuffer = sndVars.mixBufferBase + sndVars.mixBufferSize;
@@ -116,8 +115,7 @@ void timerISR() {
     // Start playing buffer 0
     DMA[1].control = 0;
     DMA[1].source = (u32)sndVars.mixBufferBase;
-    DMA[1].control =
-        FIXED_DESTINATION | INCREMENT_SOURCE | REPEAT | WORD | SPECIAL_MODE | ENABLE;
+    DMA[1].control = DMA_DEST_FIXED | DMA_SRC_INCREMENT | DMA_REPEAT | DMA_32BIT | DMA_START_SPECIAL | DMA_ENABLE;
 
     // Set the current buffer pointer to the start of buffer 1
     sndVars.curMixBuffer = sndVars.mixBufferBase + sndVars.mixBufferSize;
