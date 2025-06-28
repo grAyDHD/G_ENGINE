@@ -1,5 +1,15 @@
-#include "../includes/22_audioMixer.h"
+#include "../includes/directSound.h"
+#include "core/interrupts.h"
 
+int main() {
+  irqMaster(ON);
+
+  while(1) {
+    VBLANK();
+  }
+  return 0;
+}
+/*
 int main() { 
   initializeVBI();
  // initializeTMRI();
@@ -26,3 +36,4 @@ int main() {
 
     return 0;
 }
+*/

@@ -1,5 +1,5 @@
-#ifndef AUDIOMIXER_H
-#define AUDIOMIXER_H
+#ifndef DIRECTSOUND_H
+#define DIRECTSOUND_H
 #include "guitarData.h"
 #include "graphics/m3Text.h"
 #include "core/typedefs.h"
@@ -20,9 +20,10 @@
 #define REG_SGFIFOA_L *(volatile u16 *)0x40000A0
 #define REG_SGFIFOA_H *(volatile u16 *)0x40000A2
 
+//todo: add to display or video header
 #define DISPSTAT *(u16 *)0x4000004 // bit three vblank timer
 // todo: set up VSync, looks straightforward
-// functions in Math.s of deku tutorial
+// function in Math.s of deku tutorial
 
 typedef struct _SOUND_CHANNEL {
   s8 *data;
@@ -131,12 +132,12 @@ void timerISR() {
 void initializeTMRI() {
   // todo: improve approach by creating an interrupt table in c I can then further optimize in asm
   ISR = timerISR;
+
   // have timer fire interrupts
   // have timer fire interrupts, have gba accept timer interrups (REG_IE)
   TIMER[1].value = 65257;
   TIMER[1].control |= TIMER_ENABLE | TIMER_IRQ_ENABLE;
 
-//  REG_IE |= IRQ_TMR1;
   irqEnable(IRQ_TMR1);
 }
 
@@ -144,7 +145,6 @@ void initializeVBI() {
   ISR = vblankAudioISR;   // tell the GBA where my isr is
   // todo: update display header
   DISPSTAT = 1 << 3; // tell display to fire vblank interrupts
-//  REG_IE |= 1;       // tell GBA to accept vblank interrupts
   irqEnable(IRQ_VBLANK);
 }
 
@@ -196,4 +196,4 @@ void SndMix() {
 } // SndMix
 
 
-#endif // AUDIOMIXER_H
+#endif // DIRECTSOUND_H

@@ -12,7 +12,6 @@
 // todo: phase out IME and IE syntax with more readable IRQ master/enabler
 // only two options: 0 or 1, disable/enable
 #define IRQ_MASTER *(u16 *)0x4000208
-#define REG_IME *(u16 *)0x4000208
 
 #define IRQ_ENABLER *(u16 *)0x4000200
 #define REG_IE *(u16 *)0x4000200
@@ -35,6 +34,7 @@
 #define IRQ_ACKNOWLEDGER *(u16 *)0x4000202
 
 
+//set ON or OFF
 inline void irqMaster(u16 state) {
   IRQ_MASTER = state;
 };
