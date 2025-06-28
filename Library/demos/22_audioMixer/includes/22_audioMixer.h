@@ -20,12 +20,7 @@
 #define REG_SGFIFOA_L *(volatile u16 *)0x40000A0
 #define REG_SGFIFOA_H *(volatile u16 *)0x40000A2
 
-#define ISR *(fnptr *)0x03007FFC   // put function address
 #define DISPSTAT *(u16 *)0x4000004 // bit three vblank timer
-#define REG_IME *(u16 *)0x4000208  // set bit 1 to enable interrupts
-#define REG_IE *(u16 *)0x4000200   // first bit for vblank, |= 1
-#define REG_IF *(u16 *)0x4000202   // set first bit to acknowledge interrupt |= 1
-
 // todo: set up VSync, looks straightforward
 // functions in Math.s of deku tutorial
 
@@ -88,7 +83,7 @@ void soundInit() {
 
 void IrqNull() {}
 void vblankAudioISR(){ 
-  REG_IF = 1;
+  irqAcknowledge(IRQ_VBLANK);
 
   if (sndVars.activeBuffer == 1) // buffer 1 just got over
   {
@@ -111,7 +106,8 @@ void vblankAudioISR(){
 
 void timerISR() {
 
-  REG_IF = ACKNOWLEDGE_TIMER1_IRQ; //Acknowledge interrupt
+
+  irqAcknowledge(IRQ_TMR1);
   if (sndVars.activeBuffer == 1) // buffer 1 just got over
   {
     // Start playing buffer 0
@@ -133,20 +129,23 @@ void timerISR() {
 }
 
 void initializeTMRI() {
+  // todo: improve approach by creating an interrupt table in c I can then further optimize in asm
   ISR = timerISR;
   // have timer fire interrupts
   // have timer fire interrupts, have gba accept timer interrups (REG_IE)
   TIMER[1].value = 65257;
   TIMER[1].control |= TIMER_ENABLE | TIMER_IRQ_ENABLE;
 
-  REG_IE |= IRQ_TMR1;
+//  REG_IE |= IRQ_TMR1;
+  irqEnable(IRQ_TMR1);
 }
 
 void initializeVBI() {
   ISR = vblankAudioISR;   // tell the GBA where my isr is
-  // todo: swap with proper usage from interrupt header or display header
+  // todo: update display header
   DISPSTAT = 1 << 3; // tell display to fire vblank interrupts
-  REG_IE |= 1;       // tell GBA to accept vblank interrupts
+//  REG_IE |= 1;       // tell GBA to accept vblank interrupts
+  irqEnable(IRQ_VBLANK);
 }
 
 void SndMix() {

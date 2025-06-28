@@ -14,6 +14,9 @@ typedef void (*fnptr)(void);
 #define p16 u16 *
 #define p32 u32 *
 
+#define OFF 0
+#define ON 1
+
 //---Vector Types---
 typedef struct {
   int x;

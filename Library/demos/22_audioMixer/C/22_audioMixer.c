@@ -1,11 +1,11 @@
 #include "../includes/22_audioMixer.h"
 
 int main() { 
- // initializeVBI();
+  initializeVBI();
  // initializeTMRI();
+  irqMaster(ON);
   soundInit();
 
-  REG_IME |= 1;      // tell GBA to enable intterupts
   DSPC = MODE3 | BG2;
  
   while(1) {
