@@ -1,6 +1,8 @@
 #include "../includes/directSound.h"
 #include "core/interrupts.h"
 
+/*
+ 
 int main() {
   irqMaster(ON);
   initializeTMRI();
@@ -11,7 +13,10 @@ int main() {
   }
   return 0;
 }
-/*
+ 
+*/
+
+
 int main() { 
   initializeVBI();
  // initializeTMRI();
@@ -38,4 +43,3 @@ int main() {
 
     return 0;
 }
-*/

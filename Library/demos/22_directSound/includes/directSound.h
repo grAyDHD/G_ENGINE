@@ -9,12 +9,10 @@
 #include "input/in.h"
 #include "core/dma.h"
 // todo: split audio headers up, dmg, direct sound, and possibly a more general file
-#include "audio/dmg.h"
+#include "audio/audio.h"
 #include "core/interrupts.h"
 
 
-// todo: refactor defines into lib headers.  WIP
-#define SOUNDCNT_H *(volatile u16 *)0x04000082
 
 #define REG_SGFIFOA *(volatile u32 *)0x40000A0
 #define REG_SGFIFOA_L *(volatile u16 *)0x40000A0
@@ -55,8 +53,9 @@ void soundInit() {
 
   // todo: wtf is this lol
   // I think it enables/sets direct sound channels 
-  SOUNDCNT_H = 0x0B04;
-  ENABLE_SOUND();
+//  SOUNDCNT_H = 0x0B04;
+//  ENABLE_SOUND();
+  dsAudioInit();
 
   sndVars.mixBufferSize = 304;
   sndVars.mixBufferBase = sndMixBuffer;
@@ -75,7 +74,7 @@ void soundInit() {
 
   // todo: make clear why using timer, as special mode is set elsewhere
   TIMER[0].value = 64612; //vblank length
-  TIMER[0].control |= TIMER_ENABLE; // |= to not overwrite interrupt enable flag
+  TIMER[0].control |= TMR_ENABLE; // |= to not overwrite interrupt enable flag
 
   DMA[1].wordCount = 0;
   DMA[1].control = 0;
@@ -136,7 +135,7 @@ void initializeTMRI() {
   // have timer fire interrupts
   // have timer fire interrupts, have gba accept timer interrups (REG_IE)
   TIMER[1].value = 65257;
-  TIMER[1].control |= TIMER_ENABLE | TIMER_IRQ_ENABLE;
+  TIMER[1].control |= TMR_ENABLE | TMR_IRQ_ENABLE;
 
   irqEnable(IRQ_TMR1);
 }
