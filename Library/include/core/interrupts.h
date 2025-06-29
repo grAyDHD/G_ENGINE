@@ -14,7 +14,6 @@
 #define IRQ_MASTER *(u16 *)0x4000208
 
 #define IRQ_ENABLER *(u16 *)0x4000200
-#define REG_IE *(u16 *)0x4000200
 #define IRQ_VBLANK (1 << 0)
 #define IRQ_HBLANK (1 << 1)
 #define IRQ_VCOUNTER (1 << 2) // what is this exactly? v counter match
@@ -32,6 +31,7 @@
 
 // set first bit to acknowledge interrupt |= 1
 #define IRQ_ACKNOWLEDGER *(u16 *)0x4000202
+#define IRQ_FLAGS *(u16 *)0x4000202
 
 
 //set ON or OFF

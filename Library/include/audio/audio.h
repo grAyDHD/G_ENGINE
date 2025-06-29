@@ -13,7 +13,7 @@
 
 typedef struct {
   u16 dmg; // 0x04000080
-  u16 pcm; // 0x04000082
+  u16 ds; // 0x04000082
   u16 master; // 0x04000084
 } AudioControls;
 
@@ -39,6 +39,8 @@ typedef enum {QUARTER = 0, HALF, FULL} Ratio;
 #define DSB_TMR_SELECT(tmr) (tmr << 14) // only timer 0 or 1
 #define DSB_FIFO_RESET (1 << 15)
 
+#define DS_INIT (DSA_ENABLE_L | DSA_ENABLE_R | DSB_ENABLE_L | DSB_ENABLE_R | DSA_FULL_VOLUME | DSB_FULL_VOLUME)
+
 //--- Master sound controls ---//
 // sndcnt_x
 //0400084
@@ -46,16 +48,25 @@ typedef enum {QUARTER = 0, HALF, FULL} Ratio;
 #define AUDIO_MASTER_ENABLE (1 << 7) //bit 7 enable/disable
 #define AUDIO_MASTER_DISABLE (0)
 
-// 040000A0 FIFO_A_L sound A fifo dat 0 and data 1
-// 040000A2 FIFO_A_H sound a fifo Data 2 and data 3
-// 040000A4 FIFO_B_L sound B fifo data 0 and 1
-// 040000A6 FIFO_B_H sound B fifo data 2 and 3``
+#define FIFO_A ((volatile u32 *)0x040000A0) // 4x8 bit chunk transfers
+#define FIFO_B ((volatile u32 *)0x040000A4)
 
 void dsAudioInit(){
-  AUDIO->pcm = DSA_FULL_VOLUME | DSA_ENABLE_L | DSA_ENABLE_R | DSA_FIFO_RESET;
+  AUDIO->ds = DSA_FULL_VOLUME | DSA_ENABLE_L | DSA_ENABLE_R | DSA_FIFO_RESET;
   //todo: this should likely be separate with only a single bit to toggle.
   AUDIO->master = AUDIO_MASTER_ENABLE;
 }
 
+//DS in DMA mode:
+//set DS outputs and volumes
+//set timer 0 or 1 count value to 0xffff-round(cpuFreq/playbackFreq)
+  // 65536 = (0xffff, unsigned)
+  // 65536 - round(2^24/16000)
+// set DMA source to sample address and dest to fifo a or b
+// fifo reset bit before starting sound
+// set dma 1 or 2 start mode to 11 (special?)
+  // this sets dma to repeat on fifo empty? some docs say prohibited
+// set dma repeat and 32 bit moves and set src/dest to increment
+// enable timer at cpu frequency (prescaler/clock divider = 0)
 
 #endif
