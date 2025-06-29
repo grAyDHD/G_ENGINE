@@ -1,7 +1,9 @@
 #ifndef AUDIO_H
 #define AUDIO_H
+#include "core/typedefs.h"
 
 //--- DMG Sound Controls ---//
+// 04000080
 // sound control L ch LR volume/enable
 // bit 0-2 sound 1-4 master volume right
 // bit 3 unused
@@ -9,6 +11,9 @@
 // bit 7 unused
 // 8-11 sound 1-4 enable flags RIGHT
 // 12-15 sound 1-4 enable flags LEFT
+typedef struct {
+  volatile u16 DMG;
+};
 
 //--- Direct Sound Controls ---//
 // 04000082
@@ -26,7 +31,7 @@
 // bit 14 DMA Sound B timer select (0 or 1)
 // bit 15 DMA Sound B Reset FIFO (1 = reset)
 
-//--- Maser sound controls ---//
+//--- Master sound controls ---//
 //0400084
 //Sound on/off
 //bits 0-3 read only dmg 1-4 play status

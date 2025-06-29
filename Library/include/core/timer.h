@@ -7,22 +7,22 @@
 //-------------------------------------//
 
 //--- Timer Prescaler (Bits 0–1) ---//
-#define TIMER_FREQ_1        (0 << 0) // No division (16.78MHz)
-#define TIMER_FREQ_64       (1 << 0)
-#define TIMER_FREQ_256      (2 << 0)
-#define TIMER_FREQ_1024     (3 << 0)
+#define TMR_FREQ_1        (0 << 0) // No division (16.78MHz)
+#define TMR_FREQ_64       (1 << 0)
+#define TMR_FREQ_256      (2 << 0)
+#define TMR_FREQ_1024     (3 << 0)
 
 //--- Timer Cascade Mode (Bit 2) ---//
-#define TIMER_CASCADE       (1 << 2) // Timer N ticks when Timer N-1 overflows
+#define TMR_CASCADE       (1 << 2) // Timer N ticks when Timer N-1 overflows
 
 //--- Timer Interrupt Enable (Bit 6) ---//
-#define TIMER_IRQ_ENABLE    (1 << 6) // Fire IRQ on overflow
+#define TMR_IRQ_ENABLE    (1 << 6) // Fire IRQ on overflow
 
 //--- Timer Enable (Bit 7) ---//
-#define TIMER_ENABLE        (1 << 7) // Start timer
+#define TMR_ENABLE        (1 << 7) // Start timer
 
 // Optional grouping
-#define TIMER_STOP          (0 << 7)
+#define TMR_STOP          (0 << 7)
 
 //-------------------------------------//
 //           Timer Struct              //
@@ -34,10 +34,10 @@
 typedef struct {
   volatile u16 value;    // TMxCNT_L: Reload value (written) / Counter (read)
   volatile u16 control;   // TMxCNT_H: Timer control flags
-} ALIGN4 TIMER_DATA;
+} ALIGN4 TMR_DATA;
 
 // Pointer to timer array
-#define TIMER ((TIMER_DATA *)0x04000100)
+#define TIMER ((TMR_DATA *)0x04000100)
 
 void simpleWait(int delay);
 
