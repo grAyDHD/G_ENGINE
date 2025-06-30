@@ -31,15 +31,16 @@ typedef enum {QUARTER = 0, HALF, FULL} Ratio;
 
 #define DSA_ENABLE_R (1 << 8)
 #define DSA_ENABLE_L (1 << 9)
-#define DSA_TMR_SELECT(tmr) (tmr << 10) // only timer 0 or 1
+#define DSA_TMR(tmr) (tmr << 10) // only timer 0 or 1
 #define DSA_FIFO_RESET (1 << 11)
 
 #define DSB_ENABLE_R (1 << 12)
 #define DSB_ENABLE_L (1 << 13)
-#define DSB_TMR_SELECT(tmr) (tmr << 14) // only timer 0 or 1
+#define DSB_TMR(tmr) (tmr << 14) // only timer 0 or 1
 #define DSB_FIFO_RESET (1 << 15)
 
-#define DS_INIT (DSA_ENABLE_L | DSA_ENABLE_R | DSB_ENABLE_L | DSB_ENABLE_R | DSA_FULL_VOLUME | DSB_FULL_VOLUME)
+#define DS_MONO_INIT (DSA_ENABLE_L | DSA_ENABLE_R | DSB_ENABLE_L | DSB_ENABLE_R | DSA_FULL_VOLUME | DSB_FULL_VOLUME)
+#define DS_STEREO_INIT (DSA_ENABLE_L | DSB_ENABLE_R | DSA_FULL_VOLUME | DSB_FULL_VOLUME)
 
 //--- Master sound controls ---//
 // sndcnt_x
