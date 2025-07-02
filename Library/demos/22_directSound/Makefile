@@ -15,7 +15,7 @@ LIBRARY := $(LIBRARY_DIR)/build/g_engine.a
 
 TARGET := $(notdir $(CURDIR))
 BUILD := build
-SOURCES := C asm
+SOURCES := C asm audio
 
 #include and asset directories
 INCLUDES := $(LIBRARY_DIR)/include \

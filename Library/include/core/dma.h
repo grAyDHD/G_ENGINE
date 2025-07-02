@@ -52,7 +52,6 @@
 //-------------------------------------//
 //           DMA Struct                //
 //-------------------------------------//
-
 typedef struct {
   volatile u32 source;
   volatile u32 destination;
