@@ -67,12 +67,25 @@ typedef struct {
 //-------------------------------------//
 //         DMA Utility Function        //
 //-------------------------------------//
+inline void Dma2(void *dest, const void *src, u16 count, u16 flags) {
+  DMA[2].source = (u32)src;
+  DMA[2].destination = (u32)dest;
+  DMA[2].wordCount = count;
+  DMA[2].control = flags;
+}
 
 inline void Dma3(void *dest, const void *src, u16 count, u16 flags) {
   DMA[3].source = (u32)src;
   DMA[3].destination = (u32)dest;
   DMA[3].wordCount = count;
   DMA[3].control = flags;
+}
+
+inline void Dma0(void *dest, const void *src, u16 count, u16 flags) {
+  DMA[0].source = (u32)src;
+  DMA[0].destination = (u32)dest;
+  DMA[0].wordCount = count;
+  DMA[0].control = flags;
 }
 
 static inline void dmaStart(int channel, void *dst, const void *src, u16 count, u16 flags) {
