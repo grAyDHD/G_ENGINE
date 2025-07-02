@@ -8,12 +8,12 @@ void isr(void) {
   // Fill buffer with next chunk of audio
   if (tharpPosition < tharp16klen - 256) {
     Dma3(singleBuffer, tharp16k + tharpPosition, 64, DMA_MEMCPY32);
-    tharpPosition += 256;
+    tharpPosition += 16;
   } else {
     // End of sample - could loop or stop
     tharpPosition = 0;  // Loop back to beginning
     Dma3(singleBuffer, tharp16k, 64, DMA_MEMCPY32);
-    tharpPosition += 256;
+    tharpPosition += 16;
   }
   
   // Restart DMA to play the newly filled buffer
@@ -27,7 +27,7 @@ int main(void){
 
   // prefill buffer with audio
   Dma3(singleBuffer, tharp16k + tharpPosition, 64, DMA_MEMCPY32);
-  tharpPosition += 256;
+  tharpPosition += 16;
 
   // setup interrupts/dma1
   ISR = isr;
