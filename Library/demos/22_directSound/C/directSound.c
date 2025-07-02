@@ -5,6 +5,7 @@
 #include "core/dma.h"
 #include "core/interrupts.h"
 #include "audio/audio.h"
+
 #include "../includes/k16.h"
 #include "../includes/k8.h"
 #include "../includes/s16.h"
@@ -12,30 +13,75 @@
 #include "../includes/tharp16.h"
 #include "../includes/tharp16.h"
 
-
-// todo: move audio data to c files and out of headers
-s8 mixBufferA[256];
-s8 mixBufferB[256];
-// audio variables from headers:
-// s8 []: kick16k same for snare and tharp, 16k and 8k versions for each
-// u32: kick16klen
+#include "graphics/draw.h"
+#include "graphics/video.h"
+#include "graphics/m3Text.h"
 
 typedef struct {
-  // data, pointer to start of audio sample *u32?
-  // length = samplelen u32, u16 not large enough to contain length of longer samples
-  // position? if position is 0, not playing, else playing- u32
-  // use highest bit of position to represent whether looping or not, mask that bit for position calculations
-} DMAAudioChannel;
-// seems like too many members, will narrow down to minimum necessary while retaining flexibility/control
+  // use union here for s16 combinedBuffer, pack struct to ensure no padding messes with acess/alignment
+  s8 bufferA[256];
+  s8 bufferB[256];
+} MixBuffers;
+
+MixBuffers mixBuffer = { 
+  .bufferA = {0}, 
+  .bufferB = {0}
+};
+
+
+u16 currentBuffer = 0;
+u16 bufferNeedsRefill = 0;
+static u32 tharpPosition = 0;
+static u32 tharpPlaying = 0;
 
 void startAudioLoop(void);
 void stopAudioLoop(void);
-void tmr1_isr(void);
+void dma1_isr(void);
+void mixAudio(void);
  
+
+  //tharpPosition = 0;
+  //Dma3(singleBuffer, tharp16k + tharpPosition, 64, DMA_MEMCPY32);
+  //tharpPosition += 256;
+//
+  //first, fill buffer:
+//  Dma3(singleBuffer, tharp16k + tharpPosition, 64, DMA_MEMCPY32);
+ // tharpPosition += 256;
+
+const u8 singleBuffer[256] = {10};
+
+void isr(void) {
+  DMA[1].source = (u32)singleBuffer; // reads 4 samples at once from DMA, so must increment position in buffer.
+  irqAcknowledge(IRQ_DMA1);
+}
+
 int main(void){
+
+  ISR = isr;
+  irqEnable(IRQ_DMA1);
+  irqMaster(ON);	
+  
   DSPC = MODE3 | BG2;
 
+  AUDIO->ds = DS_MONO_INIT | DSA_TMR(0);
+  AUDIO->master = AUDIO_MASTER_ENABLE;
+  DMA[1].source = (u32)singleBuffer;
+  DMA[1].wordCount = 64; 
+  DMA[1].destination = (u32)FIFO_A;
+  DMA[1].control = DMA_ENABLE | DMA_32BIT | DMA_START_SPECIAL | DMA_REPEAT | DMA_IRQ_ENABLE;
+  
+	//Formula for playback frequency: 0xFFFF - (cpuFreq/playbackFreq)
+  TIMER[0].value = 0xFBE8; // 16khz playback freq, controls DMA repeat rate
+  TIMER[0].control = TMR_ENABLE;				 
+
 	while(1){
+
+  
+  }
+  return 0;
+}
+
+    /*
     updateKeys();
 
     //--- Program Flow ---//
@@ -44,49 +90,88 @@ int main(void){
       // if tharp loop is playing, stop
       // if not, start playback
 		}
-	}
-}
+//    mixAudio();
+  */
 
+int pos = 0;
+void dma1_isr() { 
+  /*
+  if (currentBuffer == 0) { // will fill buffer A after
+    currentBuffer = 1;
+  } else { // will fill buffer B after
+    DMA[1].source = (u32)mixBuffer.bufferA;
+    currentBuffer = 0; // 0 for A, 1 for B
+  } 
+  
+  bufferNeedsRefill = 1;
 
-/* will rewrite this
-int overflow = 0;
-void tmr1_isr() { 
-  if (overflow == 43) {
-    DMA[1].control = 0;
-    TIMER[0].control = 0;
-    TIMER[1].control = 0;
-    overflow = 0;
-  } else {
-    overflow++;
+  if (tharpPosition > tharp16klen) {
+    tharpPlaying = 0;
   }
-  irqAcknowledge(IRQ_TMR1);
+  */
+
+  //fill buffer:
+ // Dma3(singleBuffer, tharp16k + tharpPosition, 64, DMA_MEMCPY32);
+  tharpPosition += 256;
+  irqAcknowledge(IRQ_DMA1);
 }
-*/
+
+
+void mixAudio(void) {
+  if (!bufferNeedsRefill || !tharpPlaying) return;
+     
+  if (currentBuffer == 0) {
+    // Playing A, so refill B
+    Dma3(mixBuffer.bufferB, tharp16k + tharpPosition, 64, DMA_MEMCPY32);
+  } else {
+    // Playing B, so refill A
+    Dma3(mixBuffer.bufferA, tharp16k + tharpPosition, 64, DMA_MEMCPY32);
+  }
+
+  tharpPosition += 256; // is this the right number?
+  bufferNeedsRefill = 0;
+}
+
 
 void startAudioLoop (void){
-  // this isn't quite right, but how to loop it? first i'll get it to just play
-//  ISR = tmr1_isr;
+  ISR = dma1_isr;
+  irqEnable(IRQ_DMA1);
+  irqMaster(ON);	
 
-  AUDIO->ds = DS_MONO_INIT | DSA_FIFO_RESET | DSA_TMR(0);
+  tharpPosition = 0;
+
+  //fill buffer right away
+  Dma3(mixBuffer.bufferA, tharp16k, 64, DMA_MEMCPY32);
+  tharpPosition += 256;
+  Dma3(mixBuffer.bufferB, tharp16k + tharpPosition, 64, DMA_MEMCPY32);
+  tharpPosition += 256;
+  tharpPlaying = 1;
+
+  AUDIO->ds = DS_MONO_INIT | DSA_TMR(0);
   AUDIO->master = AUDIO_MASTER_ENABLE;
-  
-  // create separate MixBuffer struct? with bufferA, bufferB?a	
-//  DMA[1].source = (u32)mixBufferA; //irq will set source to buffer b?
-  //buffer A and B should be back to back, mix buffer struct? this will mimic tutorial of only swapping buffers when buffer B is finished being used by dma, so interrupt could be every 128 samples?  
-  // 32 bits, is that four samples?  256/4 = 64 dma transfers per buffer
-  DMA[1].source = (u32)tharp16k;
+  DMA[1].source = (u32)mixBuffer.bufferA; // reads 4 samples at once from DMA, so must increment position in buffer.
+  DMA[1].wordCount = 64; // 64 words, or 256 s8 values, one buffer
+  // bufferA is equivalent to 64 u32, full buffer is 128.  source must only be reset to bufferA after this 128th transfer.
   DMA[1].destination = (u32)FIFO_A;
-  DMA[1].control = DMA_ENABLE | DMA_32BIT | DMA_START_SPECIAL | DMA_REPEAT;
+  DMA[1].control = DMA_ENABLE | DMA_32BIT | DMA_START_SPECIAL | DMA_REPEAT | DMA_IRQ_ENABLE;
 	
 
 	//Formula for playback frequency: 0xFFFF - (cpuFreq/playbackFreq)
-  TIMER[0].value = 0xFBE8; // 16khz playback freq
+  TIMER[0].value = 0xFBE8; // 16khz playback freq, controls DMA repeat rate
   TIMER[0].control = TMR_ENABLE;				 
 
-//  irqEnable(IRQ_TMR1);
- // irqMaster(ON);
-	
-  //for shorter audio, 0xFFFF - number of samples and stop on irq
-  TIMER[1].value = 0xFFFF - 256; //for 256 sample buffer, isr must handle buffer swap
-  TIMER[1].control = TMR_ENABLE | TMR_IRQ_ENABLE | TMR_CASCADE;
 }
+
+    // s16 tempBuffer[256]; // avoid for now, will use once mixing is introduced
+  // may use timer 1 to track sample length?  
+  //for shorter audio, 0xFFFF - number of samples and stop on irq
+//  TIMER[1].value = 0xFFFF - 128; // sends interrupt every other buffer?  confused about when to reload buffer, when bufferA is about to play do I fill bufferB?
+//  TIMER[1].control = TMR_ENABLE | TMR_IRQ_ENABLE | TMR_CASCADE;
+
+typedef struct __attribute__((packed)) {
+  // data, pointer to start of audio sample *u32?
+  // length = samplelen u32, u16 not large enough to contain length of longer samples
+  // position? if position is 0, not playing, else playing- u32
+  // use highest bit of position to represent whether looping or not, mask that bit for position calculations
+} DMAAudioChannel;
+// seems like too many members, will narrow down to minimum necessary while retaining flexibility/control

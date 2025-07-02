@@ -23,6 +23,7 @@ typedef struct {
 // 04000082
 // DS Sound control/mixing
 typedef enum {QUARTER = 0, HALF, FULL} Ratio;
+
 #define DMG_RATIO(r) (r) //enum quarter = 0, half = 1 full = 2
 #define DSA_HALF_VOLUME (0 << 2)
 #define DSA_FULL_VOLUME (1 << 2)
@@ -32,14 +33,14 @@ typedef enum {QUARTER = 0, HALF, FULL} Ratio;
 #define DSA_ENABLE_R (1 << 8)
 #define DSA_ENABLE_L (1 << 9)
 #define DSA_TMR(tmr) (tmr << 10) // only timer 0 or 1
-#define DSA_FIFO_RESET (1 << 11)
+#define DSA_FIFO_CLEAR (1 << 11)
 
 #define DSB_ENABLE_R (1 << 12)
 #define DSB_ENABLE_L (1 << 13)
 #define DSB_TMR(tmr) (tmr << 14) // only timer 0 or 1
-#define DSB_FIFO_RESET (1 << 15)
+#define DSB_FIFO_CLEAR (1 << 15)
 
-#define DS_MONO_INIT (DSA_ENABLE_L | DSA_ENABLE_R | DSB_ENABLE_L | DSB_ENABLE_R | DSA_FULL_VOLUME | DSB_FULL_VOLUME)
+#define DS_MONO_INIT (DSA_ENABLE_L | DSA_ENABLE_R | DSB_ENABLE_L | DSB_ENABLE_R | DSA_FULL_VOLUME | DSB_FULL_VOLUME | DSA_FIFO_CLEAR | DSB_FIFO_CLEAR)
 #define DS_STEREO_INIT (DSA_ENABLE_L | DSB_ENABLE_R | DSA_FULL_VOLUME | DSB_FULL_VOLUME)
 
 //--- Master sound controls ---//
@@ -53,7 +54,7 @@ typedef enum {QUARTER = 0, HALF, FULL} Ratio;
 #define FIFO_B ((volatile u32 *)0x040000A4)
 
 void dsAudioInit(){
-  AUDIO->ds = DSA_FULL_VOLUME | DSA_ENABLE_L | DSA_ENABLE_R | DSA_FIFO_RESET;
+  AUDIO->ds = DSA_FULL_VOLUME | DSA_ENABLE_L | DSA_ENABLE_R | DSA_FIFO_CLEAR;
   //todo: this should likely be separate with only a single bit to toggle.
   AUDIO->master = AUDIO_MASTER_ENABLE;
 }
