@@ -7,7 +7,7 @@ u32 tharpPosition = 0;
 void isr(void) {
   // Fill buffer with next chunk of audio
   if (tharpPosition < tharp16klen - 16) {
-    Dma2(singleBuffer, tharp16k + tharpPosition, 4, DMA_MEMCPY32);
+    Dma3(singleBuffer, tharp16k + tharpPosition, 4, DMA_MEMCPY32);
     tharpPosition += 16;
   } else {
     // End of sample - could loop or stop
@@ -24,7 +24,7 @@ int main(void){
   DSPC = MODE3 | BG2;
 
   // prefill buffer with audio
-  Dma2(singleBuffer, tharp16k + tharpPosition, 4, DMA_MEMCPY32);
+  Dma3(singleBuffer, tharp16k + tharpPosition, 4, DMA_MEMCPY32);
   tharpPosition += 16;
 
   // setup interrupts/dma1
