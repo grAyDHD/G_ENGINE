@@ -2,18 +2,31 @@
 #include "core/dma.h"
 
 u8 singleBuffer[16] = {0};
-u32 tharpPosition = 0;
+
+typedef struct {
+  const s8 *data;
+  u32 position;
+  u32 length;
+} AudioChannel;
+
+AudioChannel channel[4];
+
+void initAudioChannel() {
+  channel[0].data = tharp16k;   
+  channel[0].position = 0;
+  channel[0].length = tharp16klen;
+}
 
 void isr(void) {
   // Fill buffer with next chunk of audio
-  if (tharpPosition < tharp16klen - 16) {
-    Dma3(singleBuffer, tharp16k + tharpPosition, 4, DMA_MEMCPY32);
-    tharpPosition += 16;
+  if (channel[0].position < channel[0].length - 16) {
+    //fill buffer with audio from audio's current position
+    Dma3(singleBuffer, tharp16k + channel[0].position, 4, DMA_MEMCPY32);
+    channel[0].position += 16;
   } else {
     // End of sample - could loop or stop
-    tharpPosition = 0;  // Loop back to beginning
-    Dma2(singleBuffer, tharp16k, 4, DMA_MEMCPY32);
-    tharpPosition = 16;
+    channel[0].position = 0;  // Loop back to beginning
+    Dma3(singleBuffer, tharp16k, 4, DMA_MEMCPY32);
   }
   
   DMA[1].control = DMA_ENABLE | DMA_START_SPECIAL | DMA_IRQ_ENABLE;
@@ -23,9 +36,7 @@ void isr(void) {
 int main(void){
   DSPC = MODE3 | BG2;
 
-  // prefill buffer with audio
-  Dma3(singleBuffer, tharp16k + tharpPosition, 4, DMA_MEMCPY32);
-  tharpPosition += 16;
+  initAudioChannel();
 
   // setup interrupts/dma1
   ISR = isr;
