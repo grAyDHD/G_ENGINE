@@ -16,9 +16,9 @@ GBA Audio Mixing Demo
 - Mixed samples play mono in FIFO_A
 
 ## Required Assets:
--[ ] Music loop (3 variants: 16kHz, 8kHz, 4kHz, 8-bit signed)
--[ ] Kick sample (3 variants: 16kHz, 8kHz, 4kHz, 8-bit signed)
--[ ] Snare sample (3 variants: 16kHz, 8kHz, 4kHz, 8-bit signed)
+-[x] Music loop (2 variants: 16kHz, 8kHz, 8-bit signed)
+-[x] Kick sample (2 variants: 16kHz, 8kHz, 8-bit signed)
+-[x] Snare sample (2 variants: 16kHz, 8kHz, 8-bit signed)
 
 ----------------------------------------------------------------
 
@@ -27,7 +27,7 @@ GBA Audio Mixing Demo
 ## Phase 1:
     Hardware Audio Foundation
 
--[ ] Direct DMA audio streaming (current stereo playback system)
+-[x] Direct DMA audio streaming (current stereo playback system)
 -[ ] Timer cascade setup (Timer 0 for sample rate, Timer 1 for buffer timing)
 -[ ] Double buffer allocation and management
 -[ ] Buffer swap interrupt handler
