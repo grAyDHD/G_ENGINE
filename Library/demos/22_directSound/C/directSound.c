@@ -4,10 +4,11 @@
 #include "core/dma.h"
 #include "core/interrupts.h"
 #include "core/timer.h"
+#include "core/typedefs.h"
 #include "graphics/draw.h"
 #include "graphics/m3Text.h"
+#include "input/in.h"
 
-// todo: move back to dma irq
 
 	//Formula for playback frequency: 0xFFFF - (cpuFreq/playbackFreq)
 #define BUFFER_SIZE 256
@@ -17,6 +18,10 @@ typedef struct {
   const s8 *data;
   u32 position;
   u32 length;
+  u32 increment; // fixed point increment, 4096 = normal
+  u32 volume;
+  u16 isPlaying;
+  u16 looping;
 } AudioChannel;
 
 AudioChannel channel[4];
@@ -34,26 +39,78 @@ typedef struct __attribute__((packed)) {
   ActiveBuffer activeBuffer;
 } Mixbuffer;
 
-s8 singleBuffer[BUFFER_SIZE] = {0};
 Mixbuffer mixbuf = {0};
 
 
 void initMixChannels() {
+  // Channel 0: Music loop (tharp)
   channel[0].data = tharp16k;   
   channel[0].position = 0;
   channel[0].length = tharp16klen;
+  channel[0].volume = 1;
+  channel[0].isPlaying = 0;
+  channel[0].looping = 0;
+
+  // Channel 1: Sample A (one-shot kick)
+  channel[1].data = kick16k;   
+  channel[1].position = 0;
+  channel[1].length = kick16klen;
+  channel[1].volume = 1;
+  channel[1].isPlaying = 0;
+  channel[1].looping = 0;
+
+  // Channel 2: Sample B (one-shot snare)
+  channel[2].data = snare16k;   
+  channel[2].position = 0;
+  channel[2].length = snare16klen;
+  channel[2].volume = 1;
+  channel[2].isPlaying = 0;
+  channel[2].looping = 0;
 }
 
-void fillBuffer() {
+void mixAudio() {
+  s32 i, ch;
+  s16 tempBuffer[BUFFER_SIZE];
   s8* targetBuffer = (mixbuf.activeBuffer == bufA) ? mixbuf.bufB : mixbuf.bufA;
 
-  if (channel[0].position < channel[0].length - BUFFER_SIZE) {
-    Dma3(targetBuffer, channel[0].data + channel[0].position, BUFFER_SIZE/4, DMA_MEMCPY32);
-    channel[0].position += BUFFER_SIZE;
-  } else {
-    // End of sample - loop back to beginning
-    channel[0].position = 0;
-    Dma3(targetBuffer, channel[0].data, BUFFER_SIZE/4, DMA_MEMCPY32);
+  i = 0;
+  Dma3(tempBuffer, &i, BUFFER_SIZE * sizeof(s16) / 4, DMA_MEMSET32);
+  
+  int audioPlaying = 0;
+
+  for (ch = 0; ch < 4; ch++) {
+    if (channel[ch].isPlaying) {
+      audioPlaying = 1;
+      for (i = 0; i < BUFFER_SIZE; i++) {
+
+//        tempBuffer[i] += channel[ch].data[channel[ch].position] * channel[ch].volume;
+        tempBuffer[i] += channel[ch].data[channel[ch].position];
+        channel[ch].position++;
+
+        if (channel[ch].position >= (channel[ch].length)) {
+          if (channel[ch].looping) {
+            while (channel[ch].position >= (channel[ch].length)) {
+              channel[ch].position -= (channel[ch].length);
+            }
+          } else {
+            channel[ch].isPlaying = 0;
+            i = BUFFER_SIZE;
+          }
+        } 
+      }
+    }
+  } 
+
+  for (i = 0; i < BUFFER_SIZE; i++) { 
+    
+    if (audioPlaying) {
+      targetBuffer[i] = (s8)tempBuffer[i];  // used without volume scaling or mixing, provides clean audio
+//    targetBuffer[i] = (s8)((tempBuffer[i]) >> 2);  // Add half-step before shifting
+
+    } else {
+      targetBuffer[i] = 0;
+    }
+
   }
 }
 
@@ -62,7 +119,6 @@ volatile u32 fifoCounter = 0;
 
 void isr(void) {
   fifoCounter++;
-
 
   if (fifoCounter >= 16) { 
     reload = 1;
@@ -104,19 +160,56 @@ void initMonoFIFO() {
   irqEnable(IRQ_DMA1);
 }
 
+void startMusicLoop() {
+  channel[0].position = 0;
+  channel[0].isPlaying = 1;
+}
+
+void stopMusicLoop() {
+  channel[0].isPlaying = 0;
+}
+
+void triggerKick() {
+  channel[1].position = 0;
+  channel[1].isPlaying = 1;
+}
+
+void triggerSnare() {
+  channel[2].position = 0;
+  channel[2].isPlaying = 1;
+}
+
 int main(void){
   DSPC = MODE3 | BG2;
 
   initMixChannels();
   irqMaster(ON);	// now enable interrupts
-  fillBuffer();
   initMonoFIFO(); // is now reading from buffer
 
 	while(1){
     if (reload == 1) {
-      fillBuffer();
+      mixAudio();
       reload = 0;
     }
+
+    updateKeys();
+    
+    if (keyTapped(ST)) {
+      if (channel[0].isPlaying) {
+        stopMusicLoop();
+      } {
+        startMusicLoop();
+      }
+    }
+
+    if (keyTapped(B)) {
+      triggerKick();
+    }
+
+    if (keyTapped(A)) {
+      triggerSnare();
+    }
+
   }
   return 0;
 }
