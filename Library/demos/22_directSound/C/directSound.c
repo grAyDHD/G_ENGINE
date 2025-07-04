@@ -18,10 +18,12 @@ typedef struct {
 
 AudioChannel channel[4];
 
-typedef struct __attribute__((packed)) {
-  s8 bufA[BUFFER_SIZE];
-  s8 bufB[BUFFER_SIZE];
+typedef struct {
+  u32 bufA[64];
+  u32 bufB[64];
 } Mixbuffer;
+
+s8 singleBuffer[BUFFER_SIZE] = {0};
 
 void initMixChannels() {
   channel[0].data = tharp16k;   
@@ -29,14 +31,8 @@ void initMixChannels() {
   channel[0].length = tharp16klen;
 }
 
-Mixbuffer dualBuffer = {0};
 
-enum CurrentBuffer { bufA = 0, bufB = 1};
-enum CurrentBuffer currentBuffer = bufA;
-
-
-  /*
-   * this fills buffer with channel 0 data.
+void tm_isr(void) {
   if (channel[0].position < channel[0].length - BUFFER_SIZE) {
     Dma3(singleBuffer, channel[0].data + channel[0].position, BUFFER_SIZE/4, DMA_MEMCPY32);
     channel[0].position += BUFFER_SIZE;
@@ -44,20 +40,6 @@ enum CurrentBuffer currentBuffer = bufA;
     // End of sample - loop back to beginning
     channel[0].position = 0;
     Dma3(singleBuffer, channel[0].data, BUFFER_SIZE/4, DMA_MEMCPY32);
-  }
-  */
-
-void tm_isr(void) {
-  if (currentBuffer == bufA) { // buffer A just finished
-    currentBuffer = bufB;
-    DMA[1].source = bufB;
-
-
-  } else { // buffer B just finished
-    currentBuffer = bufA;
-    DMA[1].source = bufA;
-    // fill buffer B, play buffer A
-    
   }
 
   DMA[1].control = 0;  // Disable completely  
@@ -71,11 +53,7 @@ void initMonoFIFO() {
   ENABLE_AUDIO;
   AUDIO->ds = DS_MONO_INIT | DSA_TMR(0);
 
-  //fill buffers A and B
-  Dma3(dualBuffer.bufA, channel[0].data, 128, DMA_MEMCPY32); // 128 words, 512 bytes 
-  channel[0].position += 512; // advance 512 bytes/samples
-
-  DMA[1].source = (u32)dualBuffer.bufA;
+  DMA[1].source = (u32)singleBuffer;
   DMA[1].destination = (u32)FIFO_A;
   DMA[1].control = DMA_ENABLE | DMA_START_SPECIAL; 
 
@@ -88,13 +66,11 @@ void initMonoFIFO() {
   ISR = tm_isr;
   irqEnable(IRQ_TMR1);
 }
-
-
 int main(void){
   DSPC = MODE3 | BG2;
   initMixChannels();
   initMonoFIFO(); // is now reading from buffer
-  irqMaster(ON);	// timer interrupt every 256 samples
+  irqMaster(ON);	
   
 	while(1){}
   return 0;

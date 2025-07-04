@@ -29,7 +29,7 @@ GBA Audio Mixing Demo
 
 -[x] Direct DMA audio streaming (current stereo playback system)
 -[x] Timer cascade setup (Timer 0 for sample rate, Timer 1 for buffer timing)
--[x] Double buffer allocation and management
+-[ ] Double buffer allocation and management
 -[ ] Buffer swap interrupt handler
 
 ## Phase 2:
