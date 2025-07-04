@@ -17,6 +17,12 @@ typedef struct {
 } AudioChannel;
 
 AudioChannel channel[4];
+
+typedef struct {
+  u32 bufA[64];
+  u32 bufB[64];
+} Mixbuffer;
+
 s8 singleBuffer[BUFFER_SIZE] = {0};
 
 void initMixChannels() {
