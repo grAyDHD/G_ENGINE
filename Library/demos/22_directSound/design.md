@@ -28,7 +28,7 @@ GBA Audio Mixing Demo
     Hardware Audio Foundation
 
 -[x] Direct DMA audio streaming (current stereo playback system)
--[ ] Timer cascade setup (Timer 0 for sample rate, Timer 1 for buffer timing)
+-[x] Timer cascade setup (Timer 0 for sample rate, Timer 1 for buffer timing)
 -[ ] Double buffer allocation and management
 -[ ] Buffer swap interrupt handler
 
