@@ -25,15 +25,17 @@ typedef enum { bufA = 0, bufB = 1 } ActiveBuffer;
 typedef struct __attribute__((packed)) {
   union {
     struct {
-      u8 bufA[BUFFER_SIZE];
-      u8 bufB[BUFFER_SIZE];
+      s8 bufA[BUFFER_SIZE];
+      s8 bufB[BUFFER_SIZE];
     };
-    u8 baseBuffer[BUFFER_SIZE * 2];
+    s8 baseBuffer[BUFFER_SIZE * 2];
   };
   ActiveBuffer activeBuffer;
 } Mixbuffer;
 
 s8 singleBuffer[BUFFER_SIZE] = {0};
+Mixbuffer mixbuf = {0};
+
 
 void initMixChannels() {
   channel[0].data = tharp16k;   
@@ -42,13 +44,15 @@ void initMixChannels() {
 }
 
 void fillBuffer() {
+  s8* targetBuffer = (mixbuf.activeBuffer == bufA) ? mixbuf.bufB : mixbuf.bufA;
+
   if (channel[0].position < channel[0].length - BUFFER_SIZE) {
-    Dma3(singleBuffer, channel[0].data + channel[0].position, BUFFER_SIZE/4, DMA_MEMCPY32);
+    Dma3(targetBuffer, channel[0].data + channel[0].position, BUFFER_SIZE/4, DMA_MEMCPY32);
     channel[0].position += BUFFER_SIZE;
   } else {
     // End of sample - loop back to beginning
     channel[0].position = 0;
-    Dma3(singleBuffer, channel[0].data, BUFFER_SIZE/4, DMA_MEMCPY32);
+    Dma3(targetBuffer, channel[0].data, BUFFER_SIZE/4, DMA_MEMCPY32);
   }
 }
 
@@ -56,9 +60,17 @@ volatile u32 reload = 0;
 
 void tm_isr(void) {
   reload = 1;
-
-  DMA[1].control = 0;  // Disable completely  
-  DMA[1].control = DMA_ENABLE | DMA_START_SPECIAL | DMA_REPEAT | DMA_DEST_FIXED;  // Full restart
+  if (mixbuf.activeBuffer == bufA) {
+    DMA[1].control = 0;
+    DMA[1].source = (u32)mixbuf.bufB;
+    DMA[1].control = DMA_ENABLE | DMA_START_SPECIAL | DMA_REPEAT ; 
+    mixbuf.activeBuffer = bufB;
+  } else {
+    DMA[1].control = 0;
+    DMA[1].source = (u32)mixbuf.bufA;
+    DMA[1].control = DMA_ENABLE | DMA_START_SPECIAL | DMA_REPEAT; 
+    mixbuf.activeBuffer = bufA;
+  }
     
   irqAcknowledge(IRQ_TMR1);
 }
@@ -68,7 +80,9 @@ void initMonoFIFO() {
   ENABLE_AUDIO;
   AUDIO->ds = DS_MONO_INIT | DSA_TMR(0);
 
-  DMA[1].source = (u32)singleBuffer;
+  mixbuf.activeBuffer = bufA;
+
+  DMA[1].source = (u32)mixbuf.baseBuffer;
   DMA[1].destination = (u32)FIFO_A;
   DMA[1].control = DMA_ENABLE | DMA_START_SPECIAL; 
 
