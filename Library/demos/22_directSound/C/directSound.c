@@ -7,8 +7,9 @@
 #include "graphics/draw.h"
 #include "graphics/m3Text.h"
 
-	//Formula for playback frequency: 0xFFFF - (cpuFreq/playbackFreq)
+// todo: move back to dma irq
 
+	//Formula for playback frequency: 0xFFFF - (cpuFreq/playbackFreq)
 #define BUFFER_SIZE 256
 #define ENABLE_AUDIO (AUDIO->master = AUDIO_MASTER_ENABLE)
 
@@ -57,22 +58,29 @@ void fillBuffer() {
 }
 
 volatile u32 reload = 0;
+volatile u32 fifoCounter = 0;
 
-void tm_isr(void) {
-  reload = 1;
-  if (mixbuf.activeBuffer == bufA) {
+void isr(void) {
+  fifoCounter++;
+
+
+  if (fifoCounter >= 16) { 
+    reload = 1;
+    if (mixbuf.activeBuffer == bufA) {
     DMA[1].control = 0;
     DMA[1].source = (u32)mixbuf.bufB;
-    DMA[1].control = DMA_ENABLE | DMA_START_SPECIAL | DMA_REPEAT ; 
+    DMA[1].control = DMA_ENABLE | DMA_START_SPECIAL | DMA_REPEAT | DMA_IRQ_ENABLE; 
     mixbuf.activeBuffer = bufB;
   } else {
     DMA[1].control = 0;
     DMA[1].source = (u32)mixbuf.bufA;
-    DMA[1].control = DMA_ENABLE | DMA_START_SPECIAL | DMA_REPEAT; 
+    DMA[1].control = DMA_ENABLE | DMA_START_SPECIAL | DMA_REPEAT | DMA_IRQ_ENABLE; 
     mixbuf.activeBuffer = bufA;
   }
+    fifoCounter = 0;
+  }
     
-  irqAcknowledge(IRQ_TMR1);
+  irqAcknowledge(IRQ_DMA1);
 }
 
 //only sets up direct sound A right now, begins reading from buffer
@@ -84,16 +92,16 @@ void initMonoFIFO() {
 
   DMA[1].source = (u32)mixbuf.baseBuffer;
   DMA[1].destination = (u32)FIFO_A;
-  DMA[1].control = DMA_ENABLE | DMA_START_SPECIAL; 
+  DMA[1].control = DMA_ENABLE | DMA_START_SPECIAL | DMA_REPEAT | DMA_IRQ_ENABLE; 
 
   TIMER[0].value = 0xFBE8;
   TIMER[0].control = TMR_ENABLE;				 
 
   TIMER[1].value = (0xFFFF - 256);
-  TIMER[1].control = TMR_CASCADE | TMR_ENABLE | TMR_IRQ_ENABLE;
+  TIMER[1].control = TMR_ENABLE;
 
-  ISR = tm_isr;
-  irqEnable(IRQ_TMR1);
+  ISR = isr;
+  irqEnable(IRQ_DMA1);
 }
 
 int main(void){
