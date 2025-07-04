@@ -4,6 +4,8 @@
 #include "core/dma.h"
 #include "core/interrupts.h"
 #include "core/timer.h"
+#include "graphics/draw.h"
+#include "graphics/m3Text.h"
 
 	//Formula for playback frequency: 0xFFFF - (cpuFreq/playbackFreq)
 
@@ -31,8 +33,7 @@ void initMixChannels() {
   channel[0].length = tharp16klen;
 }
 
-
-void tm_isr(void) {
+void fillBuffer() {
   if (channel[0].position < channel[0].length - BUFFER_SIZE) {
     Dma3(singleBuffer, channel[0].data + channel[0].position, BUFFER_SIZE/4, DMA_MEMCPY32);
     channel[0].position += BUFFER_SIZE;
@@ -41,6 +42,12 @@ void tm_isr(void) {
     channel[0].position = 0;
     Dma3(singleBuffer, channel[0].data, BUFFER_SIZE/4, DMA_MEMCPY32);
   }
+}
+
+volatile u32 reload = 0;
+
+void tm_isr(void) {
+  reload = 1;
 
   DMA[1].control = 0;  // Disable completely  
   DMA[1].control = DMA_ENABLE | DMA_START_SPECIAL | DMA_REPEAT | DMA_DEST_FIXED;  // Full restart
@@ -66,12 +73,20 @@ void initMonoFIFO() {
   ISR = tm_isr;
   irqEnable(IRQ_TMR1);
 }
+
 int main(void){
   DSPC = MODE3 | BG2;
+
   initMixChannels();
+  irqMaster(ON);	// now enable interrupts
+  fillBuffer();
   initMonoFIFO(); // is now reading from buffer
-  irqMaster(ON);	
-  
-	while(1){}
+
+	while(1){
+    if (reload == 1) {
+      fillBuffer();
+      reload = 0;
+    }
+  }
   return 0;
 }
