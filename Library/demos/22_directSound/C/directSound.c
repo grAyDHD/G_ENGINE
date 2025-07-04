@@ -20,9 +20,17 @@ typedef struct {
 
 AudioChannel channel[4];
 
-typedef struct {
-  u32 bufA[64];
-  u32 bufB[64];
+typedef enum { bufA = 0, bufB = 1 } ActiveBuffer;
+
+typedef struct __attribute__((packed)) {
+  union {
+    struct {
+      u8 bufA[BUFFER_SIZE];
+      u8 bufB[BUFFER_SIZE];
+    };
+    u8 baseBuffer[BUFFER_SIZE * 2];
+  };
+  ActiveBuffer activeBuffer;
 } Mixbuffer;
 
 s8 singleBuffer[BUFFER_SIZE] = {0};
