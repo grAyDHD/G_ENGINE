@@ -1,129 +1,73 @@
+void mixAudio() {
+  s32 i, ch;
+  s16 tempBuffer[BUFFER_SIZE];
+  s8* targetBuffer = (mixbuf.activeBuffer == bufA) ? mixbuf.bufB : mixbuf.bufA;
 
-
-typedef struct {
-  // use union here for s16 combinedBuffer, pack struct to ensure no padding messes with acess/alignment
-  s8 bufferA[256];
-  s8 bufferB[256];
-} MixBuffers;
-
-MixBuffers mixBuffer = { 
-  .bufferA = {0}, 
-  .bufferB = {0}
-};
-
-
-u16 currentBuffer = 0;
-u16 bufferNeedsRefill = 0;
-static u32 tharpPosition = 0;
-static u32 tharpPlaying = 0;
-
-void startAudioLoop(void);
-void stopAudioLoop(void);
-void dma1_isr(void);
-void mixAudio(void);
- 
-
-  //tharpPosition = 0;
-  //Dma3(singleBuffer, tharp16k + tharpPosition, 64, DMA_MEMCPY32);
-  //tharpPosition += 256;
-//
-  //first, fill buffer:
-//  Dma3(singleBuffer, tharp16k + tharpPosition, 64, DMA_MEMCPY32);
- // tharpPosition += 256;
-
-
-    /*
-    updateKeys();
-
-    //--- Program Flow ---//
-		if(keyTapped(ST)){
-      startAudioLoop();
-      // if tharp loop is playing, stop
-      // if not, start playback
-		}
-//    mixAudio();
-  */
-
-
-int pos = 0;
-void dma1_isr() { 
-  /*
-  if (currentBuffer == 0) { // will fill buffer A after
-    currentBuffer = 1;
-  } else { // will fill buffer B after
-    DMA[1].source = (u32)mixBuffer.bufferA;
-    currentBuffer = 0; // 0 for A, 1 for B
-  } 
+  i = 0;
+  Dma3(tempBuffer, &i, BUFFER_SIZE * sizeof(s16) / 4, DMA_MEMSET32);
   
-  bufferNeedsRefill = 1;
+  int audioPlaying = 0;
 
-  if (tharpPosition > tharp16klen) {
-    tharpPlaying = 0;
+  for (ch = 0; ch < 4; ch++) {
+    if (channel[ch].isPlaying) {
+      audioPlaying = 1;
+      for (i = 0; i < BUFFER_SIZE; i++) {
+
+//        tempBuffer[i] += channel[ch].data[channel[ch].position] * channel[ch].volume;
+        tempBuffer[i] += channel[ch].data[channel[ch].position];
+        channel[ch].position++;
+
+        if (channel[ch].position >= (channel[ch].length)) {
+          if (channel[ch].looping) {
+            while (channel[ch].position >= (channel[ch].length)) {
+              channel[ch].position -= (channel[ch].length);
+            }
+          } else {
+            channel[ch].isPlaying = 0;
+            channel[ch].position = 0;
+            break;
+          }
+        } 
+      }
+    }
+  } 
+
+  for (i = 0; i < BUFFER_SIZE; i++) { 
+    
+    if (audioPlaying) {
+      targetBuffer[i] = (s8)tempBuffer[i];  // used without volume scaling or mixing, provides clean audio
+
+    } else {
+      targetBuffer[i] = 0;
+    }
+
   }
-  */
-
-  //fill buffer:
- // Dma3(singleBuffer, tharp16k + tharpPosition, 64, DMA_MEMCPY32);
-  tharpPosition += 256;
-  irqAcknowledge(IRQ_DMA1);
 }
 
 
-void mixAudio(void) {
-  if (!bufferNeedsRefill || !tharpPlaying) return;
-     
-  if (currentBuffer == 0) {
-    // Playing A, so refill B
-    Dma3(mixBuffer.bufferB, tharp16k + tharpPosition, 64, DMA_MEMCPY32);
-  } else {
-    // Playing B, so refill A
-    Dma3(mixBuffer.bufferA, tharp16k + tharpPosition, 64, DMA_MEMCPY32);
-  }
+void initMixChannels() {
+  // Channel 0: Music loop (tharp)
+  channel[0].data = tharp16k;   
+  channel[0].position = 0;
+  channel[0].length = tharp16klen;
+  channel[0].volume = 1;
+  channel[0].isPlaying = 0;
+  channel[0].looping = 1;
 
-  tharpPosition += 256; // is this the right number?
-  bufferNeedsRefill = 0;
+  // Channel 1: Sample A (one-shot kick)
+  channel[1].data = kick16k;   
+  channel[1].position = 0;
+  channel[1].length = kick16klen;
+  channel[1].volume = 1;
+  channel[1].isPlaying = 0;
+  channel[1].looping = 0;
+
+  // Channel 2: Sample B (one-shot snare)
+  channel[2].data = snare16k;   
+  channel[2].position = 0;
+  channel[2].length = snare16klen;
+  channel[2].volume = 1;
+  channel[2].isPlaying = 0;
+  channel[2].looping = 0;
 }
 
-
-void startAudioLoop (void){
-  ISR = dma1_isr;
-  irqEnable(IRQ_DMA1);
-  irqMaster(ON);	
-
-  tharpPosition = 0;
-
-  //fill buffer right away
-  Dma3(mixBuffer.bufferA, tharp16k, 64, DMA_MEMCPY32);
-  tharpPosition += 256;
-  Dma3(mixBuffer.bufferB, tharp16k + tharpPosition, 64, DMA_MEMCPY32);
-  tharpPosition += 256;
-  tharpPlaying = 1;
-
-  AUDIO->ds = DS_MONO_INIT | DSA_TMR(0);
-  AUDIO->master = AUDIO_MASTER_ENABLE;
-  DMA[1].source = (u32)mixBuffer.bufferA; // reads 4 samples at once from DMA, so must increment position in buffer.
-  DMA[1].wordCount = 64; // 64 words, or 256 s8 values, one buffer
-  // bufferA is equivalent to 64 u32, full buffer is 128.  source must only be reset to bufferA after this 128th transfer.
-  DMA[1].destination = (u32)FIFO_A;
-  DMA[1].control = DMA_ENABLE | DMA_32BIT | DMA_START_SPECIAL | DMA_REPEAT | DMA_IRQ_ENABLE;
-	
-
-	//Formula for playback frequency: 0xFFFF - (cpuFreq/playbackFreq)
-  TIMER[0].value = 0xFBE8; // 16khz playback freq, controls DMA repeat rate
-  TIMER[0].control = TMR_ENABLE;				 
-
-}
-
-    // s16 tempBuffer[256]; // avoid for now, will use once mixing is introduced
-  // may use timer 1 to track sample length?  
-  //for shorter audio, 0xFFFF - number of samples and stop on irq
-//  TIMER[1].value = 0xFFFF - 128; // sends interrupt every other buffer?  confused about when to reload buffer, when bufferA is about to play do I fill bufferB?
-//  TIMER[1].control = TMR_ENABLE | TMR_IRQ_ENABLE | TMR_CASCADE;
-
-typedef struct __attribute__((packed)) {
-  // data, pointer to start of audio sample *u32?
-  // length = samplelen u32, u16 not large enough to contain length of longer samples
-  // position? if position is 0, not playing, else playing- u32
-  // use highest bit of position to represent whether looping or not, mask that bit for position calculations
-} DMAAudioChannel;
-// seems like too many members, will narrow down to minimum necessary while retaining flexibility/control

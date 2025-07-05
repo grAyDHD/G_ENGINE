@@ -15,6 +15,7 @@
 #include "../includes/s8.h"
 #include "../includes/tharp16.h"
 #include "../includes/tharp16.h"
+#include "../includes/hat.h"
 
 #include "graphics/draw.h"
 #include "graphics/video.h"
