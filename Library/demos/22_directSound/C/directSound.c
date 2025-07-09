@@ -9,8 +9,7 @@
 #include "graphics/m3Text.h"
 #include "input/in.h"
 
-
-	//Formula for playback frequency: 0xFFFF - (cpuFreq/playbackFreq)
+// Formula for playback frequency: 0xFFFF - (cpuFreq/playbackFreq)
 #define BUFFER_SIZE 256
 #define ENABLE_AUDIO (AUDIO->master = AUDIO_MASTER_ENABLE)
 
@@ -45,7 +44,7 @@ Mixbuffer mixbuf = {0};
 
 void initMixChannels() {
   // Channel 0: Music loop (tharp)
-  channel[0].data = tharp16k;   
+  channel[0].data = tharp16k;
   channel[0].position = 0;
   channel[0].length = tharp16klen;
   channel[0].volume = 32;
@@ -55,7 +54,7 @@ void initMixChannels() {
   channel[0].lastSample = 0;
 
   // Channel 1: Sample A (one-shot kick)
-  channel[1].data = kick16k;   
+  channel[1].data = kick16k;
   channel[1].position = 0;
   channel[1].length = kick16klen;
   channel[1].volume = 32;
@@ -65,7 +64,7 @@ void initMixChannels() {
   channel[1].lastSample = 0;
 
   // Channel 2: Sample B (one-shot snare)
-  channel[2].data = snare16k;   
+  channel[2].data = snare16k;
   channel[2].position = 0;
   channel[2].length = snare16klen;
   channel[2].volume = 32;
@@ -75,7 +74,7 @@ void initMixChannels() {
   channel[2].lastSample = 0;
 
   // Channel 3: Sample B (one-shot hi hat)
-  channel[3].data = hat16k;   
+  channel[3].data = hat16k;
   channel[3].position = 0;
   channel[3].length = hat16klen;
   channel[3].volume = 32;
@@ -88,16 +87,16 @@ void initMixChannels() {
 void mixAudio() {
   s32 i, ch;
   s16 tempBuffer[BUFFER_SIZE];
-  s8* targetBuffer = (mixbuf.activeBuffer == bufA) ? mixbuf.bufB : mixbuf.bufA;
+  s8 *targetBuffer = (mixbuf.activeBuffer == bufA) ? mixbuf.bufB : mixbuf.bufA;
 
   i = 0;
   Dma3(tempBuffer, &i, BUFFER_SIZE * sizeof(s16) / 4, DMA_MEMSET32);
-  
+
   for (ch = 0; ch < 4; ch++) {
     if (channel[ch].isPlaying || channel[ch].fadeOut > 0) {
       for (i = 0; i < BUFFER_SIZE; i++) {
         s8 sample = 0;
-        
+
         if (channel[ch].isPlaying) {
           sample = channel[ch].data[channel[ch].position];
           channel[ch].lastSample = sample;
@@ -116,13 +115,13 @@ void mixAudio() {
         } else if (channel[ch].fadeOut > 0) {
           sample = channel[ch].lastSample * channel[ch].fadeOut / 4;
           channel[ch].fadeOut--;
-        }        
+        }
         tempBuffer[i] += sample;
       }
     }
-  } 
+  }
 
-  for (i = 0; i < BUFFER_SIZE; i++) { 
+  for (i = 0; i < BUFFER_SIZE; i++) {
     targetBuffer[i] = (s8)tempBuffer[i];
   }
 }
@@ -133,26 +132,28 @@ volatile u32 fifoCounter = 0;
 void isr(void) {
   fifoCounter++;
 
-  if (fifoCounter >= 16) { 
+  if (fifoCounter >= 16) {
     reload = 1;
     if (mixbuf.activeBuffer == bufA) {
-    DMA[1].control = 0;
-    DMA[1].source = (u32)mixbuf.bufB;
-    DMA[1].control = DMA_ENABLE | DMA_START_SPECIAL | DMA_REPEAT | DMA_IRQ_ENABLE; 
-    mixbuf.activeBuffer = bufB;
-  } else {
-    DMA[1].control = 0;
-    DMA[1].source = (u32)mixbuf.bufA;
-    DMA[1].control = DMA_ENABLE | DMA_START_SPECIAL | DMA_REPEAT | DMA_IRQ_ENABLE; 
-    mixbuf.activeBuffer = bufA;
-  }
+      DMA[1].control = 0;
+      DMA[1].source = (u32)mixbuf.bufB;
+      DMA[1].control =
+          DMA_ENABLE | DMA_START_SPECIAL | DMA_REPEAT | DMA_IRQ_ENABLE;
+      mixbuf.activeBuffer = bufB;
+    } else {
+      DMA[1].control = 0;
+      DMA[1].source = (u32)mixbuf.bufA;
+      DMA[1].control =
+          DMA_ENABLE | DMA_START_SPECIAL | DMA_REPEAT | DMA_IRQ_ENABLE;
+      mixbuf.activeBuffer = bufA;
+    }
     fifoCounter = 0;
   }
-    
+
   irqAcknowledge(IRQ_DMA1);
 }
 
-//only sets up direct sound A right now, begins reading from buffer
+// only sets up direct sound A right now, begins reading from buffer
 void initMonoFIFO() {
   ENABLE_AUDIO;
   AUDIO->ds = DS_MONO_INIT | DSA_TMR(0);
@@ -161,10 +162,10 @@ void initMonoFIFO() {
 
   DMA[1].source = (u32)mixbuf.baseBuffer;
   DMA[1].destination = (u32)FIFO_A;
-  DMA[1].control = DMA_ENABLE | DMA_START_SPECIAL | DMA_REPEAT | DMA_IRQ_ENABLE; 
+  DMA[1].control = DMA_ENABLE | DMA_START_SPECIAL | DMA_REPEAT | DMA_IRQ_ENABLE;
 
   TIMER[0].value = 0xFBE8;
-  TIMER[0].control = TMR_ENABLE;				 
+  TIMER[0].control = TMR_ENABLE;
 
   TIMER[1].value = (0xFFFF - 256);
   TIMER[1].control = TMR_ENABLE;
@@ -178,9 +179,7 @@ void startMusicLoop() {
   channel[0].isPlaying = 1;
 }
 
-void stopMusicLoop() {
-  channel[0].isPlaying = 0;
-}
+void stopMusicLoop() { channel[0].isPlaying = 0; }
 
 void triggerKick() {
   channel[1].position = 0;
@@ -197,21 +196,21 @@ void triggerHat() {
   channel[3].isPlaying = 1;
 }
 
-int main(void){
+int main(void) {
   DSPC = MODE3 | BG2;
 
   initMixChannels();
-  irqMaster(ON);	// now enable interrupts
+  irqMaster(ON);  // now enable interrupts
   initMonoFIFO(); // is now reading from buffer
 
-	while(1){
+  while (1) {
     if (reload == 1) {
       mixAudio();
       reload = 0;
     }
 
     updateKeys();
-    
+
     if (keyTapped(ST)) {
       if (channel[0].isPlaying) {
         stopMusicLoop();
@@ -235,7 +234,6 @@ int main(void){
     if (keyTapped(LT)) {
       triggerHat();
     }
-
   }
   return 0;
 }
