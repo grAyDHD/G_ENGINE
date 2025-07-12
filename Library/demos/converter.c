@@ -11,7 +11,6 @@ typedef uint16_t u16;
 typedef int8_t s8;
 
 // songFreq = tempo*2/5;
-//
 
 #define ASSERT(condition)                                                      \
   if (!(condition)) {                                                          \
@@ -23,7 +22,7 @@ typedef struct __attribute__((packed)) {
   char name[22];
   u16 length;
   u8 finetune;
-  u8 vol;
+  u8 volume;
   u16 loopStart;  // swap bytes, word count (2 byte words)
   u16 loopLength; // swap bytes, word count (2 byte words)
 
@@ -109,44 +108,14 @@ int main(int argc, char **argv) {
 
   // tutorial says we should be at position 1080, tested and it is
 
-  //--- Patterns ---//
-  // 4 channels, 4 columns wide
-  // all MOD patterns have 64 rows
-  // 4x64, 4 bytes per pattern, 1024 bytes or 1 KB
-  // each pattern contains 4 fields:
-  //  12-bit period value
-  //  8-bit sample number,
-  //  4-bit effect type
-  //  8-bit effect parameter
-
-  // 0        1        2        3
-  // SSSSPPPP pppppppp ssssEEEE FFFFFFFF
-
-  u8 cell[4];
-  u16 period; // PPPPpppppppp
-  u8 sample;  // SSSSssss
-  u8 effect;  // EEEE
-  u8 param;   // FFFFFFFF
-
-  fread(pattern, 4, 1, modFile);
-  sample = (cell[2] >> 4) | (cell[0] & 0xF0);
-  period = cell[1] | ((cell[0] & 0x0F) << 8);
-  effect = cell[2] >> 4;
-  param = cell[3];
-
-  /*
-    dc.w 856,808,762,720,678,640,604,570,538,508,480,453 ; C-1 to B-1
-          dc.w 428,404,381,360,339,320,302,285,269,254,240,226 ; C-2 to B-2
-          dc.w 214,202,190,180,170,160,151,143,135,127,120,113 ; C-3 to B-3
-   * */
-
+  // frequency = 7159090.5 / (period * 2);
   // these are unique to amiga cpu rate
   const u16 octave1Period[12] = {
       // this is the first row of the table from before
       856, 808, 762, 720, 678, 640, 604, 570, 538, 508, 480, 453 // C-1 to B-1
   };
 
-  u16 periodTable[12 * 5];
+  u16 periodTable[60];
   u8 octave, note;
 
   for (octave = 0; octave < 5; octave++) {
@@ -169,6 +138,45 @@ int main(int argc, char **argv) {
     memset(modHeader.pattern[currentPattern], 0, 1024);
   }
 
+  for (row = 0; row < 64; row++) {
+    for (column = 0; column < 4; column++) {
+      u8 cell[4];
+      u16 period;
+      u8 sample;
+      u8 effect;
+      u8 param;
+
+      fread(cell, 4, 1, modFile);
+      sample = (cell[2] >> 4) | (cell[0] & 0xF0);
+      period = cell[1] | ((cell[0] & 0x0F) << 8);
+      effect = cell[2] >> 4;
+      param = cell[3];
+
+      u8 closestNote = 0;
+      u16 closestDist = 0xFFFF;
+
+      for (i = 0; i < 60; i++) {
+        u16 newDist = abs(period - periodTable[i]);
+        if (newDist < closestDist) {
+          closestNote = i;
+          closestDist = newDist;
+        }
+      }
+      u8 *outCell =
+          &modHeader.pattern[currentPattern][row * 4 * 4 + column * 4];
+      outCell[0] = closestNote;
+      outCell[1] = sample;
+      outCell[2] = effect;
+      outCell[3] = param;
+    }
+  }
+
+  for (i = 0; i < 31; i++) {
+    u32 realLength = ((u32)modHeader.sample[i].length) * 2;
+
+    if (realLength != 0) {
+    }
+  }
   fclose(modFile);
   return 0;
 }
