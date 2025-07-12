@@ -39,7 +39,7 @@ typedef struct {
   u8 **pattern;
   u8 patternCount;
 
-  s8 *sampleData; // stored at end of file
+  s8 *sampleData[31]; // stored at end of file
 } MOD_HEADER;
 
 char name[20];
@@ -136,38 +136,38 @@ int main(int argc, char **argv) {
     modHeader.pattern[currentPattern] = malloc(1024 * sizeof(u8));
     ASSERT(modHeader.pattern[currentPattern])
     memset(modHeader.pattern[currentPattern], 0, 1024);
-  }
 
-  for (row = 0; row < 64; row++) {
-    for (column = 0; column < 4; column++) {
-      u8 cell[4];
-      u16 period;
-      u8 sample;
-      u8 effect;
-      u8 param;
+    for (row = 0; row < 64; row++) {
+      for (column = 0; column < 4; column++) {
+        u8 cell[4];
+        u16 period;
+        u8 sample;
+        u8 effect;
+        u8 param;
 
-      fread(cell, 4, 1, modFile);
-      sample = (cell[2] >> 4) | (cell[0] & 0xF0);
-      period = cell[1] | ((cell[0] & 0x0F) << 8);
-      effect = cell[2] >> 4;
-      param = cell[3];
+        fread(cell, 4, 1, modFile);
+        sample = (cell[2] >> 4) | (cell[0] & 0xF0);
+        period = cell[1] | ((cell[0] & 0x0F) << 8);
+        effect = cell[2] >> 4;
+        param = cell[3];
 
-      u8 closestNote = 0;
-      u16 closestDist = 0xFFFF;
+        u8 closestNote = 0;
+        u16 closestDist = 0xFFFF;
 
-      for (i = 0; i < 60; i++) {
-        u16 newDist = abs(period - periodTable[i]);
-        if (newDist < closestDist) {
-          closestNote = i;
-          closestDist = newDist;
+        for (i = 0; i < 60; i++) {
+          u16 newDist = abs(period - periodTable[i]);
+          if (newDist < closestDist) {
+            closestNote = i;
+            closestDist = newDist;
+          }
         }
+        u8 *outCell =
+            &modHeader.pattern[currentPattern][row * 4 * 4 + column * 4];
+        outCell[0] = closestNote;
+        outCell[1] = sample;
+        outCell[2] = effect;
+        outCell[3] = param;
       }
-      u8 *outCell =
-          &modHeader.pattern[currentPattern][row * 4 * 4 + column * 4];
-      outCell[0] = closestNote;
-      outCell[1] = sample;
-      outCell[2] = effect;
-      outCell[3] = param;
     }
   }
 
@@ -175,6 +175,10 @@ int main(int argc, char **argv) {
     u32 realLength = ((u32)modHeader.sample[i].length) * 2;
 
     if (realLength != 0) {
+      modHeader.sampleData[i] = malloc(realLength * sizeof(s8));
+      ASSERT(modHeader.sampleData[i] != NULL);
+
+      fread(modHeader.sampleData[i], realLength, 1, modFile);
     }
   }
   fclose(modFile);
