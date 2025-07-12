@@ -2,8 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 
 typedef int32_t s32;
+typedef u_int32_t u32;
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef int8_t s8;
@@ -89,14 +91,13 @@ int main(int argc, char **argv) {
          (modHeader.sample[i].loopLength >> 8));
   }
 
-  // one byte stores number of orders, keeps in bounds
+  // one byte stores number of orders
+  // prevents reads of all orders higher than count+1
   fread(&modHeader.orderCount, 1, 1, modFile);
-  u8 trash; // unused byte
-  fread(&trash, 1, 1,
-        modFile); // writes from modfile trash bit to addreass of trash.  Is
-                  // this primarily to advance the pointer?
+  u8 trash; // unused byte in mod format
+  fread(&trash, 1, 1, modFile);
 
-  // reads order from modFile
+  // orders specify pattern to play, song plays orders sequentially
   fread(modHeader.order, 128, 1, modFile);
   u8 highestPattern = 0;
   for (i = 0; i < modHeader.orderCount; i++) {
@@ -108,24 +109,29 @@ int main(int argc, char **argv) {
 
   // tutorial says we should be at position 1080, tested and it is
 
+  //--- Patterns ---//
   // 4 channels, 4 columns wide
   // all MOD patterns have 64 rows
-  // 4x64, 4 bytes per cell, 1024 bytes or 1 KB
-  // each cell contains 4 fields:
+  // 4x64, 4 bytes per pattern, 1024 bytes or 1 KB
+  // each pattern contains 4 fields:
+  //  12-bit period value
   //  8-bit sample number,
   //  4-bit effect type
-  //  4-bit effect parameter
+  //  8-bit effect parameter
+
+  // 0        1        2        3
+  // SSSSPPPP pppppppp ssssEEEE FFFFFFFF
 
   u8 cell[4];
-  u8 sample;
-  u16 period;
-  u8 effect;
-  u8 param;
+  u16 period; // PPPPpppppppp
+  u8 sample;  // SSSSssss
+  u8 effect;  // EEEE
+  u8 param;   // FFFFFFFF
 
-  fread(cell, 4, 1, modFile);
+  fread(pattern, 4, 1, modFile);
   sample = (cell[2] >> 4) | (cell[0] & 0xF0);
-  period = cell[1] | ((cell[0] & 0xF) << 8);
-  effect = cell[2] & 0xF;
+  period = cell[1] | ((cell[0] & 0x0F) << 8);
+  effect = cell[2] >> 4;
   param = cell[3];
 
   /*
@@ -134,8 +140,7 @@ int main(int argc, char **argv) {
           dc.w 214,202,190,180,170,160,151,143,135,127,120,113 ; C-3 to B-3
    * */
 
-  // todo: read what these numbers are, relavive playback hz?  how do I apply to
-  // my mixer?
+  // these are unique to amiga cpu rate
   const u16 octave1Period[12] = {
       // this is the first row of the table from before
       856, 808, 762, 720, 678, 640, 604, 570, 538, 508, 480, 453 // C-1 to B-1
@@ -152,10 +157,17 @@ int main(int argc, char **argv) {
     }
   }
 
-  // modHeader.pattern = new u8 * [modHeader.patternCount];
   modHeader.pattern = malloc(modHeader.patternCount * sizeof(u8 *));
   ASSERT(modHeader.pattern); // handle running out of memory
   memset(modHeader.pattern, 0, modHeader.patternCount * sizeof(u8 *));
+
+  u8 currentPattern, row, column;
+  for (currentPattern = 0; currentPattern < modHeader.patternCount;
+       currentPattern++) {
+    modHeader.pattern[currentPattern] = malloc(1024 * sizeof(u8));
+    ASSERT(modHeader.pattern[currentPattern])
+    memset(modHeader.pattern[currentPattern], 0, 1024);
+  }
 
   fclose(modFile);
   return 0;
