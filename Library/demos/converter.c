@@ -1,8 +1,11 @@
+#include <dirent.h>
+#include <linux/limits.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 typedef int32_t s32;
 typedef u_int32_t u32;
@@ -50,6 +53,47 @@ u8 orderCount;
 u8 patternCount;
 
 MOD_HEADER modHeader;
+
+int isModFile(const char *txt) {
+  int txt_len = strlen(txt);
+  if (txt_len > 4) {
+    if ((*(txt + txt_len - 4) == '.') &&
+        ((*(txt + txt_len - 3) == 'm') || (*(txt + txt_len - 3) == 'M')) &&
+        ((*(txt + txt_len - 2) == 'o') || (*(txt + txt_len - 2) == 'O')) &&
+        ((*(txt + txt_len - 1) == 'd') || (*(txt + txt_len - 1) == 'D'))) {
+      return 1;
+    }
+  }
+  return 0;
+}
+
+u32 getFileList(char **fileTable, u32 maxFiles) {
+  char cwd[PATH_MAX];
+  if (getcwd(cwd, sizeof(cwd)) == NULL) {
+    perror("getcwd() error");
+    return 0;
+  };
+
+  DIR *dir;
+  struct dirent *ent;
+  if ((dir = opendir(cwd)) == NULL) {
+    printf("Unable to open directory %s...\n", cwd);
+    return 0;
+  }
+
+  u32 curFile = 0;
+  while ((ent = readdir(dir)) != NULL) {
+    if (isModFile(ent->d_name)) {
+      fileTable[curFile] = malloc((strlen(ent->d_name) + 1) * sizeof(char));
+      ASSERT(fileTable[curFile] != NULL);
+      strcpy(fileTable[curFile], ent->d_name);
+
+      curFile++;
+    }
+  }
+  closedir(dir);
+  return curFile; // number of files loaded
+}
 
 int main(int argc, char **argv) {
   s32 i;
@@ -182,5 +226,6 @@ int main(int argc, char **argv) {
     }
   }
   fclose(modFile);
+
   return 0;
 }
