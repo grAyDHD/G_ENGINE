@@ -1,0 +1,73 @@
+void mixAudio() {
+  s32 i, ch;
+  s16 tempBuffer[BUFFER_SIZE];
+  s8* targetBuffer = (mixbuf.activeBuffer == bufA) ? mixbuf.bufB : mixbuf.bufA;
+
+  i = 0;
+  Dma3(tempBuffer, &i, BUFFER_SIZE * sizeof(s16) / 4, DMA_MEMSET32);
+  
+  int audioPlaying = 0;
+
+  for (ch = 0; ch < 4; ch++) {
+    if (channel[ch].isPlaying) {
+      audioPlaying = 1;
+      for (i = 0; i < BUFFER_SIZE; i++) {
+
+//        tempBuffer[i] += channel[ch].data[channel[ch].position] * channel[ch].volume;
+        tempBuffer[i] += channel[ch].data[channel[ch].position];
+        channel[ch].position++;
+
+        if (channel[ch].position >= (channel[ch].length)) {
+          if (channel[ch].looping) {
+            while (channel[ch].position >= (channel[ch].length)) {
+              channel[ch].position -= (channel[ch].length);
+            }
+          } else {
+            channel[ch].isPlaying = 0;
+            channel[ch].position = 0;
+            break;
+          }
+        } 
+      }
+    }
+  } 
+
+  for (i = 0; i < BUFFER_SIZE; i++) { 
+    
+    if (audioPlaying) {
+      targetBuffer[i] = (s8)tempBuffer[i];  // used without volume scaling or mixing, provides clean audio
+
+    } else {
+      targetBuffer[i] = 0;
+    }
+
+  }
+}
+
+
+void initMixChannels() {
+  // Channel 0: Music loop (tharp)
+  channel[0].data = tharp16k;   
+  channel[0].position = 0;
+  channel[0].length = tharp16klen;
+  channel[0].volume = 1;
+  channel[0].isPlaying = 0;
+  channel[0].looping = 1;
+
+  // Channel 1: Sample A (one-shot kick)
+  channel[1].data = kick16k;   
+  channel[1].position = 0;
+  channel[1].length = kick16klen;
+  channel[1].volume = 1;
+  channel[1].isPlaying = 0;
+  channel[1].looping = 0;
+
+  // Channel 2: Sample B (one-shot snare)
+  channel[2].data = snare16k;   
+  channel[2].position = 0;
+  channel[2].length = snare16klen;
+  channel[2].volume = 1;
+  channel[2].isPlaying = 0;
+  channel[2].looping = 0;
+}
+
