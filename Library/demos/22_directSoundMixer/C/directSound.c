@@ -1,6 +1,7 @@
 #include "../includes/directSound.h"
 #include "audio/audio.h"
 #include "audio/dmg.h"
+#include "audio/mixer.h"
 #include "core/dma.h"
 #include "core/interrupts.h"
 #include "core/timer.h"
@@ -9,92 +10,27 @@
 #include "graphics/m3Text.h"
 #include "input/in.h"
 
-AudioChannel channel[4];
-
-Mixbuffer mixbuf = {0};
-
-void initMixChannels() {
+void setMixChannels() {
   // Channel 0: Music loop (tharp)
   channel[0].data = tharp16k;
-  channel[0].position = 0;
   channel[0].length = tharp16klen;
   channel[0].volume = 32;
-  channel[0].isPlaying = 0;
   channel[0].looping = 1;
-  channel[0].fadeOut = 0;
-  channel[0].lastSample = 0;
 
   // Channel 1: Sample A (one-shot kick)
   channel[1].data = kick16k;
-  channel[1].position = 0;
   channel[1].length = kick16klen;
   channel[1].volume = 32;
-  channel[1].isPlaying = 0;
-  channel[1].looping = 0;
-  channel[1].fadeOut = 0;
-  channel[1].lastSample = 0;
 
   // Channel 2: Sample B (one-shot snare)
   channel[2].data = snare16k;
-  channel[2].position = 0;
   channel[2].length = snare16klen;
   channel[2].volume = 32;
-  channel[2].isPlaying = 0;
-  channel[2].looping = 0;
-  channel[2].fadeOut = 0;
-  channel[2].lastSample = 0;
 
   // Channel 3: Sample B (one-shot hi hat)
   channel[3].data = hat16k;
-  channel[3].position = 0;
   channel[3].length = hat16klen;
   channel[3].volume = 32;
-  channel[3].isPlaying = 0;
-  channel[3].looping = 0;
-  channel[3].fadeOut = 0;
-  channel[3].lastSample = 0;
-}
-
-void mixAudio() {
-  s32 i, ch;
-  s16 tempBuffer[BUFFER_SIZE];
-  s8 *targetBuffer = (mixbuf.activeBuffer == bufA) ? mixbuf.bufB : mixbuf.bufA;
-
-  i = 0;
-  Dma3(tempBuffer, &i, BUFFER_SIZE * sizeof(s16) / 4, DMA_MEMSET32);
-
-  for (ch = 0; ch < 4; ch++) {
-    if (channel[ch].isPlaying || channel[ch].fadeOut > 0) {
-      for (i = 0; i < BUFFER_SIZE; i++) {
-        s8 sample = 0;
-
-        if (channel[ch].isPlaying) {
-          sample = channel[ch].data[channel[ch].position];
-          channel[ch].lastSample = sample;
-          channel[ch].position++;
-
-          if (channel[ch].position >= channel[ch].length) {
-            if (channel[ch].looping) {
-              while (channel[ch].position >= channel[ch].length) {
-                channel[ch].position -= channel[ch].length;
-              }
-            } else {
-              channel[ch].isPlaying = 0;
-              channel[ch].fadeOut = 4; // 4 samples to fade out
-            }
-          }
-        } else if (channel[ch].fadeOut > 0) {
-          sample = channel[ch].lastSample * channel[ch].fadeOut / 4;
-          channel[ch].fadeOut--;
-        }
-        tempBuffer[i] += sample;
-      }
-    }
-  }
-
-  for (i = 0; i < BUFFER_SIZE; i++) {
-    targetBuffer[i] = (s8)tempBuffer[i];
-  }
 }
 
 volatile u32 reload = 0;
@@ -171,6 +107,7 @@ int main(void) {
   DSPC = MODE3 | BG2;
 
   initMixChannels();
+  setMixChannels();
   irqMaster(ON);  // now enable interrupts
   initMonoFIFO(); // is now reading from buffer
 

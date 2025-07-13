@@ -2,6 +2,8 @@
 #define AUDIO_H
 #include "core/typedefs.h"
 
+#define ENABLE_AUDIO (AUDIO->master = AUDIO_MASTER_ENABLE)
+
 //--- DMG Sound Controls ---//
 // 04000080
 
@@ -57,35 +59,6 @@ typedef enum { QUARTER = 0, HALF, FULL } Ratio;
 
 #define FIFO_A ((volatile u32 *)0x040000A0) // 4x8 bit chunk transfers
 #define FIFO_B ((volatile u32 *)0x040000A4)
-
-// Formula for playback frequency: 0xFFFF - (cpuFreq/playbackFreq)
-#define BUFFER_SIZE 256
-#define ENABLE_AUDIO (AUDIO->master = AUDIO_MASTER_ENABLE)
-
-typedef struct {
-  const s8 *data;
-  u32 position;
-  u32 length;
-  u32 increment; // fixed point increment, 4096 = normal
-  u32 volume;
-  u16 isPlaying;
-  u16 looping;
-  u16 fadeOut;
-  s8 lastSample;
-} AudioChannel;
-
-typedef enum { bufA = 0, bufB = 1 } ActiveBuffer;
-
-typedef struct __attribute__((packed)) {
-  union {
-    struct {
-      s8 bufA[BUFFER_SIZE];
-      s8 bufB[BUFFER_SIZE];
-    };
-    s8 baseBuffer[BUFFER_SIZE * 2];
-  };
-  ActiveBuffer activeBuffer;
-} Mixbuffer;
 
 void dsAudioInit() {
   AUDIO->ds = DSA_FULL_VOLUME | DSA_ENABLE_L | DSA_ENABLE_R | DSA_FIFO_CLEAR;
