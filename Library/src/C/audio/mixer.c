@@ -1,5 +1,8 @@
-#include "../../include/audio/mixer.h"
+#include "audio/mixer.h"
+#include "audio/audio.h"
 #include "core/dma.h"
+#include "core/interrupts.h"
+#include "core/timer.h"
 
 AudioChannel channel[4];
 
@@ -59,4 +62,54 @@ void mixAudio() {
   for (i = 0; i < BUFFER_SIZE; i++) {
     targetBuffer[i] = (s8)tempBuffer[i];
   }
+}
+
+void swapMixBuffer() {
+  DMA[1].control = 0;
+
+  if (mixbuf.activeBuffer == bufA) {
+    mixbuf.activeBuffer = bufB;
+    DMA[1].source = (u32)mixbuf.bufB;
+  } else {
+    mixbuf.activeBuffer = bufA;
+    DMA[1].source = (u32)mixbuf.bufA;
+  }
+
+  DMA[1].control = DMA_ENABLE | DMA_START_SPECIAL | DMA_REPEAT | DMA_IRQ_ENABLE;
+}
+
+volatile u32 reload = 0;
+static volatile u32 fifoCounter = 0;
+
+void audioIsr(void) {
+  fifoCounter++;
+
+  if (fifoCounter >= 16) { // increment every 16 samples
+    fifoCounter = 0;
+    reload = 1;
+    swapMixBuffer();
+  }
+
+  irqAcknowledge(IRQ_DMA1);
+}
+
+// only sets up direct sound A right now, begins reading from buffer
+void initMonoFIFO() {
+  ENABLE_AUDIO;
+  AUDIO->ds = DS_MONO_INIT | DSA_TMR(0);
+
+  mixbuf.activeBuffer = bufA;
+
+  DMA[1].source = (u32)mixbuf.bufA;
+  DMA[1].destination = (u32)FIFO_A;
+  DMA[1].control = DMA_ENABLE | DMA_START_SPECIAL | DMA_REPEAT | DMA_IRQ_ENABLE;
+
+  TIMER[0].value = 0xFBE8;
+  TIMER[0].control = TMR_ENABLE;
+
+  TIMER[1].value = (0xFFFF - 256);
+  TIMER[1].control = TMR_ENABLE;
+
+  ISR = audioIsr;
+  irqEnable(IRQ_DMA1);
 }

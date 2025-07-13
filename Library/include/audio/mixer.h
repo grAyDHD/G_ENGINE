@@ -23,19 +23,23 @@ extern AudioChannel channel[4];
 typedef enum { bufA = 0, bufB = 1 } ActiveBuffer;
 
 typedef struct __attribute__((packed)) {
-  union {
-    struct {
-      s8 bufA[BUFFER_SIZE];
-      s8 bufB[BUFFER_SIZE];
-    };
-    s8 baseBuffer[BUFFER_SIZE * 2];
+  struct {
+    s8 bufA[BUFFER_SIZE];
+    s8 bufB[BUFFER_SIZE];
   };
+
   ActiveBuffer activeBuffer;
 } Mixbuffer;
 
 extern Mixbuffer mixbuf;
 
-void mixAudio();
+extern volatile u32 reload;
+
+void audioIsr(void);
+
 void initMixChannels();
+void initMonoFIFO();
+void swapMixBuffer();
+void mixAudio();
 
 #endif // !MIXER_H

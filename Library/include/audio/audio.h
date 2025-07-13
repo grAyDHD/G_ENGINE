@@ -60,11 +60,11 @@ typedef enum { QUARTER = 0, HALF, FULL } Ratio;
 #define FIFO_A ((volatile u32 *)0x040000A0) // 4x8 bit chunk transfers
 #define FIFO_B ((volatile u32 *)0x040000A4)
 
-void dsAudioInit() {
-  AUDIO->ds = DSA_FULL_VOLUME | DSA_ENABLE_L | DSA_ENABLE_R | DSA_FIFO_CLEAR;
-  // todo: this should likely be separate with only a single bit to toggle.
-  AUDIO->master = AUDIO_MASTER_ENABLE;
-}
+// void dsAudioInit() {
+//   AUDIO->ds = DSA_FULL_VOLUME | DSA_ENABLE_L | DSA_ENABLE_R | DSA_FIFO_CLEAR;
+//  todo: this should likely be separate with only a single bit to toggle.
+//  AUDIO->master = AUDIO_MASTER_ENABLE;
+//}
 
 // DS in DMA mode:
 // set DS outputs and volumes
