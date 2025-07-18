@@ -3,6 +3,8 @@
 #include "core/dma.h"
 #include "core/interrupts.h"
 #include "core/timer.h"
+#include "graphics/draw.h"
+#include "graphics/m3Text.h"
 
 AudioChannel channel[4];
 
@@ -33,13 +35,10 @@ void mixAudio() {
   for (ch = 0; ch < 4; ch++) {
     if (channel[ch].isPlaying || channel[ch].fadeOut > 0) {
       for (i = 0; i < BUFFER_SIZE; i++) {
-        s8 sample = 0;
-
         if (channel[ch].isPlaying) {
-          sample = channel[ch].data[channel[ch].position];
-          channel[ch].lastSample = sample;
+          channel[ch].lastSample = channel[ch].data[channel[ch].position];
+          tempBuffer[i] += (channel[ch].lastSample * channel[ch].volume);
           channel[ch].position++;
-
           if (channel[ch].position >= channel[ch].length) {
             if (channel[ch].looping) {
               while (channel[ch].position >= channel[ch].length) {
@@ -51,16 +50,21 @@ void mixAudio() {
             }
           }
         } else if (channel[ch].fadeOut > 0) {
-          sample = channel[ch].lastSample * channel[ch].fadeOut / 4;
+          tempBuffer[i] += channel[ch].lastSample * channel[ch].fadeOut / 4;
           channel[ch].fadeOut--;
         }
-        tempBuffer[i] += sample;
       }
     }
   }
 
+  static s8 lastOutput = 0;
   for (i = 0; i < BUFFER_SIZE; i++) {
-    targetBuffer[i] = (s8)tempBuffer[i];
+    s8 currentSample = (s8)((tempBuffer[i]) >> 6);
+    s8 filtered = (currentSample + lastOutput) >> 1;
+    targetBuffer[i] = filtered;
+    lastOutput = currentSample;
+
+    // targetBuffer[i] = (s8)((tempBuffer[i]) >> 6);
   }
 }
 
@@ -106,9 +110,6 @@ void initMonoFIFO() {
 
   TIMER[0].value = 0xFBE8;
   TIMER[0].control = TMR_ENABLE;
-
-  TIMER[1].value = (0xFFFF - 256);
-  TIMER[1].control = TMR_ENABLE;
 
   ISR = audioIsr;
   irqEnable(IRQ_DMA1);
