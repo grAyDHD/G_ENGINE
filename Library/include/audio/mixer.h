@@ -1,5 +1,6 @@
 #ifndef MIXER_H
 #define MIXER_H
+
 #include "core/typedefs.h"
 
 // Formula for playback frequency: 0xFFFF - (cpuFreq/playbackFreq)
