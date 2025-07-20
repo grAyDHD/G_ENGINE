@@ -119,7 +119,61 @@ void renderChar(int *x, int *y, char c) {
   *x += fontData[glyphIndex].width + 1;
 };
 
-int getFontDataIndex(char c) {
+// This should be 256, not 94 - it maps ASCII values to your font indices
+static s8 fontDataIndex[256] = {[0 ... 255] = -1};
+
+void initCharLookup() {
+  // A-Z map to font indices 0-25
+  for (int i = 0; i < 26; i++) {
+    fontDataIndex['A' + i] = i;
+  }
+  // a-z map to font indices 26-51
+  for (int i = 0; i < 26; i++) {
+    fontDataIndex['a' + i] = 26 + i;
+  }
+  // 0-9 map to font indices 52-61
+  for (int i = 0; i < 10; i++) {
+    fontDataIndex['0' + i] = 52 + i;
+  }
+  // ALL special characters map to font indices 62-93
+  fontDataIndex['{'] = 62;
+  fontDataIndex['}'] = 63;
+  fontDataIndex['('] = 64;
+  fontDataIndex[')'] = 65;
+  fontDataIndex['['] = 66;
+  fontDataIndex[']'] = 67;
+  fontDataIndex['<'] = 68;
+  fontDataIndex['>'] = 69;
+  fontDataIndex['$'] = 70;
+  fontDataIndex['#'] = 71;
+  fontDataIndex['@'] = 72;
+  fontDataIndex['+'] = 73;
+  fontDataIndex['-'] = 74;
+  fontDataIndex['*'] = 75;
+  fontDataIndex['/'] = 76;
+  fontDataIndex['^'] = 77;
+  fontDataIndex['='] = 78;
+  fontDataIndex['%'] = 79;
+  fontDataIndex['&'] = 80;
+  fontDataIndex['\\'] = 81;
+  fontDataIndex['|'] = 82;
+  fontDataIndex['~'] = 83;
+  fontDataIndex['!'] = 84;
+  fontDataIndex['?'] = 85;
+  fontDataIndex['\''] = 86;
+  fontDataIndex['\"'] = 87;
+  fontDataIndex['.'] = 88;
+  fontDataIndex[','] = 89;
+  fontDataIndex[';'] = 90;
+  fontDataIndex[':'] = 91;
+  fontDataIndex['`'] = 92;
+  fontDataIndex['_'] = 93;
+}
+
+// Replace your entire if/switch logic with just this:
+int getFontDataIndex(char c) { return fontDataIndex[(u8)c]; }
+
+int dontgetFontDataIndex(char c) {
   if (c >= 'A' && c <= 'Z') {
     return c - 'A';
   } else if (c >= 'a' && c <= 'z') {

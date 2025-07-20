@@ -25,7 +25,7 @@ typedef struct {
 extern GlyphInfo fontData[94];
 extern void printGlyphColored(int x, int y, const void *fontBitmap,
                               GlyphInfo *fontDataIndex, u16 currentTextColor);
-
+void initCharLookup();
 int getCurrentTextColor();
 int measureText(const char *text);
 void clearTextArea(int x, int y, int width, int height);

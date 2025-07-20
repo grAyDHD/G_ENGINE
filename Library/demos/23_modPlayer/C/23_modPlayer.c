@@ -24,6 +24,7 @@ void updateDebugDisplay(int pattern, int row) {
 int main() {
   DSPC = MODE3 | BG2;
 
+  initCharLookup();
   initMixChannels();
 
   irqMaster(ON);  // now enable interrupts
@@ -40,8 +41,8 @@ int main() {
     x++;
     y += 2;
 
-    updateDebugDisplay(x, y);
     VBLANK();
+    updateDebugDisplay(x, y);
   }
   return 0;
 }
