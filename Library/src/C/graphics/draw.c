@@ -84,3 +84,11 @@ void drawRect(Coordinate start, int width, int height, u16 color) {
     plotPixel(start.x + width - 1, j, color);
   }
 }
+
+void fillRect(int x, int y, int width, int height, unsigned short color) {
+  for (int i = x; i < x + width; i++) {
+    for (int j = y; j < y + height; j++) {
+      plotPixel(i, j, color);
+    }
+  }
+}

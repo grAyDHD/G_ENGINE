@@ -1,12 +1,15 @@
-//#include "assets/fonts/Peaberry/Peaberry.h"
-//#include "assets/fonts/Peaberry/PeaberryData.h"
+// #include "assets/fonts/Peaberry/Peaberry.h"
+// #include "assets/fonts/Peaberry/PeaberryData.h"
 
 #include "graphics/m3Text.h"
 #include "assets/fonts/MiniGBA/MiniGBA.h"
 #include "assets/fonts/MiniGBA/MiniGBAData.h"
 #include "graphics/draw.h"
 
-// upcoming features: variable text size, current font sctruct/pointer, can change to another font at whim. Use library to only include fonts directly used by given project in compilation. text color change if font is monocolor, with shadow settings?
+// upcoming features: variable text size, current font sctruct/pointer, can
+// change to another font at whim. Use library to only include fonts directly
+// used by given project in compilation. text color change if font is monocolor,
+// with shadow settings?
 
 int getFontDataIndex(char c);
 
@@ -16,16 +19,29 @@ void gprintf(int x, int y, const char *format, u32 arg);
 
 static u16 currentTextColor = RGB(31, 31, 31);
 
-int getCurrentTextColor() {
-  return currentTextColor;
+int getCurrentTextColor() { return currentTextColor; }
+
+void setTextColorRGB(int r, int g, int b) { currentTextColor = RGB(r, g, b); }
+
+void setTextColor(u16 color) { currentTextColor = color; }
+
+int measureText(const char *text) {
+  int width = 0;
+  for (int i = 0; text[i] != '\0'; i++) {
+    if (text[i] == ' ') {
+      width += 2;
+    } else {
+      int glyphIndex = getFontDataIndex(text[i]);
+      if (glyphIndex >= 0) {
+        width += fontData[glyphIndex].width + 1;
+      }
+    }
+  }
+  return width > 0 ? width - 1 : 0;
 }
 
-void setTextColorRGB(int r, int g, int b) {
-  currentTextColor = RGB(r, g, b);
-}
-
-void setTextColor(u16 color) {
-  currentTextColor = color;
+void clearTextArea(int x, int y, int width, int height) {
+  fillRect(x, y, width, height, RGB(0, 0, 0));
 }
 
 void gprintf(int x, int y, const char *fmt, u32 arg) {
@@ -38,7 +54,7 @@ void gprintf(int x, int y, const char *fmt, u32 arg) {
     if (fmt[i] == '%') {
       i++;
       switch (fmt[i]) {
-      case ('d'): 
+      case ('d'):
         if (val == 0) {
           renderChar(&x, &y, '0');
           continue;
@@ -60,22 +76,22 @@ void gprintf(int x, int y, const char *fmt, u32 arg) {
         }
         break;
 
-        case ('x'):
-          renderChar(&x, &y, '0');
-          renderChar(&x, &y, 'x');
-          int nibble;
-          for (int i = 7; i >= 0; i--) {
-            nibble = ((arg >> (i * 4)) & 0xF);
-            if (nibble < 10) {
-              renderChar(&x, &y, '0' + nibble);
-            } else {
-              renderChar(&x, &y, 'A' + (nibble - 10));
-            }
+      case ('x'):
+        renderChar(&x, &y, '0');
+        renderChar(&x, &y, 'x');
+        int nibble;
+        for (int i = 7; i >= 0; i--) {
+          nibble = ((arg >> (i * 4)) & 0xF);
+          if (nibble < 10) {
+            renderChar(&x, &y, '0' + nibble);
+          } else {
+            renderChar(&x, &y, 'A' + (nibble - 10));
           }
-          break;
-        default:
-          renderChar(&x, &y, '%');
-          renderChar(&x, &y, fmt[i]);
+        }
+        break;
+      default:
+        renderChar(&x, &y, '%');
+        renderChar(&x, &y, fmt[i]);
         break;
       }
     } else {
@@ -97,9 +113,10 @@ void renderChar(int *x, int *y, char c) {
   }
 
   int glyphIndex = getFontDataIndex(c);
-  printGlyphColored(*x, *y, &MiniGBABitmap, &fontData[glyphIndex], currentTextColor);
+  printGlyphColored(*x, *y, &MiniGBABitmap, &fontData[glyphIndex],
+                    currentTextColor);
 
-  *x += fontData[glyphIndex].width + 1; 
+  *x += fontData[glyphIndex].width + 1;
 };
 
 int getFontDataIndex(char c) {
@@ -180,5 +197,3 @@ int getFontDataIndex(char c) {
     }
   }
 }
-
-

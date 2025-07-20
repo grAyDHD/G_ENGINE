@@ -7,11 +7,13 @@
 #define RGB(r, g, b) (((r) & 0x1F) | ((g) & 0x1F) << 5 | ((b) & 0x1F) << 10)
 #define dblClr(color) ((color) | (color << 16))
 
+// mode 3
 void plotPixel(int x, int y, unsigned short color);
 void drawLine(Coordinate start, Coordinate end, unsigned short color);
 void drawCircle(int x, int y, int radius, unsigned short color);
 void fillCircle(int x, int y, int radius, unsigned short color);
 void drawRect(Coordinate start, int width, int height, unsigned short color);
+void fillRect(int x, int y, int width, int height, unsigned short color);
 
 extern void fillScreen(u32 clr);
 extern void m3_Background(const void *src);
