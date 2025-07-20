@@ -12,7 +12,25 @@
 // 120/(2/5) = 300
 // mixFreq = sampleRate = 16000
 // samplesPerTick = 16000/300 = 53.333
+void initDebugDisplay() {
+  // Draw static labels once at startup - never cleared
+  printString(10, 10, "Pattern:");
+  printString(10, 22, "Row:");
+  printString(10, 34, "Tempo:");
+  // etc.
+}
 
+void updateDebugNumbers(int pattern, int row, int tempo) {
+  // Only clear/redraw the number portions
+  clearTextArea(70, 10, 30, 11); // Clear just the number area
+  gprintf(70, 10, "%d", pattern);
+
+  clearTextArea(70, 22, 30, 11);
+  gprintf(70, 22, "%d", row);
+
+  clearTextArea(70, 34, 30, 11);
+  gprintf(70, 34, "%d", tempo);
+}
 void updateDebugDisplay(int pattern, int row) {
   clearTextArea(10, 10, 80, 8);
   gprintf(10, 10, "Pattern: %d", pattern);
@@ -30,6 +48,8 @@ int main() {
   irqMaster(ON);  // now enable interrupts
   initMonoFIFO(); // is now reading from buffer
 
+  initDebugDisplay();
+
   int x = 0, y = 0;
 
   while (1) {
@@ -42,7 +62,7 @@ int main() {
     y += 2;
 
     VBLANK();
-    updateDebugDisplay(x, y);
+    updateDebugNumbers(x, y, 0);
   }
   return 0;
 }

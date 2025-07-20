@@ -11,12 +11,6 @@
 // used by given project in compilation. text color change if font is monocolor,
 // with shadow settings?
 
-int getFontDataIndex(char c);
-
-void renderChar(int *x, int *y, char c);
-void printString(int x, int y, const char *text);
-void gprintf(int x, int y, const char *format, u32 arg);
-
 static u16 currentTextColor = RGB(31, 31, 31);
 
 int getCurrentTextColor() { return currentTextColor; }
@@ -119,23 +113,21 @@ void renderChar(int *x, int *y, char c) {
   *x += fontData[glyphIndex].width + 1;
 };
 
-// This should be 256, not 94 - it maps ASCII values to your font indices
 static s8 fontDataIndex[256] = {[0 ... 255] = -1};
 
 void initCharLookup() {
-  // A-Z map to font indices 0-25
   for (int i = 0; i < 26; i++) {
     fontDataIndex['A' + i] = i;
   }
-  // a-z map to font indices 26-51
+
   for (int i = 0; i < 26; i++) {
     fontDataIndex['a' + i] = 26 + i;
   }
-  // 0-9 map to font indices 52-61
+
   for (int i = 0; i < 10; i++) {
     fontDataIndex['0' + i] = 52 + i;
   }
-  // ALL special characters map to font indices 62-93
+
   fontDataIndex['{'] = 62;
   fontDataIndex['}'] = 63;
   fontDataIndex['('] = 64;
@@ -170,84 +162,4 @@ void initCharLookup() {
   fontDataIndex['_'] = 93;
 }
 
-// Replace your entire if/switch logic with just this:
 int getFontDataIndex(char c) { return fontDataIndex[(u8)c]; }
-
-int dontgetFontDataIndex(char c) {
-  if (c >= 'A' && c <= 'Z') {
-    return c - 'A';
-  } else if (c >= 'a' && c <= 'z') {
-    return c - 'a' + 26;
-  } else if (c >= '0' && c <= '9') {
-    return c - '0' + 52;
-  } else {
-    switch (c) {
-    case '{':
-      return 62;
-    case '}':
-      return 63;
-    case '(':
-      return 64;
-    case ')':
-      return 65;
-    case '[':
-      return 66;
-    case ']':
-      return 67;
-    case '<':
-      return 68;
-    case '>':
-      return 69;
-    case '$':
-      return 70;
-    case '#':
-      return 71;
-    case '@':
-      return 72;
-    case '+':
-      return 73;
-    case '-':
-      return 74;
-    case '*':
-      return 75;
-    case '/':
-      return 76;
-    case '^':
-      return 77;
-    case '=':
-      return 78;
-    case '%':
-      return 79;
-    case '&':
-      return 80;
-    case '\\':
-      return 81;
-    case '|':
-      return 82;
-    case '~':
-      return 83;
-    case '!':
-      return 84;
-    case '?':
-      return 85;
-    case '\'':
-      return 86;
-    case '\"':
-      return 87;
-    case '.':
-      return 88;
-    case ',':
-      return 89;
-    case ';':
-      return 90;
-    case ':':
-      return 91;
-    case '`':
-      return 92;
-    case '_':
-      return 93;
-    default:
-      return -1;
-    }
-  }
-}
