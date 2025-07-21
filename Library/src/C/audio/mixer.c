@@ -17,13 +17,14 @@ void initMixChannels() {
     channel[i].position = 0;
     channel[i].length = 0;
     channel[i].volume = 0;
-    channel[i].isPlaying = 0;
-    channel[i].looping = 0;
-    channel[i].fadeOut = 0;
-    channel[i].lastSample = 0;
+    //  channel[i].isPlaying = 0;
+    //  channel[i].looping = 0;
+    //   channel[i].fadeOut = 0;
+    //    channel[i].lastSample = 0;
   }
 }
 
+/*
 void mixAudio() {
   s32 i, ch;
   s16 tempBuffer[BUFFER_SIZE];
@@ -67,6 +68,7 @@ void mixAudio() {
     // targetBuffer[i] = (s8)((tempBuffer[i]) >> 6);
   }
 }
+*/
 
 void swapMixBuffer() {
   DMA[1].control = 0;

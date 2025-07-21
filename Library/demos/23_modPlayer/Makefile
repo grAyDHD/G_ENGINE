@@ -15,7 +15,7 @@ LIBRARY := $(LIBRARY_DIR)/build/g_engine.a
 
 TARGET := $(notdir $(CURDIR))
 BUILD := build
-SOURCES := C asm audio
+SOURCES := C asm audio data
 
 #include and asset directories
 INCLUDES := $(LIBRARY_DIR)/include \
@@ -24,7 +24,8 @@ INCLUDES := $(LIBRARY_DIR)/include \
 						$(LIBRARY_DIR)/audio \
 						$(LIBRARY_DIR)/input \
 						$(LIBRARY_DIR)/physics \
-DATA := 
+						data
+DATA :=
 MUSIC :=
 GRAPHICS := graphics
 
@@ -53,6 +54,9 @@ export DEPSDIR	:=	$(TOPDIR)/$(BUILD)
 CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
 CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
+$(info CFILES: $(CFILES))
+$(info SFILES: $(SFILES))
+$(info SOURCES: $(SOURCES))
 PNGFILES	:=	$(foreach dir,$(GRAPHICS),$(notdir $(wildcard $(dir)/*.png)))
 BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
 

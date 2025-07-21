@@ -12,11 +12,13 @@ typedef struct {
   u32 position;
   u32 length;
   u32 increment; // fixed point increment, 4096 = normal
+  u32 loopLength;
   u32 volume;
-  u16 isPlaying;
-  u16 looping;
-  u16 fadeOut;
-  s8 lastSample;
+  // u16 isPlaying;
+  // u16 looping;
+  // u16 fadeOut;
+
+  // s8 lastSample;
 } AudioChannel;
 
 extern AudioChannel channel[4];
