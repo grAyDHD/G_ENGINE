@@ -8,6 +8,7 @@ int main() {
   //  for (i = 0; i < IRQTABLE_NUM; i++) {
   //    IntrTable[i] = (u32)IrqNull;
   //  }
+
   // set VBlank interrupt
   //  IntrTable[IRQTABLE_VBL] = (u32)SndVSync;
   //  REG_DISPSTAT = DSTAT_VBL_IRQ;
@@ -28,8 +29,8 @@ int main() {
     //    FontPrint(0, 0, BGS(31), "Sound example");
     //    FontPrint(0, 1, BGS(31), "Start: play song");
 
-    if (KEY_DOWN(ST)) {
-      SndPlayMOD(MOD_AdventureBoy);
+    if (keyTapped(ST)) {
+      //      SndPlayMOD(MOD_AdventureBoy);
     }
 
     // Fill the next sound buffer, and update the music.
