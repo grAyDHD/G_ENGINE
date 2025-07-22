@@ -1,4 +1,5 @@
 #include "../includes/23_modPlayer.h"
+#include "graphics/m3Text.h"
 
 MOD sndMod;
 SOUND_VARS sndVars;
@@ -400,14 +401,13 @@ void SndPlayMOD(u32 modIdx) {
 } // SndPlayMOD
 
 void initDebugDisplay() {
+  printString(0, 0, "Sound example");
+  printString(0, 10, "Start: play song");
   // Draw static labels once at startup - never cleared
-  printString(10, 10, "Pattern:");
-  printString(10, 22, "Row:");
+  //  printString(10, 10, "Pattern:");
+  //  printString(10, 22, "Row:");
   //  printString(10, 34, "Tempo:");
-  gprintf(10, 34, "sample data start address: %x", (u32)&channel[0].data);
-
-  //  FontPrint(0, 0, BGS(31), "Sound example");
-  //  FontPrint(0, 1, BGS(31), "Start: play song");
+  //  gprintf(10, 34, "sample data start address: %x", (u32)&channel[0].data);
 }
 
 void updateDebugNumbers(int pattern, int row, int tempo) {
@@ -423,6 +423,7 @@ void updateDebugNumbers(int pattern, int row, int tempo) {
   //  gprintf(70, 34, "%d", tempo);
 
   // Print out some info on the screen
+  printString(0, 0, "C0.data:");
   /*
   FontPrint(0, 4, BGS(31), "C0.data:");
   FontPrint(8, 4, BGS(31), htoa((s32)sndChannel[0].data));

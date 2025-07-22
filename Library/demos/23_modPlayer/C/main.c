@@ -11,11 +11,8 @@ int main() {
   initCharLookup();
 
   /*
-  initialization code:
-  s8 sndMixBuffer[BUFFER_SIZE * 2];
 
   //  initialize main sound variables
-  sndVars.mixBufferBase = (s8 *)mixbuf.bufA;
   sndVars.curMixBuffer = sndVars.mixBufferBase;
   sndVars.mixBufferSize = BUFFER_SIZE;
   sndVars.mixFreq = 16000;
@@ -55,7 +52,7 @@ int main() {
     y += 2;
 
     VBLANK();
-    updateDebugNumbers(x, y, 0);
+    //    updateDebugNumbers(x, y, 0);
 
     if (KEY_DOWN(ST)) {
       SndPlayMOD(MOD_AdventureBoy);

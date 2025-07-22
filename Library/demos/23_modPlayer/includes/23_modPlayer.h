@@ -43,8 +43,8 @@ typedef struct _SOUND_VARS {
   u16 rcpMixFreq;
   s16 samplesUntilMODTick;
   u16 samplesPerMODTick;
-  u8 activeBuffer;
 
+  u8 activeBuffer;
 } SOUND_VARS;
 
 // This is the layout of the sample info in ROM
