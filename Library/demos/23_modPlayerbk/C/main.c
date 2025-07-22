@@ -63,7 +63,7 @@ int main() {
     updateKeys();
 
     if (keyTapped(B)) {
-      SndPlayMOD(MOD_AdventureBoy);
+      SndPlayMOD(MOD_);
       bCounter++;
     }
 
