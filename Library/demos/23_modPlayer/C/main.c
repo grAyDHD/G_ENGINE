@@ -1,62 +1,50 @@
-#include "../includes/23_modPlayer.h"
-#include "audio/mixer.h"
+#include "core/typedefs.h"
 #include "input/in.h"
 
 int main() {
   s32 i;
-  int x = 0, y = 0;
-  i = 0;
 
-  DSPC = MODE3 | BG2;
-  initCharLookup();
+  // initialize interrupts
+  //  for (i = 0; i < IRQTABLE_NUM; i++) {
+  //    IntrTable[i] = (u32)IrqNull;
+  //  }
+  // set VBlank interrupt
+  //  IntrTable[IRQTABLE_VBL] = (u32)SndVSync;
+  //  REG_DISPSTAT = DSTAT_VBL_IRQ;
+  //  REG_IE = IRQ_VBL;
 
-  /*
+  //  SndInit(SND_FREQ_18157);
 
-  //  initialize main sound variables
-  sndVars.curMixBuffer = sndVars.mixBufferBase;
-  sndVars.mixBufferSize = BUFFER_SIZE;
-  sndVars.mixFreq = 16000;
-  sndVars.rcpMixFreq = (1 << 28) / 16000;
-  sndVars.samplesUntilMODTick = 0;
-  sndVars.samplesPerMODTick = 0;
-  sndVars.activeBuffer = 0; // 1 so first swap will start DMA
+  // sound will actually start playing here (although the buffer
+  // is empty at this point, so you won't hear anything)
+  //  REG_IME = 1;
 
-  i = 0;
-  Dma3(sndMixBuffer, &i, 736 * 2 / 4, DMA_MEMSET32);
-
-  // initialize channel structures
-  for (i = 0; i < 4; i++) {
-    channel[i].data = 0;
-    channel[i].position = 0;
-    channel[i].increment = 0;
-    channel[i].volume = 0;
-    channel[i].length = 0;
-    channel[i].loopLength = 0;
-  }
-*/
-  initMixChannels();
-
-  irqMaster(ON);  // now enable interrupts
-  initMonoFIFO(); // is now reading from buffer
-
-  initDebugDisplay();
+  //  i = 0;
 
   while (1) {
-    if (reload == 1) {
-      //      mixAudio();
-      SndUpdate();
-      reload = 0;
-    }
+    //    VSync();
 
-    x++;
-    y += 2;
-
-    VBLANK();
-    //    updateDebugNumbers(x, y, 0);
+    // print the instructions
+    //    FontPrint(0, 0, BGS(31), "Sound example");
+    //    FontPrint(0, 1, BGS(31), "Start: play song");
 
     if (KEY_DOWN(ST)) {
       SndPlayMOD(MOD_AdventureBoy);
     }
+
+    // Fill the next sound buffer, and update the music.
+    // This can be done anywhere you like.
+    // It takes a while if you have many channels running,
+    // so it's best to do it after you're done with everything else.
+    // If you think you could get missed frames, you might want to
+    // do this in your VBlank function, just so you know for sure
+    // it will happen every frame.
+
+    // Wait until VBlank is over, to use BG color for profiling
+    //    while (REG_VCOUNT != 0)
+    //      ;
+    //   SndUpdate();
   }
+
   return 0;
 }
