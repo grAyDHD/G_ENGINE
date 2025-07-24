@@ -1,8 +1,50 @@
 #include "../includes/23_modPlayer.h"
-#include "graphics/m3Text.h"
 
-MOD sndMod;
+// ----- Constants -----
+
+#define MOD_DEFAULT_SPEED 6
+#define MOD_DEFAULT_TEMPO 125
+
+// ----- Structures -----
+
+// structure to store all the frequency settings we allow
+
+typedef struct _FREQ_TABLE {
+  u16 timer;
+  u16 freq;
+  u16 bufSize;
+
+} FREQ_TABLE;
+
+// ----- Local function prototypes -----
+
+static void MODProcessRow();
+static void MODPlayNote(u32 channelIdx, u32 note, u32 sample, u32 effect,
+                        u32 param);
+static void MODSetTempo(u32 tempo);
+
+// ----- Variables -----
+
+// Globals, as seen in tutorial day 2. In the tutorial, I hardcoded
+// SOUND_MAX_CHANNELS to 4, but it's the same effect either way
+SOUND_CHANNEL sndChannel[SND_MAX_CHANNELS];
 SOUND_VARS sndVars;
+MOD sndMod;
+
+// This is the actual double buffer memory. The size is taken from
+// the highest entry in the frequency table above.
+s8 sndMixBuffer[736 * 2]; // IN_EWRAM;
+
+// ----- Tables -----
+
+static const FREQ_TABLE freqTable[SND_FREQ_NUM] = {
+    // timer, frequency, and buffer size for frequencies
+    // that time out perfectly with VBlank.
+    // These are in the order of the SND_FREQ enum in Sound.h.
+    {62610, 5734, 96},   {63940, 10512, 176}, {64282, 13379, 224},
+    {64612, 18157, 304}, {64738, 21024, 352}, {64909, 26758, 448},
+    {65004, 31536, 528}, {65074, 36314, 608}, {65118, 40137, 672},
+    {65137, 42048, 704}, {65154, 43959, 736}};
 
 const u16 noteFreqTable[] = {
     // Finetune 0
@@ -184,86 +226,169 @@ const u16 noteFreqTable[] = {
 
 }; // noteFreqTable
 
-static void MODPlayNote(u32 channelIdx, u32 note, u32 sampleIdx, u32 effect,
-                        u32 param) {
-  AudioChannel *sndChn;
-  MOD_CHANNEL *modChn;
-  const SAMPLE_HEADER *sample;
-  u8 finetune;
+// ----- Functions -----
 
-  // Here's that special case that they didn't specify a sample before playing a
-  // note
-  if (sampleIdx == MOD_NO_SAMPLE) {
-    return;
+// Call this once at startup
+void SndInit(SND_FREQ freq) {
+  s32 i;
+
+  // enable sound
+  REG_SGCNT0_H = SOUNDA_LOUT | SOUNDA_ROUT | SOUNDA_FIFORESET | SOUNDA_VOL_100;
+  REG_SGCNT1 = SOUND_ENABLE;
+
+  // clear the whole buffer area
+  i = 0;
+  Dma3(sndMixBuffer, &i, 736 * 2 / 4, DMA_MEMSET32);
+
+  // initialize main sound variables
+  sndVars.mixBufferSize = freqTable[freq].bufSize;
+  sndVars.mixBufferBase = sndMixBuffer;
+  sndVars.curMixBuffer = sndVars.mixBufferBase;
+  sndVars.activeBuffer = 1; // 1 so first swap will start DMA
+
+  sndVars.mixFreq = freqTable[freq].freq;
+  sndVars.rcpMixFreq = (1 << 28) / sndVars.mixFreq;
+  // sndVars.rcpMixFreq = div(1 << 28, sndVars.mixFreq);
+
+  // initialize channel structures
+  for (i = 0; i < SND_MAX_CHANNELS; i++) {
+    sndChannel[i].data = 0;
+    sndChannel[i].pos = 0;
+    sndChannel[i].inc = 0;
+    sndChannel[i].vol = 0;
+    sndChannel[i].length = 0;
+    sndChannel[i].loopLength = 0;
   }
 
-  // These make things less cumbersome
-  sndChn = &channel[channelIdx];
-  modChn = &sndMod.channel[channelIdx];
-  sample = &sndMod.sample[sampleIdx];
+  // start up the timer we will be using
+  REG_TM0D = freqTable[freq].timer;
+  REG_TM0CNT = TIMER_ENABLE;
 
-  // 60 notes total, and one full set of notes for each finetune level
-  modChn->frequency = noteFreqTable[sample->finetune * 60 + note];
+  // set up the DMA settings, but let the VBlank interrupt
+  // actually start it up, so the timing is right
+  REG_DM1CNT = 0;
+  REG_DM1DAD = (u32)&REG_SGFIFOA;
 
-  // Set up the mixer channel
-  sndChn->data = sample->smpData;
-  sndChn->position = 0;
-  sndChn->increment =
-      modChn->frequency * sndVars.rcpMixFreq >> 16; // Explained below
+} // SndInit
 
-  // Next member is volume, but skip setting it because it doesn't change unless
-  // a new sample was specified, in which case it was already set back in
-  // MODProcessRow
+// Call this every frame to fill the buffer. It can be
+// called anywhere as long as it happens once per frame.
+void SndUpdate() {
+  s32 samplesLeft = sndVars.mixBufferSize;
 
-  // If looping, use loopStart+loopLength as the ending point,
-  // otherwise just use normal length.
-  // Length and loop length are still half what the real size is
-  // (to fit in 16 bits, as per MOD format), so they need to be
-  // shifted left 1. They also need to be shifted left 12 because
-  // the mixer compares the 12-bit fixed-point position against
-  // them directly, so that comes to a total shift left of 13
-  sndChn->length =
-      (sample->loopLength != 0 ? sample->loopStart + sample->loopLength
-                               : sample->length)
-      << 13;
-  sndChn->loopLength = sample->loopLength << 13;
+  while (samplesLeft > 0) {
+    // Check if the song needs updated
+    if (sndVars.samplesUntilMODTick == 0 && sndMod.state == MOD_STATE_PLAY) {
+      // Update the song and set the number of samples to mix before the next
+      // update
+      MODUpdate();
+      sndVars.samplesUntilMODTick = sndVars.samplesPerMODTick;
+    }
 
-} // MODPlayNote
+    // Figure out if this is the last batch of samples for this frame
+    if (sndVars.samplesUntilMODTick < samplesLeft &&
+        sndMod.state == MOD_STATE_PLAY) {
+      // Song will need updated before we're out of samples, so mix up to the
+      // song tick
+      SndMix(sndVars.samplesUntilMODTick);
+      // Subtract the number we just mixed
+      samplesLeft -= sndVars.samplesUntilMODTick;
 
-static void MODProcessRow() {
-  s32 curChannel;
-
-  for (curChannel = 0; curChannel < 4; curChannel++) {
-    u8 note, sample, effect, param;
-
-    // Read in the pattern data, advancing rowPtr to the next channel in the
-    // process
-    note = *sndMod.rowPtr++;
-    sample = *sndMod.rowPtr++;
-    effect = *sndMod.rowPtr++;
-    param = *sndMod.rowPtr++;
-
-    // Use sample memory if no sample, or set sample memory if there is one
-    if (sample == MOD_NO_SAMPLE) {
-      sample = sndMod.channel[curChannel].sample;
+      // No more left, so song will get updated next time through the loop
+      sndVars.samplesUntilMODTick = 0;
     } else {
-      // Set sample memory
-      sndMod.channel[curChannel].sample = sample;
-      // Another tricky thing to know about MOD: Volume is only set when
-      // specifying new samples, NOT when playing notes, and it is set even
-      // when there is a sample, but no note specified (although the sample
-      // playing doesn't change in that case)
-      sndMod.channel[curChannel].vol = sndMod.sample[sample].vol;
-      channel[curChannel].volume = sndMod.channel[curChannel].vol;
-    }
-
-    // See if there's any note to play
-    if (note != MOD_NO_NOTE) {
-      MODPlayNote(curChannel, note, sample, effect, param);
+      // Either song is not playing, so just mix a full buffer, or
+      // not enough samples left to make it to another song tick,
+      // so mix what's left and exit
+      SndMix(samplesLeft);
+      // This is how many samples will get mixed first thing next frame
+      // before updating the song
+      sndVars.samplesUntilMODTick -= samplesLeft;
+      // Mixed the last of the 304 samples, this will break from the while loop
+      samplesLeft = 0;
     }
   }
 
-} // MODProcessRow
+} // SndUpdate
+
+// This is only called by SndUpdate
+void SndMix(u32 samplesToMix) {
+  s32 i, curChn;
+
+  // If you want to use a higher frequency than 18157,
+  // you'll need to make this bigger.
+  // To be safe, it would be best to set it to the buffer
+  // size of the highest frequency we allow in freqTable
+  s16 tempBuffer[304];
+
+  // zero as much of the buffer as we'll actually use,
+  // rounding samples up to nearest 2 for memset32
+  i = 0;
+  Dma3(tempBuffer, &i, (samplesToMix + 1) * sizeof(s16) / 4, DMA_MEMSET32);
+
+  for (curChn = 0; curChn < SND_MAX_CHANNELS; curChn++) {
+    SOUND_CHANNEL *chnPtr = &sndChannel[curChn];
+
+    // check special active flag value
+    if (chnPtr->data != 0) {
+      // this channel is active, so mix its data into the intermediate buffer
+      for (i = 0; i < samplesToMix; i++) {
+        // mix a sample into the intermediate buffer
+        tempBuffer[i] += chnPtr->data[chnPtr->pos >> 12] * chnPtr->vol;
+        chnPtr->pos += chnPtr->inc;
+
+        // loop the sound if it hits the end
+        if (chnPtr->pos >= chnPtr->length) {
+          // check special loop on/off flag value
+          if (chnPtr->loopLength == 0) {
+            // disable the channel and break from the i loop
+            chnPtr->data = 0;
+            i = samplesToMix;
+          } else {
+            // loop back
+            while (chnPtr->pos >= chnPtr->length) {
+              chnPtr->pos -= chnPtr->loopLength;
+            }
+          }
+        }
+      } // end for i = 0 to bufSize
+    } // end data != 0
+  } // end channel loop
+
+  // now downsample the 16-bit buffer and copy it into the actual playing buffer
+  for (i = 0; i < samplesToMix; i++) {
+    // >>6 to divide off the volume, >>2 to divide by 4 channels
+    // to prevent overflow. Could make a define for this up with
+    // SOUND_MAX_CHANNELS, but I'll hardcode it for now
+    sndVars.curMixBuffer[i] = tempBuffer[i] >> 8;
+  }
+
+  // curMixBuffer will get reset on next VBlank anyway, so we can
+  // move the pointer forward to avoid having to make a variable
+  // to keep track of how many samples have been mixed so far
+  sndVars.curMixBuffer += samplesToMix;
+
+} // SndMix
+
+void SndPlayMOD(u32 modIdx) {
+  const MOD_HEADER *modHeader = &dModTable[modIdx];
+
+  sndMod.sample = modHeader->sample;
+  sndMod.pattern = modHeader->pattern;
+  sndMod.order = modHeader->order;
+  sndMod.orderCount = modHeader->orderCount;
+  sndMod.curOrder = 0;
+  sndMod.curRow = 0;
+  sndMod.tick = 0;
+  sndMod.speed = MOD_DEFAULT_SPEED;
+  sndMod.rowPtr = sndMod.pattern[sndMod.order[0]];
+  sndMod.state = MOD_STATE_PLAY;
+
+  // Set to default
+  MODSetTempo(MOD_DEFAULT_TEMPO);
+  sndVars.samplesUntilMODTick = 0;
+
+} // SndPlayMOD
 
 void MODUpdate() {
   if (++sndMod.tick >= sndMod.speed) {
@@ -287,167 +412,96 @@ void MODUpdate() {
 
 } // MODUpdate
 
+static void MODProcessRow() {
+  s32 curChannel;
+
+  for (curChannel = 0; curChannel < SND_MAX_CHANNELS; curChannel++) {
+    u8 note, sample, effect, param;
+
+    // Read in the pattern data, advancing rowPtr to the next channel in the
+    // process
+    note = *sndMod.rowPtr++;
+    sample = *sndMod.rowPtr++;
+    effect = *sndMod.rowPtr++;
+    param = *sndMod.rowPtr++;
+
+    // Use sample memory if no sample, or set sample memory if there is one
+    if (sample == MOD_NO_SAMPLE) {
+      sample = sndMod.channel[curChannel].sample;
+    } else {
+      // Set sample memory
+      sndMod.channel[curChannel].sample = sample;
+      // Another tricky thing to know about MOD: Volume is only set when
+      // specifying new samples, NOT when playing notes, and it is set even
+      // when there is a sample, but no note specified (although the sample
+      // playing doesn't change in that case)
+      sndMod.channel[curChannel].vol = sndMod.sample[sample].vol;
+      sndChannel[curChannel].vol = sndMod.channel[curChannel].vol;
+    }
+
+    // See if there's any note to play
+    if (note != MOD_NO_NOTE) {
+      MODPlayNote(curChannel, note, sample, effect, param);
+    }
+  }
+
+} // MODProcessRow
+
+static void MODPlayNote(u32 channelIdx, u32 note, u32 sampleIdx, u32 effect,
+                        u32 param) {
+  SOUND_CHANNEL *sndChn;
+  MOD_CHANNEL *modChn;
+  const SAMPLE_HEADER *sample;
+  u8 finetune;
+
+  // Here's that special case that they didn't specify a sample before playing a
+  // note
+  if (sampleIdx == MOD_NO_SAMPLE) {
+    return;
+  }
+
+  // These make things less cumbersome
+  sndChn = &sndChannel[channelIdx];
+  modChn = &sndMod.channel[channelIdx];
+  sample = &sndMod.sample[sampleIdx];
+
+  // 60 notes total, and one full set of notes for each finetune level
+  modChn->frequency = noteFreqTable[sample->finetune * 60 + note];
+
+  // Set up the mixer channel
+  sndChn->data = sample->smpData;
+  sndChn->pos = 0;
+  sndChn->inc = modChn->frequency * sndVars.rcpMixFreq >> 16; // Explained below
+
+  // Next member is volume, but skip setting it because it doesn't change unless
+  // a new sample was specified, in which case it was already set back in
+  // MODProcessRow
+
+  // If looping, use loopStart+loopLength as the ending point,
+  // otherwise just use normal length.
+  // Length and loop length are still half what the real size is
+  // (to fit in 16 bits, as per MOD format), so they need to be
+  // shifted left 1. They also need to be shifted left 12 because
+  // the mixer compares the 12-bit fixed-point position against
+  // them directly, so that comes to a total shift left of 13
+  sndChn->length =
+      (sample->loopLength != 0 ? sample->loopStart + sample->loopLength
+                               : sample->length)
+      << 13;
+  sndChn->loopLength = sample->loopLength << 13;
+
+} // MODPlayNote
+
 static void MODSetTempo(u32 tempo) {
   u32 modFreq;
 
   sndMod.tempo = tempo;
   modFreq = (tempo * 2) / 5;
+  // modFreq = div(tempo * 2, 5);
 
   sndVars.samplesUntilMODTick -= sndVars.samplesPerMODTick;
   sndVars.samplesPerMODTick = sndVars.mixFreq / modFreq;
+  // sndVars.samplesPerMODTick = div(sndVars.mixFreq, modFreq);
   sndVars.samplesUntilMODTick += sndVars.samplesPerMODTick;
 
 } // MODSetTempo
-
-// This is only called by SndUpdate
-void SndMix(u32 samplesToMix) {
-  s32 i, curChn;
-
-  // If you want to use a higher frequency than 18157,
-  // you'll need to make this bigger.
-  // To be safe, it would be best to set it to the buffer
-  // size of the highest frequency we allow in freqTable
-  s16 tempBuffer[BUFFER_SIZE];
-
-  // zero as much of the buffer as we'll actually use,
-  // rounding samples up to nearest 2 for memset32
-  i = 0;
-  Dma3(tempBuffer, &i, (samplesToMix + 1) * sizeof(s16) / 4, DMA_MEMSET32);
-
-  for (curChn = 0; curChn < 4; curChn++) {
-    AudioChannel *chnPtr = &channel[curChn];
-
-    // check special active flag value
-    if (chnPtr->data != 0) {
-      // this channel is active, so mix its data into the intermediate buffer
-      for (i = 0; i < samplesToMix; i++) {
-        // mix a sample into the intermediate buffer
-        tempBuffer[i] += chnPtr->data[chnPtr->position >> 12] * chnPtr->volume;
-        chnPtr->position += chnPtr->increment;
-
-        // loop the sound if it hits the end
-        if (chnPtr->position >= chnPtr->length) {
-          // check special loop on/off flag value
-          if (chnPtr->loopLength == 0) {
-            // disable the channel and break from the i loop
-            chnPtr->data = 0;
-            i = samplesToMix;
-          } else {
-            // loop back
-            while (chnPtr->position >= chnPtr->length) {
-              chnPtr->position -= chnPtr->loopLength;
-            }
-          }
-        }
-      } // end for i = 0 to bufSize
-    } // end data != 0
-  } // end channel loop
-
-  // now downsample the 16-bit buffer and copy it into the actual playing buffer
-  for (i = 0; i < samplesToMix; i++) {
-    // >>6 to divide off the volume, >>2 to divide by 4 channels
-    // to prevent overflow. Could make a define for this up with
-    // SOUND_MAX_CHANNELS, but I'll hardcode it for now
-    sndVars.curMixBuffer[i] = tempBuffer[i] >> 8;
-  }
-
-  // curMixBuffer will get reset on next VBlank anyway, so we can
-  // move the pointer forward to avoid having to make a variable
-  // to keep track of how many samples have been mixed so far
-  sndVars.curMixBuffer += samplesToMix;
-
-} // SndMix
-
-void SndUpdate() {
-  s32 samplesLeft = BUFFER_SIZE; // 256
-
-  while (samplesLeft > 0) {
-    if (sndVars.samplesUntilMODTick == 0 && sndMod.state == MOD_STATE_PLAY) {
-      MODUpdate();
-      sndVars.samplesUntilMODTick = sndVars.samplesPerMODTick;
-    }
-
-    if (sndVars.samplesUntilMODTick < samplesLeft &&
-        sndMod.state == MOD_STATE_PLAY) {
-      SndMix(sndVars.samplesUntilMODTick);
-      samplesLeft -= sndVars.samplesUntilMODTick;
-      sndVars.samplesUntilMODTick = 0;
-    } else {
-      SndMix(samplesLeft);
-      sndVars.samplesUntilMODTick -= samplesLeft;
-      samplesLeft = 0;
-    }
-  }
-}
-
-void SndPlayMOD(u32 modIdx) {
-  const MOD_HEADER *modHeader = &dModTable[modIdx];
-
-  sndMod.sample = modHeader->sample;
-  sndMod.pattern = modHeader->pattern;
-  sndMod.order = modHeader->order;
-  sndMod.orderCount = modHeader->orderCount;
-  sndMod.curOrder = 0;
-  sndMod.curRow = 0;
-  sndMod.tick = 0;
-  sndMod.speed = MOD_DEFAULT_SPEED;
-  sndMod.rowPtr = sndMod.pattern[sndMod.order[0]];
-  sndMod.state = MOD_STATE_PLAY;
-
-  // Set to default
-  MODSetTempo(MOD_DEFAULT_TEMPO);
-  sndVars.samplesUntilMODTick = 0;
-
-} // SndPlayMOD
-
-void initDebugDisplay() {
-  printString(0, 0, "Sound example");
-  printString(0, 10, "Start; play song");
-  // Draw static labels once at startup - never cleared
-  //  printString(10, 10, "Pattern:");
-  //  printString(10, 22, "Row:");
-  //  printString(10, 34, "Tempo:");
-  //  gprintf(10, 34, "sample data start address: %x", (u32)&channel[0].data);
-
-  //  printString(0, 20, "C0.data:");
-  gprintf(8, 20, "%x", (u32)channel[0].data);
-}
-
-void updateDebugNumbers(int pattern, int row, int tempo) {
-  // Only clear/redraw the number portions
-  clearTextArea(70, 10, 30, 11); // Clear just the number area
-  gprintf(70, 10, "%d", pattern);
-
-  clearTextArea(70, 22, 30, 11);
-  gprintf(70, 22, "%d", row);
-
-  //  clearTextArea(70, 34, 30, 11);
-  //  clearTextArea(70, 34, 30, 11);
-  //  gprintf(70, 34, "%d", tempo);
-
-  // Print out some info on the screen
-  printString(0, 0, "C0.data:");
-  /*
-  FontPrint(0, 5, BGS(31), "C0.pos:");
-  FontPrint(8, 5, BGS(31), htoa((s32)sndChannel[0].pos));
-  FontPrint(0, 6, BGS(31), "C0.inc:");
-  FontPrint(8, 6, BGS(31), htoa((s32)sndChannel[0].inc));
-  FontPrint(0, 7, BGS(31), "C0.vol:");
-  FontPrint(8, 7, BGS(31), htoa((s32)sndChannel[0].vol));
-  FontPrint(0, 8, BGS(31), "C0.len:");
-  FontPrint(8, 8, BGS(31), htoa((s32)sndChannel[0].length));
-  FontPrint(0, 9, BGS(31), "C0.loop:");
-  FontPrint(8, 9, BGS(31), htoa((s32)sndChannel[0].loopLength));
-
-  FontPrint(0, 11, BGS(31), "mod.curOrder:");
-  FontPrint(15, 11, BGS(31), htoa(sndMod.curOrder));
-  FontPrint(0, 12, BGS(31), "mod.curRow:");
-  FontPrint(15, 12, BGS(31), htoa(sndMod.curRow));
-  FontPrint(0, 13, BGS(31), "mod.tick:");
-  FontPrint(15, 13, BGS(31), htoa(sndMod.tick));
-  FontPrint(0, 14, BGS(31), "mod.state:");
-  FontPrint(15, 14, BGS(31), htoa(sndMod.state));
-  FontPrint(0, 15, BGS(31), "smpsToTick:");
-  FontPrint(15, 15, BGS(31), htoa(sndVars.samplesUntilMODTick));
-  */
-}
