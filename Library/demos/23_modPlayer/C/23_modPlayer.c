@@ -1,4 +1,5 @@
 #include "../includes/23_modPlayer.h"
+#include "audio/audio.h"
 
 // ----- Constants -----
 
@@ -27,7 +28,7 @@ static void MODSetTempo(u32 tempo);
 
 // Globals, as seen in tutorial day 2. In the tutorial, I hardcoded
 // SOUND_MAX_CHANNELS to 4, but it's the same effect either way
-SOUND_CHANNEL sndChannel[SND_MAX_CHANNELS];
+ModMixerChannel modMixerChannel[MOD_MAX_CHANNELS];
 SOUND_VARS sndVars;
 MOD sndMod;
 
@@ -253,9 +254,8 @@ void SndVSync() {
 
 // Call this once at startup
 void SndInit(SND_FREQ freq) {
-  // enable sound
-  REG_SGCNT0_H = SOUNDA_LOUT | SOUNDA_ROUT | SOUNDA_FIFORESET | SOUNDA_VOL_100;
-  REG_SGCNT1 = SOUND_ENABLE;
+  AUDIO->ds = DS_MONO_INIT;
+  ENABLE_AUDIO;
 
   for (int i = 0; i < 736 * 2; i++) {
     sndMixBuffer[i] = 0;
@@ -272,23 +272,26 @@ void SndInit(SND_FREQ freq) {
   // sndVars.rcpMixFreq = div(1 << 28, sndVars.mixFreq);
 
   // initialize channel structures
-  for (int i = 0; i < SND_MAX_CHANNELS; i++) {
-    sndChannel[i].data = 0;
-    sndChannel[i].pos = 0;
-    sndChannel[i].inc = 0;
-    sndChannel[i].vol = 0;
-    sndChannel[i].length = 0;
-    sndChannel[i].loopLength = 0;
+  for (int i = 0; i < MOD_MAX_CHANNELS; i++) {
+    modMixerChannel[i].data = 0;
+    modMixerChannel[i].pos = 0;
+    modMixerChannel[i].inc = 0;
+    modMixerChannel[i].vol = 0;
+    modMixerChannel[i].length = 0;
+    modMixerChannel[i].loopLength = 0;
   }
 
   // start up the timer we will be using
-  REG_TM0D = freqTable[freq].timer;
-  REG_TM0CNT = TIMER_ENABLE;
+  TIMER[0].value = freqTable[freq].timer;
+  TIMER[0].control = TIMER_ENABLE;
 
   // set up the DMA settings, but let the VBlank interrupt
   // actually start it up, so the timing is right
-  REG_DM1CNT = 0;
-  REG_DM1DAD = (u32)&REG_SGFIFOA;
+  DMA[1].control = 0;
+  DMA[1].destination = (u32)FIFO_A;
+
+  // #define REG_SGFIFOA *(volatile u32 *)0x40000A0
+  // #define FIFO_A ((volatile u32 *)0x040000A0) // 4x8 bit chunk transfers
 
 } // SndInit
 
@@ -347,8 +350,8 @@ void SndMix(u32 samplesToMix) {
   i = 0;
   Dma3(tempBuffer, &i, (samplesToMix + 1) * sizeof(s16) / 4, DMA_MEMSET32);
 
-  for (curChn = 0; curChn < SND_MAX_CHANNELS; curChn++) {
-    SOUND_CHANNEL *chnPtr = &sndChannel[curChn];
+  for (curChn = 0; curChn < MOD_MAX_CHANNELS; curChn++) {
+    ModMixerChannel *chnPtr = &modMixerChannel[curChn];
 
     // check special active flag value
     if (chnPtr->data != 0) {
@@ -436,7 +439,7 @@ void MODUpdate() {
 static void MODProcessRow() {
   s32 curChannel;
 
-  for (curChannel = 0; curChannel < SND_MAX_CHANNELS; curChannel++) {
+  for (curChannel = 0; curChannel < MOD_MAX_CHANNELS; curChannel++) {
     u8 note, sample, effect, param;
 
     // Read in the pattern data, advancing rowPtr to the next channel in the
@@ -457,7 +460,7 @@ static void MODProcessRow() {
       // when there is a sample, but no note specified (although the sample
       // playing doesn't change in that case)
       sndMod.channel[curChannel].vol = sndMod.sample[sample].vol;
-      sndChannel[curChannel].vol = sndMod.channel[curChannel].vol;
+      modMixerChannel[curChannel].vol = sndMod.channel[curChannel].vol;
     }
 
     // See if there's any note to play
@@ -470,7 +473,7 @@ static void MODProcessRow() {
 
 static void MODPlayNote(u32 channelIdx, u32 note, u32 sampleIdx, u32 effect,
                         u32 param) {
-  SOUND_CHANNEL *sndChn;
+  ModMixerChannel *sndChn;
   MOD_CHANNEL *modChn;
   const SAMPLE_HEADER *sample;
   u8 finetune;
@@ -482,7 +485,7 @@ static void MODPlayNote(u32 channelIdx, u32 note, u32 sampleIdx, u32 effect,
   }
 
   // These make things less cumbersome
-  sndChn = &sndChannel[channelIdx];
+  sndChn = &modMixerChannel[channelIdx];
   modChn = &sndMod.channel[channelIdx];
   sample = &sndMod.sample[sampleIdx];
 

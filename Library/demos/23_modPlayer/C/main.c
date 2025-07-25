@@ -16,7 +16,6 @@ int main() {
 
   initCharLookup();
   initializeInterrupts();
-
   SndInit(SND_FREQ_18157);
 
   while (1) {

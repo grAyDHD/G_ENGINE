@@ -2,8 +2,10 @@
 #define MODPLAYER_H
 
 #include "../data/dataSndData.h"
+#include "audio/audio.h"
 #include "core/dma.h"
 #include "core/interrupts.h"
+#include "core/timer.h"
 #include "core/typedefs.h"
 #include "gba.h"
 #include "graphics/video.h"
@@ -11,7 +13,7 @@
 
 // ----- Constants -----
 
-#define SND_MAX_CHANNELS 4
+#define MOD_MAX_CHANNELS 4
 
 // For patterns to specify that there is no note. We have 5 octaves,
 // so only notes 0-59 are used, and 63 is the highest that still fits
@@ -54,7 +56,7 @@ typedef struct _SOUND_CHANNEL {
   u32 length;
   u32 loopLength;
 
-} SOUND_CHANNEL;
+} ModMixerChannel;
 
 typedef struct _SOUND_VARS {
   s8 *mixBufferBase;
@@ -125,13 +127,13 @@ typedef struct _MOD {
 
   u8 pad;
 
-  MOD_CHANNEL channel[SND_MAX_CHANNELS]; // Current state of each channel
+  MOD_CHANNEL channel[MOD_MAX_CHANNELS]; // Current state of each channel
 
 } MOD;
 
 // ----- Global vars -----
 
-extern SOUND_CHANNEL sndChannel[SND_MAX_CHANNELS];
+extern ModMixerChannel modMixerChannel[MOD_MAX_CHANNELS];
 extern SOUND_VARS sndVars;
 extern MOD sndMod;
 
