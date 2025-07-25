@@ -88,7 +88,7 @@ extern const s8 dSmpData13[];
 extern const s8 dSmpData14[];
 extern const s8 dSmpData15[];
 
-const SAMPLE_HEADER dMod0SmpTable[] = {
+const SampleHeader dMod0SmpTable[] = {
     {10594, 0, 64, 0, 0, dSmpData0},    {3307, 0, 30, 0, 3307, dSmpData1},
     {12412, 0, 64, 0, 0, dSmpData2},    {1708, 0, 58, 0, 0, dSmpData3},
     {3500, 0, 30, 0, 3500, dSmpData4},  {2000, 0, 40, 0, 0, dSmpData5},
@@ -123,7 +123,7 @@ const u8 dMod0OrderTable[] = {
     54, 61, 48, 51, 53, 52, 55, 63, 64, 66, 67, 65, 58, 59, 60,
 };
 
-const SAMPLE_HEADER dMod1SmpTable[] = {
+const SampleHeader dMod1SmpTable[] = {
     {32, 0, 64, 0, 32, dSmpData15},
 };
 
@@ -135,11 +135,11 @@ const u8 dMod1OrderTable[] = {
     0,
 };
 
-const MOD_HEADER dModTable[] = {
+const ModHeader dModTable[] = {
     {dMod0SmpTable, dMod0OrderTable, dMod0PatternTable, 15, 68},
     {dMod1SmpTable, dMod1OrderTable, dMod1PatternTable, 1, 1},
 };
 
-const SAMPLE_HEADER dSfxTable[] = {
+const SampleHeader dSfxTable[] = {
     {0, 0, 0, 0, 0, 0} // Placeholder, no SFX specified
 };

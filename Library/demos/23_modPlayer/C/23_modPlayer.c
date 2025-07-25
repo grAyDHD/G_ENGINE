@@ -29,8 +29,9 @@ static void MODSetTempo(u32 tempo);
 // Globals, as seen in tutorial day 2. In the tutorial, I hardcoded
 // SOUND_MAX_CHANNELS to 4, but it's the same effect either way
 ModMixerChannel modMixerChannel[MOD_MAX_CHANNELS];
-SOUND_VARS sndVars;
-MOD sndMod;
+ModMixer modMixer;
+ModTiming modTiming;
+ModPlayer modPlayer;
 
 // This is the actual double buffer memory. The size is taken from
 // the highest entry in the frequency table above.
@@ -230,24 +231,24 @@ const u16 noteFreqTable[] = {
 // ----- Functions -----
 
 void SndVSync() {
-  if (sndVars.activeBuffer == 1) // buffer 1 just got over
+  if (modMixer.activeBuffer == 1) // buffer 1 just got over
   {
     // begin streaming to FIFO
     REG_DM1CNT = 0;
-    REG_DM1SAD = (u32)sndVars.mixBufferBase;
+    REG_DM1SAD = (u32)modMixer.mixBufferBase;
     REG_DM1CNT_H =
         DMA_DEST_FIXED | DMA_REPEAT | DMA_WORD | DMA_MODE_FIFO | DMA_ENABLE;
 
     // Set the current buffer pointer to the start of buffer 1
-    sndVars.curMixBuffer = sndVars.mixBufferBase + sndVars.mixBufferSize;
-    sndVars.activeBuffer = 0;
+    modMixer.curMixBuffer = modMixer.mixBufferBase + modMixer.mixBufferSize;
+    modMixer.activeBuffer = 0;
   } else // buffer 0 just got over
   {
     // DMA points to buffer 1 already, so don't bother stopping and resetting it
 
     // Set the current buffer pointer to the start of buffer 0
-    sndVars.curMixBuffer = sndVars.mixBufferBase;
-    sndVars.activeBuffer = 1;
+    modMixer.curMixBuffer = modMixer.mixBufferBase;
+    modMixer.activeBuffer = 1;
   }
   irqAcknowledge(IRQ_VBLANK);
 }
@@ -262,13 +263,13 @@ void SndInit(SND_FREQ freq) {
   }
 
   // initialize main sound variables
-  sndVars.mixBufferSize = freqTable[freq].bufSize;
-  sndVars.mixBufferBase = sndMixBuffer;
-  sndVars.curMixBuffer = sndVars.mixBufferBase;
-  sndVars.activeBuffer = 1; // 1 so first swap will start DMA
+  modMixer.mixBufferSize = freqTable[freq].bufSize;
+  modMixer.mixBufferBase = sndMixBuffer;
+  modMixer.curMixBuffer = modMixer.mixBufferBase;
+  modMixer.activeBuffer = 1; // 1 so first swap will start DMA
 
-  sndVars.mixFreq = freqTable[freq].freq;
-  sndVars.rcpMixFreq = (1 << 28) / sndVars.mixFreq;
+  modTiming.mixFreq = freqTable[freq].freq;
+  modTiming.rcpMixFreq = (1 << 28) / modTiming.mixFreq;
   // sndVars.rcpMixFreq = div(1 << 28, sndVars.mixFreq);
 
   // initialize channel structures
@@ -290,36 +291,34 @@ void SndInit(SND_FREQ freq) {
   DMA[1].control = 0;
   DMA[1].destination = (u32)FIFO_A;
 
-  // #define REG_SGFIFOA *(volatile u32 *)0x40000A0
-  // #define FIFO_A ((volatile u32 *)0x040000A0) // 4x8 bit chunk transfers
-
 } // SndInit
 
 // Call this every frame to fill the buffer. It can be
 // called anywhere as long as it happens once per frame.
 void SndUpdate() {
-  s32 samplesLeft = sndVars.mixBufferSize;
+  s32 samplesLeft = modMixer.mixBufferSize;
 
   while (samplesLeft > 0) {
     // Check if the song needs updated
-    if (sndVars.samplesUntilMODTick == 0 && sndMod.state == MOD_STATE_PLAY) {
+    if (modTiming.samplesUntilMODTick == 0 &&
+        modPlayer.state == MOD_STATE_PLAY) {
       // Update the song and set the number of samples to mix before the next
       // update
       MODUpdate();
-      sndVars.samplesUntilMODTick = sndVars.samplesPerMODTick;
+      modTiming.samplesUntilMODTick = modTiming.samplesPerMODTick;
     }
 
     // Figure out if this is the last batch of samples for this frame
-    if (sndVars.samplesUntilMODTick < samplesLeft &&
-        sndMod.state == MOD_STATE_PLAY) {
+    if (modTiming.samplesUntilMODTick < samplesLeft &&
+        modPlayer.state == MOD_STATE_PLAY) {
       // Song will need updated before we're out of samples, so mix up to the
       // song tick
-      SndMix(sndVars.samplesUntilMODTick);
+      SndMix(modTiming.samplesUntilMODTick);
       // Subtract the number we just mixed
-      samplesLeft -= sndVars.samplesUntilMODTick;
+      samplesLeft -= modTiming.samplesUntilMODTick;
 
       // No more left, so song will get updated next time through the loop
-      sndVars.samplesUntilMODTick = 0;
+      modTiming.samplesUntilMODTick = 0;
     } else {
       // Either song is not playing, so just mix a full buffer, or
       // not enough samples left to make it to another song tick,
@@ -327,7 +326,7 @@ void SndUpdate() {
       SndMix(samplesLeft);
       // This is how many samples will get mixed first thing next frame
       // before updating the song
-      sndVars.samplesUntilMODTick -= samplesLeft;
+      modTiming.samplesUntilMODTick -= samplesLeft;
       // Mixed the last of the 304 samples, this will break from the while loop
       samplesLeft = 0;
     }
@@ -384,48 +383,49 @@ void SndMix(u32 samplesToMix) {
     // >>6 to divide off the volume, >>2 to divide by 4 channels
     // to prevent overflow. Could make a define for this up with
     // SOUND_MAX_CHANNELS, but I'll hardcode it for now
-    sndVars.curMixBuffer[i] = tempBuffer[i] >> 8;
+    modMixer.curMixBuffer[i] = tempBuffer[i] >> 8;
   }
 
   // curMixBuffer will get reset on next VBlank anyway, so we can
   // move the pointer forward to avoid having to make a variable
   // to keep track of how many samples have been mixed so far
-  sndVars.curMixBuffer += samplesToMix;
+  modMixer.curMixBuffer += samplesToMix;
 
 } // SndMix
 
 void SndPlayMOD(u32 modIdx) {
-  const MOD_HEADER *modHeader = &dModTable[modIdx];
+  const ModHeader *modHeader = &dModTable[modIdx];
 
-  sndMod.sample = modHeader->sample;
-  sndMod.pattern = modHeader->pattern;
-  sndMod.order = modHeader->order;
-  sndMod.orderCount = modHeader->orderCount;
-  sndMod.curOrder = 0;
-  sndMod.curRow = 0;
-  sndMod.tick = 0;
-  sndMod.speed = MOD_DEFAULT_SPEED;
-  sndMod.rowPtr = sndMod.pattern[sndMod.order[0]];
-  sndMod.state = MOD_STATE_PLAY;
+  modPlayer.sample = modHeader->sample;
+  modPlayer.pattern = modHeader->pattern;
+  modPlayer.order = modHeader->order;
+  modPlayer.orderCount = modHeader->orderCount;
+  modPlayer.curOrder = 0;
+  modPlayer.curRow = 0;
+  modPlayer.tick = 0;
+  modPlayer.speed = MOD_DEFAULT_SPEED;
+  modPlayer.rowPtr = modPlayer.pattern[modPlayer.order[0]];
+  modPlayer.state = MOD_STATE_PLAY;
 
   // Set to default
   MODSetTempo(MOD_DEFAULT_TEMPO);
-  sndVars.samplesUntilMODTick = 0;
+  modTiming.samplesUntilMODTick = 0;
 
 } // SndPlayMOD
 
 void MODUpdate() {
-  if (++sndMod.tick >= sndMod.speed) {
-    sndMod.tick = 0;
+  if (++modPlayer.tick >= modPlayer.speed) {
+    modPlayer.tick = 0;
 
-    if (++sndMod.curRow >= 64) {
-      sndMod.curRow = 0;
+    if (++modPlayer.curRow >= 64) {
+      modPlayer.curRow = 0;
 
-      if (++sndMod.curOrder >= sndMod.orderCount) {
-        sndMod.state = MOD_STATE_STOP;
+      if (++modPlayer.curOrder >= modPlayer.orderCount) {
+        modPlayer.state = MOD_STATE_STOP;
         return;
       } else {
-        sndMod.rowPtr = sndMod.pattern[sndMod.order[sndMod.curOrder]];
+        modPlayer.rowPtr =
+            modPlayer.pattern[modPlayer.order[modPlayer.curOrder]];
       }
     }
 
@@ -444,23 +444,23 @@ static void MODProcessRow() {
 
     // Read in the pattern data, advancing rowPtr to the next channel in the
     // process
-    note = *sndMod.rowPtr++;
-    sample = *sndMod.rowPtr++;
-    effect = *sndMod.rowPtr++;
-    param = *sndMod.rowPtr++;
+    note = *modPlayer.rowPtr++;
+    sample = *modPlayer.rowPtr++;
+    effect = *modPlayer.rowPtr++;
+    param = *modPlayer.rowPtr++;
 
     // Use sample memory if no sample, or set sample memory if there is one
     if (sample == MOD_NO_SAMPLE) {
-      sample = sndMod.channel[curChannel].sample;
+      sample = modPlayer.channel[curChannel].sample;
     } else {
       // Set sample memory
-      sndMod.channel[curChannel].sample = sample;
+      modPlayer.channel[curChannel].sample = sample;
       // Another tricky thing to know about MOD: Volume is only set when
       // specifying new samples, NOT when playing notes, and it is set even
       // when there is a sample, but no note specified (although the sample
       // playing doesn't change in that case)
-      sndMod.channel[curChannel].vol = sndMod.sample[sample].vol;
-      modMixerChannel[curChannel].vol = sndMod.channel[curChannel].vol;
+      modPlayer.channel[curChannel].vol = modPlayer.sample[sample].vol;
+      modMixerChannel[curChannel].vol = modPlayer.channel[curChannel].vol;
     }
 
     // See if there's any note to play
@@ -474,8 +474,8 @@ static void MODProcessRow() {
 static void MODPlayNote(u32 channelIdx, u32 note, u32 sampleIdx, u32 effect,
                         u32 param) {
   ModMixerChannel *sndChn;
-  MOD_CHANNEL *modChn;
-  const SAMPLE_HEADER *sample;
+  ModChannel *modChn;
+  const SampleHeader *sample;
   u8 finetune;
 
   // Here's that special case that they didn't specify a sample before playing a
@@ -486,8 +486,8 @@ static void MODPlayNote(u32 channelIdx, u32 note, u32 sampleIdx, u32 effect,
 
   // These make things less cumbersome
   sndChn = &modMixerChannel[channelIdx];
-  modChn = &sndMod.channel[channelIdx];
-  sample = &sndMod.sample[sampleIdx];
+  modChn = &modPlayer.channel[channelIdx];
+  sample = &modPlayer.sample[sampleIdx];
 
   // 60 notes total, and one full set of notes for each finetune level
   modChn->frequency = noteFreqTable[sample->finetune * 60 + note];
@@ -495,7 +495,8 @@ static void MODPlayNote(u32 channelIdx, u32 note, u32 sampleIdx, u32 effect,
   // Set up the mixer channel
   sndChn->data = sample->smpData;
   sndChn->pos = 0;
-  sndChn->inc = modChn->frequency * sndVars.rcpMixFreq >> 16; // Explained below
+  sndChn->inc =
+      modChn->frequency * modTiming.rcpMixFreq >> 16; // Explained below
 
   // Next member is volume, but skip setting it because it doesn't change unless
   // a new sample was specified, in which case it was already set back in
@@ -519,13 +520,13 @@ static void MODPlayNote(u32 channelIdx, u32 note, u32 sampleIdx, u32 effect,
 static void MODSetTempo(u32 tempo) {
   u32 modFreq;
 
-  sndMod.tempo = tempo;
+  modPlayer.tempo = tempo;
   modFreq = (tempo * 2) / 5;
   // modFreq = div(tempo * 2, 5);
 
-  sndVars.samplesUntilMODTick -= sndVars.samplesPerMODTick;
-  sndVars.samplesPerMODTick = sndVars.mixFreq / modFreq;
+  modTiming.samplesUntilMODTick -= modTiming.samplesPerMODTick;
+  modTiming.samplesPerMODTick = modTiming.mixFreq / modFreq;
   // sndVars.samplesPerMODTick = div(sndVars.mixFreq, modFreq);
-  sndVars.samplesUntilMODTick += sndVars.samplesPerMODTick;
+  modTiming.samplesUntilMODTick += modTiming.samplesPerMODTick;
 
 } // MODSetTempo
