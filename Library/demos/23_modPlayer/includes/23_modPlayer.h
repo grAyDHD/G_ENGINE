@@ -143,7 +143,7 @@ extern const SAMPLE_HEADER dSfxTable[];
 // ----- Global functions -----
 
 extern void SndInit(SND_FREQ freq);
-// extern void SndVSync(); // IN_IWRAM; // in Irq.c
+extern void SndVSync(); // IN_IWRAM; // in Irq.c
 extern void SndMix(u32 samplesToMix);
 extern void SndUpdate();
 
