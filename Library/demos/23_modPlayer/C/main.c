@@ -4,18 +4,20 @@
 #include "graphics/m3Text.h"
 #include "input/in.h"
 
+void initializeInterrupts() {
+  ISR = SndVSync;
+  DISPSTAT = 1 << 3; // tell display to fire vblank interrupts
+  irqEnable(IRQ_VBLANK);
+  irqMaster(ON);
+}
+
 int main() {
   DSPC = MODE3 | BG2;
 
   initCharLookup();
-
-  ISR = SndVSync;
-  DISPSTAT = 1 << 3; // tell display to fire vblank interrupts
-  irqEnable(IRQ_VBLANK);
+  initializeInterrupts();
 
   SndInit(SND_FREQ_18157);
-
-  irqMaster(ON);
 
   while (1) {
     VBLANK();

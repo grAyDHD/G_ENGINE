@@ -253,15 +253,13 @@ void SndVSync() {
 
 // Call this once at startup
 void SndInit(SND_FREQ freq) {
-  s32 i;
-
   // enable sound
   REG_SGCNT0_H = SOUNDA_LOUT | SOUNDA_ROUT | SOUNDA_FIFORESET | SOUNDA_VOL_100;
   REG_SGCNT1 = SOUND_ENABLE;
 
-  // clear the whole buffer area
-  i = 0;
-  Dma3(sndMixBuffer, &i, 736 * 2 / 4, DMA_MEMSET32);
+  for (int i = 0; i < 736 * 2; i++) {
+    sndMixBuffer[i] = 0;
+  }
 
   // initialize main sound variables
   sndVars.mixBufferSize = freqTable[freq].bufSize;
@@ -274,7 +272,7 @@ void SndInit(SND_FREQ freq) {
   // sndVars.rcpMixFreq = div(1 << 28, sndVars.mixFreq);
 
   // initialize channel structures
-  for (i = 0; i < SND_MAX_CHANNELS; i++) {
+  for (int i = 0; i < SND_MAX_CHANNELS; i++) {
     sndChannel[i].data = 0;
     sndChannel[i].pos = 0;
     sndChannel[i].inc = 0;
