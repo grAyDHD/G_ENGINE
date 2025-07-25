@@ -26,11 +26,13 @@ extern AudioChannel channel[4];
 typedef enum { bufA = 0, bufB = 1 } ActiveBuffer;
 
 typedef struct __attribute__((packed)) {
-  struct {
-    s8 bufA[BUFFER_SIZE];
-    s8 bufB[BUFFER_SIZE];
+  union {
+    struct {
+      s8 bufA[BUFFER_SIZE];
+      s8 bufB[BUFFER_SIZE];
+    };
+    s8 bufBase[BUFFER_SIZE * 2];
   };
-
   ActiveBuffer activeBuffer;
 } Mixbuffer;
 

@@ -1,5 +1,7 @@
 #include "../includes/23_modPlayer.h"
 #include "audio/audio.h"
+#include "audio/mixer.h"
+#include "core/dma.h"
 
 // ----- Constants -----
 
@@ -26,27 +28,14 @@ static void MODSetTempo(u32 tempo);
 
 // ----- Variables -----
 
-// Globals, as seen in tutorial day 2. In the tutorial, I hardcoded
-// SOUND_MAX_CHANNELS to 4, but it's the same effect either way
 ModMixerChannel modMixerChannel[MOD_MAX_CHANNELS];
-ModMixer modMixer;
+// ModMixer modMixer;
+// Mixbuffer mixbuf = {0};
+Mixbuf mbuf = {0};
 ModTiming modTiming;
 ModPlayer modPlayer;
 
-// This is the actual double buffer memory. The size is taken from
-// the highest entry in the frequency table above.
-s8 sndMixBuffer[736 * 2]; // IN_EWRAM;
-
-// ----- Tables -----
-
-static const FREQ_TABLE freqTable[SND_FREQ_NUM] = {
-    // timer, frequency, and buffer size for frequencies
-    // that time out perfectly with VBlank.
-    // These are in the order of the SND_FREQ enum in Sound.h.
-    {62610, 5734, 96},   {63940, 10512, 176}, {64282, 13379, 224},
-    {64612, 18157, 304}, {64738, 21024, 352}, {64909, 26758, 448},
-    {65004, 31536, 528}, {65074, 36314, 608}, {65118, 40137, 672},
-    {65137, 42048, 704}, {65154, 43959, 736}};
+//  ----- Tables -----
 
 const u16 noteFreqTable[] = {
     // Finetune 0
@@ -231,25 +220,24 @@ const u16 noteFreqTable[] = {
 // ----- Functions -----
 
 void SndVSync() {
-  if (modMixer.activeBuffer == 1) // buffer 1 just got over
-  {
+  if (mbuf.activeBuffer == bufB) {
     // begin streaming to FIFO
-    DMA[1].control = 0; // todo: add word count to 0 if needed
-    DMA[1].source = (u32)modMixer.mixBufferBase;
+    DMA[1].control = 0;
+    DMA[1].source = (u32)mbuf.bufBase;
 
-    DMA[1].control =
-        DMA_DEST_FIXED | DMA_REPEAT | DMA_WORD | DMA_MODE_FIFO | DMA_ENABLE;
+    DMA[1].control = DMA_DEST_FIXED | DMA_REPEAT | DMA_32BIT |
+                     DMA_START_SPECIAL | DMA_ENABLE;
 
     // Set the current buffer pointer to the start of buffer 1
-    modMixer.curMixBuffer = modMixer.mixBufferBase + modMixer.mixBufferSize;
-    modMixer.activeBuffer = 0;
+    mbuf.position = mbuf.bufBase + TUT_BUFFER_SIZE;
+    mbuf.activeBuffer = bufA;
   } else // buffer 0 just got over
   {
     // DMA points to buffer 1 already, so don't bother stopping and resetting it
 
-    // Set the current buffer pointer to the start of buffer 0
-    modMixer.curMixBuffer = modMixer.mixBufferBase;
-    modMixer.activeBuffer = 1;
+    // set mixBuffer to very start
+    mbuf.position = mbuf.bufBase;
+    mbuf.activeBuffer = bufB;
   }
   irqAcknowledge(IRQ_VBLANK);
 }
@@ -259,19 +247,15 @@ void SndInit(SND_FREQ freq) {
   AUDIO->ds = DS_MONO_INIT;
   ENABLE_AUDIO;
 
-  for (int i = 0; i < 736 * 2; i++) {
-    sndMixBuffer[i] = 0;
+  for (int i = 0; i < TUT_BUFFER_SIZE * 2; i++) {
+    mbuf.bufBase[i] = 0;
   }
 
-  // initialize main sound variables
-  modMixer.mixBufferSize = freqTable[freq].bufSize;
-  modMixer.mixBufferBase = sndMixBuffer;
-  modMixer.curMixBuffer = modMixer.mixBufferBase;
-  modMixer.activeBuffer = 1; // 1 so first swap will start DMA
+  mbuf.activeBuffer = bufB;
+  mbuf.position = mbuf.bufBase;
 
-  modTiming.mixFreq = freqTable[freq].freq;
+  modTiming.mixFreq = 18157;
   modTiming.rcpMixFreq = (1 << 28) / modTiming.mixFreq;
-  // sndVars.rcpMixFreq = div(1 << 28, sndVars.mixFreq);
 
   // initialize channel structures
   for (int i = 0; i < MOD_MAX_CHANNELS; i++) {
@@ -284,7 +268,8 @@ void SndInit(SND_FREQ freq) {
   }
 
   // start up the timer we will be using
-  TIMER[0].value = freqTable[freq].timer;
+  TIMER[0].value = 64612;
+  //{64612, 18157, 304}
   TIMER[0].control = TMR_ENABLE;
 
   // set up the DMA settings, but let the VBlank interrupt
@@ -295,7 +280,7 @@ void SndInit(SND_FREQ freq) {
 } // SndInit
 
 void SndUpdate() {
-  s32 samplesLeft = modMixer.mixBufferSize;
+  s32 samplesLeft = TUT_BUFFER_SIZE;
 
   while (samplesLeft > 0) {
     if (modTiming.samplesUntilMODTick == 0 &&
@@ -327,7 +312,7 @@ void SndMix(u32 samplesToMix) {
   // you'll need to make this bigger.
   // To be safe, it would be best to set it to the buffer
   // size of the highest frequency we allow in freqTable
-  s16 tempBuffer[304];
+  s16 tempBuffer[TUT_BUFFER_SIZE];
 
   // zero as much of the buffer as we'll actually use,
   // rounding samples up to nearest 2 for memset32
@@ -368,13 +353,13 @@ void SndMix(u32 samplesToMix) {
     // >>6 to divide off the volume, >>2 to divide by 4 channels
     // to prevent overflow. Could make a define for this up with
     // SOUND_MAX_CHANNELS, but I'll hardcode it for now
-    modMixer.curMixBuffer[i] = tempBuffer[i] >> 8;
+    mbuf.position[i] = tempBuffer[i] >> 8;
   }
 
   // curMixBuffer will get reset on next VBlank anyway, so we can
   // move the pointer forward to avoid having to make a variable
   // to keep track of how many samples have been mixed so far
-  modMixer.curMixBuffer += samplesToMix;
+  mbuf.position += samplesToMix;
 
 } // SndMix
 

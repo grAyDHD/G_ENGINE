@@ -3,6 +3,7 @@
 
 #include "../data/dataSndData.h"
 #include "audio/audio.h"
+#include "audio/mixer.h"
 #include "core/dma.h"
 #include "core/interrupts.h"
 #include "core/timer.h"
@@ -55,15 +56,30 @@ typedef struct {
   u32 vol;
   u32 length;
   u32 loopLength;
-
 } ModMixerChannel;
 
+/*
 typedef struct {
   u32 mixBufferSize;
   s8 *mixBufferBase;
   s8 *curMixBuffer;
   u8 activeBuffer;
 } ModMixer;
+*/
+
+#define TUT_BUFFER_SIZE 304
+
+typedef struct __attribute__((packed)) {
+  union {
+    struct {
+      s8 bufA[TUT_BUFFER_SIZE];
+      s8 bufB[TUT_BUFFER_SIZE];
+    };
+    s8 bufBase[TUT_BUFFER_SIZE * 2];
+  };
+  ActiveBuffer activeBuffer;
+  s8 *position;
+} Mixbuf;
 
 typedef struct {
   u16 mixFreq;
@@ -136,7 +152,8 @@ typedef struct {
 // ----- Global vars -----
 
 extern ModMixerChannel modMixerChannel[MOD_MAX_CHANNELS];
-extern ModMixer modMixer;
+// extern ModMixer modMixer;
+extern Mixbuf mbuf;
 extern ModTiming modTiming;
 extern ModPlayer modPlayer;
 

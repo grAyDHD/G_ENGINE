@@ -1,4 +1,5 @@
 #include "../includes/23_modPlayer.h"
+#include "audio/mixer.h"
 #include "core/interrupts.h"
 #include "core/timer.h"
 #include "graphics/m3Text.h"
@@ -17,6 +18,8 @@ int main() {
   initCharLookup();
   initializeInterrupts();
   SndInit(SND_FREQ_18157);
+  gprintf(5, 5, "mixFreq: %d", modTiming.mixFreq);
+  gprintf(5, 15, "rcpMixFreq: %d", modTiming.rcpMixFreq);
 
   while (1) {
     VBLANK();
