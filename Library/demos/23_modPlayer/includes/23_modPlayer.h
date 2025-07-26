@@ -15,6 +15,7 @@
 // ----- Constants -----
 
 #define MOD_MAX_CHANNELS 4
+#define TUT_BUFFER_SIZE 304
 
 // For patterns to specify that there is no note. We have 5 octaves,
 // so only notes 0-59 are used, and 63 is the highest that still fits
@@ -23,28 +24,10 @@
 // Valid samples are 0-30, use 31 as a blank to fit in 5 bits
 #define MOD_NO_SAMPLE 31
 
-typedef enum _SND_FREQ {
-  SND_FREQ_5734,
-  SND_FREQ_10512,
-  SND_FREQ_13379,
-  SND_FREQ_18157,
-  SND_FREQ_21024,
-  SND_FREQ_26758,
-  SND_FREQ_31536,
-  SND_FREQ_36314,
-  SND_FREQ_40137,
-  SND_FREQ_42048,
-  SND_FREQ_43959,
-
-  SND_FREQ_NUM
-
-} SND_FREQ;
-
 typedef enum _MOD_STATE {
   MOD_STATE_STOP,
   MOD_STATE_PLAY,
   MOD_STATE_PAUSE,
-
 } MOD_STATE;
 
 // ----- Structures -----
@@ -57,17 +40,6 @@ typedef struct {
   u32 length;
   u32 loopLength;
 } ModMixerChannel;
-
-/*
-typedef struct {
-  u32 mixBufferSize;
-  s8 *mixBufferBase;
-  s8 *curMixBuffer;
-  u8 activeBuffer;
-} ModMixer;
-*/
-
-#define TUT_BUFFER_SIZE 304
 
 typedef struct __attribute__((packed)) {
   union {
@@ -164,7 +136,7 @@ extern const SampleHeader dSfxTable[];
 
 // ----- Global functions -----
 
-extern void SndInit(SND_FREQ freq);
+extern void SndInit();
 extern void SndVSync(); // IN_IWRAM; // in Irq.c
 extern void SndMix(u32 samplesToMix);
 extern void SndUpdate();

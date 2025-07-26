@@ -34,14 +34,13 @@ typedef struct __attribute__((packed)) {
     s8 bufBase[BUFFER_SIZE * 2];
   };
   ActiveBuffer activeBuffer;
+  s8 *position;
 } Mixbuffer;
 
 extern Mixbuffer mixbuf;
-
 extern volatile u32 reload;
 
 void audioIsr(void);
-
 void initMixChannels();
 void initMonoFIFO();
 void swapMixBuffer();

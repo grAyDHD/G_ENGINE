@@ -10,15 +10,6 @@
 
 // ----- Structures -----
 
-// structure to store all the frequency settings we allow
-
-typedef struct _FREQ_TABLE {
-  u16 timer;
-  u16 freq;
-  u16 bufSize;
-
-} FREQ_TABLE;
-
 // ----- Local function prototypes -----
 
 static void MODProcessRow();
@@ -29,8 +20,6 @@ static void MODSetTempo(u32 tempo);
 // ----- Variables -----
 
 ModMixerChannel modMixerChannel[MOD_MAX_CHANNELS];
-// ModMixer modMixer;
-// Mixbuffer mixbuf = {0};
 Mixbuf mbuf = {0};
 ModTiming modTiming;
 ModPlayer modPlayer;
@@ -243,7 +232,7 @@ void SndVSync() {
 }
 
 // Call this once at startup
-void SndInit(SND_FREQ freq) {
+void SndInit() {
   AUDIO->ds = DS_MONO_INIT;
   ENABLE_AUDIO;
 
@@ -268,8 +257,8 @@ void SndInit(SND_FREQ freq) {
   }
 
   // start up the timer we will be using
-  TIMER[0].value = 64612;
   //{64612, 18157, 304}
+  TIMER[0].value = 64612;
   TIMER[0].control = TMR_ENABLE;
 
   // set up the DMA settings, but let the VBlank interrupt
