@@ -210,23 +210,22 @@ const u16 noteFreqTable[] = {
 
 void SndVSync() {
   if (mbuf.activeBuffer == bufB) {
-    // begin streaming to FIFO
+    // begin streaming to FIFO from buffer base
     DMA[1].control = 0;
     DMA[1].source = (u32)mbuf.bufBase;
-
     DMA[1].control = DMA_DEST_FIXED | DMA_REPEAT | DMA_32BIT |
                      DMA_START_SPECIAL | DMA_ENABLE;
 
-    // Set the current buffer pointer to the start of buffer 1
-    mbuf.position = mbuf.bufBase + TUT_BUFFER_SIZE;
     mbuf.activeBuffer = bufA;
-  } else // buffer 0 just got over
+    mbuf.position =
+        mbuf.bufBase + BUFFER_SIZE; // sets write position to inactive buffer
+  } else                            // buffer 1 just got over
   {
     // DMA points to buffer 1 already, so don't bother stopping and resetting it
 
     // set mixBuffer to very start
-    mbuf.position = mbuf.bufBase;
     mbuf.activeBuffer = bufB;
+    mbuf.position = mbuf.bufBase;
   }
   irqAcknowledge(IRQ_VBLANK);
 }
@@ -236,14 +235,14 @@ void SndInit() {
   AUDIO->ds = DS_MONO_INIT;
   ENABLE_AUDIO;
 
-  for (int i = 0; i < TUT_BUFFER_SIZE * 2; i++) {
+  for (int i = 0; i < BUFFER_SIZE * 2; i++) {
     mbuf.bufBase[i] = 0;
   }
 
   mbuf.activeBuffer = bufB;
   mbuf.position = mbuf.bufBase;
 
-  modTiming.mixFreq = 18157;
+  modTiming.mixFreq = 16000;
   modTiming.rcpMixFreq = (1 << 28) / modTiming.mixFreq;
 
   // initialize channel structures
@@ -258,18 +257,20 @@ void SndInit() {
 
   // start up the timer we will be using
   //{64612, 18157, 304}
-  TIMER[0].value = 64612;
+  TIMER[0].value = 0xFBE8;
   TIMER[0].control = TMR_ENABLE;
 
   // set up the DMA settings, but let the VBlank interrupt
   // actually start it up, so the timing is right
-  DMA[1].control = 0;
+  DMA[1].source = (u32)mbuf.bufB;
   DMA[1].destination = (u32)FIFO_A;
+  DMA[1].control = DMA_DEST_FIXED | DMA_REPEAT | DMA_32BIT | DMA_START_SPECIAL |
+                   DMA_ENABLE | DMA_IRQ_ENABLE;
 
 } // SndInit
 
 void SndUpdate() {
-  s32 samplesLeft = TUT_BUFFER_SIZE;
+  s32 samplesLeft = BUFFER_SIZE;
 
   while (samplesLeft > 0) {
     if (modTiming.samplesUntilMODTick == 0 &&
@@ -301,7 +302,7 @@ void SndMix(u32 samplesToMix) {
   // you'll need to make this bigger.
   // To be safe, it would be best to set it to the buffer
   // size of the highest frequency we allow in freqTable
-  s16 tempBuffer[TUT_BUFFER_SIZE];
+  s16 tempBuffer[BUFFER_SIZE];
 
   // zero as much of the buffer as we'll actually use,
   // rounding samples up to nearest 2 for memset32
