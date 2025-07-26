@@ -7,7 +7,6 @@
 #include "graphics/m3Text.h"
 
 AudioChannel channel[4];
-
 Mixbuffer mixbuf = {0};
 
 void initMixChannels() {
@@ -87,6 +86,33 @@ void swapMixBuffer() {
 volatile u32 reload = 0;
 static volatile u32 fifoCounter = 0;
 
+void dmaAudioIsr(void) {
+  fifoCounter++;
+
+  if (fifoCounter >= 16) { // increment every 16 samples
+    fifoCounter = 0;
+    reload = 1;
+    if (mixbuf.activeBuffer == bufB) {
+      // begin streaming to FIFO from buffer base
+      DMA[1].control = 0;
+      DMA[1].source = (u32)mixbuf.bufBase;
+      DMA[1].control = DMA_DEST_FIXED | DMA_REPEAT | DMA_32BIT |
+                       DMA_START_SPECIAL | DMA_ENABLE | DMA_IRQ_ENABLE;
+
+      mixbuf.activeBuffer = bufA;
+      mixbuf.position = mixbuf.bufBase +
+                        BUFFER_SIZE; // sets write position to inactive buffer
+    } else                           // buffer 1 just got over
+    {
+      mixbuf.activeBuffer = bufB;
+      mixbuf.position = mixbuf.bufBase;
+    }
+  }
+
+  irqAcknowledge(IRQ_DMA1);
+}
+
+/*
 void audioIsr(void) {
   fifoCounter++;
 
@@ -97,6 +123,13 @@ void audioIsr(void) {
   }
 
   irqAcknowledge(IRQ_DMA1);
+}
+*/
+
+void initializeFIFOInterrupts() {
+  ISR = dmaAudioIsr;
+  irqEnable(IRQ_DMA1);
+  irqMaster(ON);
 }
 
 // only sets up direct sound A right now, begins reading from buffer
@@ -113,6 +146,6 @@ void initMonoFIFO() {
   TIMER[0].value = 0xFBE8;
   TIMER[0].control = TMR_ENABLE;
 
-  ISR = audioIsr;
+  ISR = dmaAudioIsr;
   irqEnable(IRQ_DMA1);
 }

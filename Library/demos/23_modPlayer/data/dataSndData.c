@@ -1,4 +1,5 @@
-#include "../includes/23_modPlayer.h"
+#include "audio/modPlayer.h"
+#include "core/typedefs.h"
 
 extern const u8 dMod0Pattern0[];
 extern const u8 dMod0Pattern1[];
