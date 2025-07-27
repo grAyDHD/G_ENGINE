@@ -25,7 +25,7 @@ int main() {
     }
 
     if (keyTapped(B)) {
-      SndPlayMOD(MOD_BIT_Introtune);
+      SndPlayMOD(MOD_);
     }
   }
 
