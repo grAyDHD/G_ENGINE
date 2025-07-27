@@ -10,7 +10,7 @@ int main() {
 
   initCharLookup();
   initializeFIFOInterrupts();
-  SndInit();
+  modInit();
   gprintf(5, 5, "mixFreq: %d", modTiming.mixFreq);
   gprintf(5, 15, "rcpMixFreq: %d", modTiming.rcpMixFreq);
 
@@ -20,12 +20,12 @@ int main() {
     updateKeys();
 
     if (reload == 1) {
-      SndUpdate();
+      modUpdate();
       reload = 0;
     }
 
     if (keyTapped(B)) {
-      SndPlayMOD(MOD_);
+      playMod(MOD_);
     }
   }
 
