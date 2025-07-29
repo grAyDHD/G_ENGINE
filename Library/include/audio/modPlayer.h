@@ -91,12 +91,6 @@ typedef struct {
   ModChannel channel[MOD_MAX_CHANNELS]; // Current state of each channel
 } ModPlayer;
 
-typedef enum {
-  MOD_PLAY_NOTE = (1 << 0),
-  MOD_SET_VOL = (1 << 1),
-  MOD_SET_FREQ = (1 << 2), // create defines for bits, 1 << 1, etc
-} ModUpdateFlags;
-
 typedef struct {
   ModChannel *modCh;
   ModMixerChannel *mixCh;
@@ -108,15 +102,6 @@ typedef struct {
 
   u8 updateFlags; // ModUpdateFlags
 } ModEffectUpdateData;
-
-typedef void (*ModEffect)(ModEffectUpdateData *data);
-
-typedef enum {
-  MOD_EFFECT_TIMING_ROW,
-  MOD_EFFECT_TIMING_MID,
-
-  MOD_EFFECT_TIMING_COUNT,
-} ModEffectTiming;
 
 // ----- Global vars -----
 
@@ -137,5 +122,7 @@ extern void modUpdate();
 extern void modAdvance();
 
 extern void playMod(u32 modIdx);
+extern void modSetTempo(u32 tempo);
+extern void modPlayNote(ModEffectUpdateData *data);
 
 #endif
