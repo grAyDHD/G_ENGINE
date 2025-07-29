@@ -10,6 +10,8 @@
 #include "graphics/video.h"
 #include "input/in.h"
 
+#define NULL ((void *)0)
+
 // ----- Constants -----
 
 #define MOD_MAX_CHANNELS 4
@@ -58,7 +60,9 @@ typedef struct {
   u32 frequency; // Current frequency of note being played, in Hz
   u8 sample;     // Last sample used on this channel
   u8 vol;        // Current volume
-  u8 pad[2];     // Align to 4 bytes
+
+  u8 effect; // Current effect (set to 0 on row tick if no effect/parameter)
+  u8 param;  // Current parameter (set to 0 on row tick if no effect/parameter)
 } ModChannel;
 
 typedef struct {
@@ -87,6 +91,33 @@ typedef struct {
   ModChannel channel[MOD_MAX_CHANNELS]; // Current state of each channel
 } ModPlayer;
 
+typedef enum {
+  MOD_PLAY_NOTE = (1 << 0),
+  MOD_SET_VOL = (1 << 1),
+  MOD_SET_FREQ = (1 << 2), // create defines for bits, 1 << 1, etc
+} ModUpdateFlags;
+
+typedef struct {
+  ModChannel *modCh;
+  ModMixerChannel *mixCh;
+
+  u8 note;
+  u8 sample;
+  u8 effect;
+  u8 param;
+
+  u8 updateFlags; // ModUpdateFlags
+} ModEffectUpdateData;
+
+typedef void (*ModEffect)(ModEffectUpdateData *data);
+
+typedef enum {
+  MOD_EFFECT_TIMING_ROW,
+  MOD_EFFECT_TIMING_MID,
+
+  MOD_EFFECT_TIMING_COUNT,
+} ModEffectTiming;
+
 // ----- Global vars -----
 
 extern ModMixerChannel modMixerChannel[MOD_MAX_CHANNELS];
@@ -104,6 +135,7 @@ extern void modInit();
 extern void modMix(u32 samplesToMix);
 extern void modUpdate();
 extern void modAdvance();
+
 extern void playMod(u32 modIdx);
 
 #endif

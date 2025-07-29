@@ -4,6 +4,61 @@
 #include "audio/modFreqTable.h"
 #include "core/dma.h"
 
+static const ModEffect modEffect[MOD_EFFECT_TIMING_COUNT][16] = {
+    {
+        // MOD_EFFECT_TABLE_ROW
+        NULL, // 0x0: Arpeggio
+        NULL, // 0x1: Porta up
+        NULL, // 0x2: Porta down
+        NULL, // 0x3: Tone porta
+        NULL, // 0x4: Vibrato
+        NULL, // 0x5: Volslide+Tone porta
+        NULL, // 0x6: Volslide+Vibrato
+        NULL, // 0x7: Tremolo
+        NULL, // 0x8: Set panning
+        NULL, // 0x9: Sample offset
+        NULL, // 0xA: Volume slide
+        NULL, // 0xB: Jump to order
+        NULL, // 0xC: Set volume
+        NULL, // 0xD: Break to row
+        NULL, // 0xE: Special (more on this later)
+        NULL  // 0xF: Speed/Tempo
+    },
+    {
+        // MOD_EFFECT_TABLE_MID
+        NULL, // 0x0: Arpeggio
+        NULL, // 0x1: Porta up
+        NULL, // 0x2: Porta down
+        NULL, // 0x3: Tone porta
+        NULL, // 0x4: Vibrato
+        NULL, // 0x5: Volslide+Tone porta
+        NULL, // 0x6: Volslide+Vibrato
+        NULL, // 0x7: Tremolo
+        NULL, // 0x8: Set panning
+        NULL, // 0x9: Sample offset
+        NULL, // 0xA: Volume slide
+        NULL, // 0xB: Jump to order
+        NULL, // 0xC: Set volume
+        NULL, // 0xD: Break to row
+        NULL, // 0xE: Special (more on this later)
+        NULL  // 0xF: Speed/Tempo
+    },
+};
+
+static const ModEffectUpdateData modDefaultData[MOD_EFFECT_TIMING_COUNT] = {
+    {
+        // MOD_EFFECT_TIMING_ROW
+        NULL, NULL,                       // modCh, mixCh (filled in later)
+        MOD_NO_NOTE, MOD_NO_SAMPLE, 0, 0, // note, sample, effect, param
+        MOD_PLAY_NOTE // Default: try to play notes on row-ticks
+    },
+    {
+        // MOD_EFFECT_TIMING_MID
+        NULL, NULL,                       // modCh, mixCh (filled in later)
+        MOD_NO_NOTE, MOD_NO_SAMPLE, 0, 0, // note, sample, effect, param
+        0 // Default: don't do anything on mid-ticks
+    }};
+
 // ----- Constants -----
 
 #define MOD_DEFAULT_SPEED 6
@@ -12,10 +67,11 @@
 // ----- Structures -----
 
 // ----- Local function prototypes -----
+static void modHandleUpdateFlags(ModEffectUpdateData *data);
+static void modUpdateEffects();
 
 static void modProcessRow();
-static void modPlayNote(u32 channelIdx, u32 note, u32 sample, u32 effect,
-                        u32 param);
+static void modPlayNote(ModEffectUpdateData *data);
 static void modSetTempo(u32 tempo);
 
 // ----- Variables -----
@@ -167,86 +223,92 @@ void modAdvance() {
 
     modProcessRow();
   } else {
-    // We'll update the non row-tick effects here later
+    modUpdateEffects();
   }
 
 } // updateMod
 
 static void modProcessRow() {
-  s32 curChannel;
+  s32 ch;
 
-  for (curChannel = 0; curChannel < MOD_MAX_CHANNELS; curChannel++) {
-    u8 note, sample, effect, param;
+  for (ch = 0; ch < MOD_MAX_CHANNELS; ch++) {
+    ModEffectUpdateData data = modDefaultData[MOD_EFFECT_TIMING_ROW];
 
-    note = *modPlayer.rowPtr++;
-    sample = *modPlayer.rowPtr++;
-    effect = *modPlayer.rowPtr++;
-    param = *modPlayer.rowPtr++;
+    data.modCh = &modPlayer.channel[ch];
+    data.mixCh = &modMixerChannel[ch];
 
-    if (sample == MOD_NO_SAMPLE) {
-      sample = modPlayer.channel[curChannel].sample;
-    } else {
-      modPlayer.channel[curChannel].sample = sample;
-      // Another tricky thing to know about MOD: Volume is only set when
-      // specifying new samples, NOT when playing notes, and it is set even
-      // when there is a sample, but no note specified (although the sample
-      // playing doesn't change in that case)
-      modPlayer.channel[curChannel].vol = modPlayer.sample[sample].vol;
-      modMixerChannel[curChannel].vol = modPlayer.channel[curChannel].vol;
+    data.note = *modPlayer.rowPtr++;
+    data.sample = *modPlayer.rowPtr++;
+    data.effect = *modPlayer.rowPtr++;
+    data.param = *modPlayer.rowPtr++;
+
+    // Set these for the mid-ticks
+    data.modCh->effect = data.effect;
+    data.modCh->param = data.param;
+
+    if (data.sample != MOD_NO_SAMPLE) { // Never set local to memory anymore
+      data.modCh->sample = data.sample;
+      data.modCh->vol = modPlayer.sample[data.sample].vol;
+
+      // Don't set mixer channel volume until after effect processing
+      // vars.sndChn->vol          = vars.modChn->vol;
+      data.updateFlags |= MOD_SET_VOL;
     }
 
-    if (note != MOD_NO_NOTE) {
-      modPlayNote(curChannel, note, sample, effect, param);
+    if ((data.effect != 0 || data.param != 0) &&
+        (modEffect[MOD_EFFECT_TIMING_ROW][data.effect] != NULL)) {
+      modEffect[MOD_EFFECT_TIMING_ROW][data.effect](&data);
+    }
+
+    if ((data.note != MOD_NO_NOTE) && (data.updateFlags & MOD_PLAY_NOTE)) {
+      modPlayNote(&data); // update function or parameters
+    }
+
+    // Set the mixer volume like the block above that handles new samples used
+    // to do
+    if (data.updateFlags & MOD_SET_VOL) {
+      data.mixCh->vol = data.modCh->vol;
+    }
+
+    // Like MODPlayNote used to do
+    if (data.updateFlags & MOD_SET_FREQ) {
+      data.mixCh->inc = data.modCh->frequency * modTiming.rcpMixFreq >> 16;
     }
   }
 
 } // MODProcessRow
 
-static void modPlayNote(u32 channelIdx, u32 note, u32 sampleIdx, u32 effect,
-                        u32 param) {
+static void modPlayNote(ModEffectUpdateData *data) {
   ModMixerChannel *sndChn;
   ModChannel *modChn;
   const SampleHeader *sample;
   u8 finetune;
 
-  // Here's that special case that they didn't specify a sample before playing a
-  // note
-  if (sampleIdx == MOD_NO_SAMPLE) {
+  // Here's that special case that they didn't specify a sample before playing
+  // a note
+  if (data->sample == MOD_NO_SAMPLE) {
     return;
   }
 
-  // These make things less cumbersome
-  sndChn = &modMixerChannel[channelIdx];
-  modChn = &modPlayer.channel[channelIdx];
-  sample = &modPlayer.sample[sampleIdx];
+  sample = &modPlayer.sample[data->modCh->sample];
+  data->modCh->frequency = modFreqTable[sample->finetune * 60 + data->note];
 
-  // 60 notes total, and one full set of notes for each finetune level
-  modChn->frequency = modFreqTable[sample->finetune * 60 + note];
+  // set up mixer channel
+  data->mixCh->data = sample->smpData;
+  data->mixCh->pos = 0;
 
-  // Set up the mixer channel
-  sndChn->data = sample->smpData;
-  sndChn->pos = 0;
-  sndChn->inc =
-      modChn->frequency * modTiming.rcpMixFreq >> 16; // Explained below
+  // Let update flags take care of setting the inc
+  // because it may also need to be set by effects without playing a note
+  // vars->sndChn->inc        = vars->modChn->frequency * sndVars.rcpMixFreq >>
+  // 16;
+  data->updateFlags |= MOD_SET_FREQ;
 
-  // Next member is volume, but skip setting it because it doesn't change unless
-  // a new sample was specified, in which case it was already set back in
-  // MODProcessRow
-
-  // If looping, use loopStart+loopLength as the ending point,
-  // otherwise just use normal length.
-  // Length and loop length are still half what the real size is
-  // (to fit in 16 bits, as per MOD format), so they need to be
-  // shifted left 1. They also need to be shifted left 12 because
-  // the mixer compares the 12-bit fixed-point position against
-  // them directly, so that comes to a total shift left of 13
-  sndChn->length =
+  data->mixCh->length =
       (sample->loopLength != 0 ? sample->loopStart + sample->loopLength
                                : sample->length)
       << 13;
-  sndChn->loopLength = sample->loopLength << 13;
-
-} // MODPlayNote
+  data->mixCh->loopLength = sample->loopLength << 13;
+} // modPlayNote
 
 static void modSetTempo(u32 tempo) {
   u32 modFreq;
@@ -257,4 +319,42 @@ static void modSetTempo(u32 tempo) {
   modTiming.samplesUntilMODTick -= modTiming.samplesPerMODTick;
   modTiming.samplesPerMODTick = modTiming.mixFreq / modFreq;
   modTiming.samplesUntilMODTick += modTiming.samplesPerMODTick;
-} // MODSetTempo
+} // modSetTempo
+
+static void modUpdateEffects() {
+  s32 ch;
+
+  for (ch = 0; ch < MOD_MAX_CHANNELS; ch++) {
+    // Bail if there's no effect to update
+    if (modPlayer.channel[ch].effect != 0 || modPlayer.channel[ch].param != 0) {
+      // Initialize with mid-tick values now
+      ModEffectUpdateData data = modDefaultData[MOD_EFFECT_TIMING_MID];
+
+      data.modCh = &modPlayer.channel[ch];
+      data.mixCh = &modMixerChannel[ch];
+
+      // Already made sure there was an effect, so just check the function.
+      // Notice that we're using the mid-tick table now.
+      if (modEffect[MOD_EFFECT_TIMING_MID][data.modCh->effect] != NULL)
+        modEffect[MOD_EFFECT_TIMING_MID][data.modCh->effect](&data);
+
+      modHandleUpdateFlags(&data);
+    }
+  }
+} // modUpdateEffects
+
+static void modHandleUpdateFlags(ModEffectUpdateData *data) {
+
+  if ((data->note != MOD_NO_NOTE) && (data->updateFlags & MOD_PLAY_NOTE)) {
+    modPlayNote(data);
+  }
+
+  if (data->updateFlags & MOD_SET_VOL) {
+    data->mixCh->vol = data->modCh->vol;
+  }
+
+  if (data->updateFlags & MOD_SET_FREQ) {
+    data->mixCh->inc = data->modCh->frequency * modTiming.rcpMixFreq >> 16;
+  }
+
+} // modHandleUpdateFlags
