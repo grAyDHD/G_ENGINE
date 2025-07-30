@@ -13,9 +13,6 @@ int main() {
   modInit();
   gprintf(5, 5, "mixFreq: %d", modTiming.mixFreq);
   gprintf(5, 15, "rcpMixFreq: %d", modTiming.rcpMixFreq);
-  printString(25, 25, "this prints a string");
-
-  fillScreen(RGB(20, 1, 8));
 
   // 1. Channel 0 data pointer
   printString(0, 35, "C0.data:");
@@ -68,83 +65,73 @@ int main() {
 
     // 1. Channel 0 data pointer
     if (modMixerChannel[0].data != (s8 *)lastData) {
-      clearTextArea(65, 35, 80, 10);
-      gprintf(65, 35, "%x", (u32)modMixerChannel[0].data);
+      clearTextArea(127, 35, 55, 9);
+      gprintf(105, 35, "%x", (u32)modMixerChannel[0].data);
       lastData = (u32)modMixerChannel[0].data;
     }
-
     // UPDATE WARNING
     // 2. Channel 0 position
     if (modMixerChannel[0].pos != lastPos && frameCount % 5 == 0) {
-      //      clearTextArea(60, 45, 80, 10);
-      gprintf(60, 45, "%x", modMixerChannel[0].pos);
+      clearTextArea(127, 45, 55, 9);
+      gprintf(105, 45, "%x", modMixerChannel[0].pos);
       lastPos = modMixerChannel[0].pos;
     }
-
     // 3. Channel 0 increment
     if (modMixerChannel[0].inc != lastInc) {
-      clearTextArea(60, 55, 80, 10);
-      gprintf(60, 55, "%x", modMixerChannel[0].inc);
+      clearTextArea(127, 55, 55, 9);
+      gprintf(105, 55, "%x", modMixerChannel[0].inc);
       lastInc = modMixerChannel[0].inc;
     }
-
     // 4. Channel 0 volume
     if (modMixerChannel[0].vol != lastVol && frameCount % 5 == 1) {
-      clearTextArea(60, 65, 80, 10);
-      gprintf(60, 65, "%x", modMixerChannel[0].vol);
+      clearTextArea(127, 65, 55, 9);
+      gprintf(105, 65, "%x", modMixerChannel[0].vol);
       lastVol = modMixerChannel[0].vol;
     }
-
     // 5. Channel 0 length
     if (modMixerChannel[0].length != lastLength) {
-      clearTextArea(60, 75, 80, 10);
-      gprintf(60, 75, "%x", modMixerChannel[0].length);
+      clearTextArea(127, 75, 55, 9);
+      gprintf(105, 75, "%x", modMixerChannel[0].length);
       lastLength = modMixerChannel[0].length;
     }
-
     // 6. Channel 0 loop length
     if (modMixerChannel[0].loopLength != lastLoopLength) {
-      clearTextArea(70, 85, 80, 10);
-      gprintf(70, 85, "%x", modMixerChannel[0].loopLength);
+      clearTextArea(127, 85, 55, 9);
+      gprintf(105, 85, "%x", modMixerChannel[0].loopLength);
       lastLoopLength = modMixerChannel[0].loopLength;
     }
-
     // 7. Current order
     if (modPlayer.curOrder != lastCurOrder) {
-      clearTextArea(105, 105, 80, 10);
+      clearTextArea(127, 105, 55, 9);
       gprintf(105, 105, "%x", modPlayer.curOrder);
       lastCurOrder = modPlayer.curOrder;
     }
-
     // UPDATE WARNING
     // 8. Current row
     if (modPlayer.curRow != lastCurRow && frameCount % 5 == 2) {
-      // clearTextArea(90, 115, 80, 10);
-      gprintf(90, 115, "%x", modPlayer.curRow);
+      clearTextArea(127, 115, 55, 9);
+      gprintf(105, 115, "%x", modPlayer.curRow);
       lastCurRow = modPlayer.curRow;
     }
-
     // UPDATE WARNING
     // 9. Current tick
     if (modPlayer.tick != lastTick && frameCount % 5 == 3) {
-      // clearTextArea(70, 125, 80, 10);
-      gprintf(70, 125, "%x", modPlayer.tick);
+      clearTextArea(127, 125, 55, 9);
+      gprintf(105, 125, "%x", modPlayer.tick);
       lastTick = modPlayer.tick;
     }
-
     // 10. MOD state
     if (modPlayer.state != lastState) {
-      clearTextArea(80, 135, 80, 10);
-      gprintf(80, 135, "%x", modPlayer.state);
+      clearTextArea(127, 135, 55, 9);
+      gprintf(105, 135, "%x", modPlayer.state);
       lastState = modPlayer.state;
     }
-
     // UPDATE WARNING
     // 11. Samples until tick
     if (modTiming.samplesUntilMODTick != lastSamplesToTick &&
         frameCount % 5 == 4) {
-      // clearTextArea(90, 145, 80, 10);
-      gprintf(90, 145, "%x", modTiming.samplesUntilMODTick);
+      clearTextArea(127, 145, 55, 9);
+      gprintf(105, 145, "%x", modTiming.samplesUntilMODTick);
       lastSamplesToTick = modTiming.samplesUntilMODTick;
     }
 
