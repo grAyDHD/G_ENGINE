@@ -53,6 +53,20 @@ extern const u8 dMod0Pattern49[];
 extern const u8 dMod0Pattern50[];
 extern const u8 dMod0Pattern51[];
 
+extern const u8 dMod1Pattern0[];
+extern const u8 dMod1Pattern1[];
+extern const u8 dMod1Pattern2[];
+extern const u8 dMod1Pattern3[];
+extern const u8 dMod1Pattern4[];
+extern const u8 dMod1Pattern5[];
+extern const u8 dMod1Pattern6[];
+extern const u8 dMod1Pattern7[];
+extern const u8 dMod1Pattern8[];
+extern const u8 dMod1Pattern9[];
+extern const u8 dMod1Pattern10[];
+extern const u8 dMod1Pattern11[];
+extern const u8 dMod1Pattern12[];
+
 extern const s8 dSmpData0[];
 extern const s8 dSmpData1[];
 extern const s8 dSmpData2[];
@@ -75,6 +89,14 @@ extern const s8 dSmpData18[];
 extern const s8 dSmpData19[];
 extern const s8 dSmpData20[];
 extern const s8 dSmpData21[];
+extern const s8 dSmpData22[];
+extern const s8 dSmpData23[];
+extern const s8 dSmpData24[];
+extern const s8 dSmpData25[];
+extern const s8 dSmpData26[];
+extern const s8 dSmpData27[];
+extern const s8 dSmpData28[];
+extern const s8 dSmpData29[];
 
 const SampleHeader dMod0SmpTable[] = {
     {4777, 0, 64, 1141, 3614, dSmpData0},
@@ -123,8 +145,27 @@ const u8 dMod0OrderTable[] = {
     40, 41, 36, 38, 39, 42, 44, 45, 37, 46, 47, 48, 49, 50, 51,
 };
 
+const SampleHeader dMod1SmpTable[] = {
+    {17, 0, 64, 0, 16, dSmpData22},  {65, 0, 64, 0, 64, dSmpData23},
+    {8, 0, 32, 0, 8, dSmpData24},    {8, 0, 16, 0, 8, dSmpData25},
+    {8, 0, 64, 0, 8, dSmpData26},    {1123, 0, 48, 0, 0, dSmpData27},
+    {1505, 0, 64, 0, 0, dSmpData28}, {1463, 0, 64, 0, 0, dSmpData29},
+};
+
+const u8 *dMod1PatternTable[] = {
+    dMod1Pattern0,  dMod1Pattern1, dMod1Pattern2,  dMod1Pattern3,
+    dMod1Pattern4,  dMod1Pattern5, dMod1Pattern6,  dMod1Pattern7,
+    dMod1Pattern8,  dMod1Pattern9, dMod1Pattern10, dMod1Pattern11,
+    dMod1Pattern12,
+};
+
+const u8 dMod1OrderTable[] = {
+    0, 1, 2, 3, 4, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+};
+
 const ModHeader dModTable[] = {
     {dMod0SmpTable, dMod0OrderTable, dMod0PatternTable, 49, 52},
+    {dMod1SmpTable, dMod1OrderTable, dMod1PatternTable, 15, 13},
 };
 
 const SampleHeader dSfxTable[] = {

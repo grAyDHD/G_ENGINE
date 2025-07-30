@@ -3,9 +3,6 @@
 
 #include "modPlayer.h"
 
-// forward declaration from modPlayer.h
-// struct ModEffectUpdateData;
-
 typedef enum {
   MOD_PLAY_NOTE = (1 << 0),
   MOD_SET_VOL = (1 << 1),
