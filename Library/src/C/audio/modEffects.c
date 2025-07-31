@@ -12,22 +12,22 @@ void MODFXSpeed(ModEffectUpdateData *data) {
 const ModEffect modEffect[MOD_EFFECT_TIMING_COUNT][16] = {
     {
         // MOD_EFFECT_TABLE_ROW
-        NULL, // 0x0: Arpeggio
-        NULL, // 0x1: Porta up
-        NULL, // 0x2: Porta down
-        NULL, // 0x3: Tone porta
-        NULL, // 0x4: Vibrato
-        NULL, // 0x5: Volslide+Tone porta
-        NULL, // 0x6: Volslide+Vibrato
-        NULL, // 0x7: Tremolo
-        NULL, // 0x8: Set panning
-        NULL, // 0x9: Sample offset
-        NULL, // 0xA: Volume slide
-        NULL, // 0xB: Jump to order
-        NULL, // 0xC: Set volume
-        NULL, // 0xD: Break to row
-        NULL, // 0xE: Special (more on this later)
-        NULL  // 0xF: Speed/Tempo
+        NULL,      // 0x0: Arpeggio
+        NULL,      // 0x1: Porta up
+        NULL,      // 0x2: Porta down
+        NULL,      // 0x3: Tone porta
+        NULL,      // 0x4: Vibrato
+        NULL,      // 0x5: Volslide+Tone porta
+        NULL,      // 0x6: Volslide+Vibrato
+        NULL,      // 0x7: Tremolo
+        NULL,      // 0x8: Set panning
+        NULL,      // 0x9: Sample offset
+        NULL,      // 0xA: Volume slide
+        NULL,      // 0xB: Jump to order
+        NULL,      // 0xC: Set volume
+        NULL,      // 0xD: Break to row
+        NULL,      // 0xE: Special (more on this later)
+        MODFXSpeed // 0xF: Speed/Tempo
     },
     {
         // MOD_EFFECT_TABLE_MID
