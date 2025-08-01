@@ -32,7 +32,6 @@ void updateMovementSystem(Entity *entity, PositionComponent *position,
 
 void updateAnimationSystem(Entity *entity, AnimationComponent *animation);
 
-void updateRenderSystem(ECS *ecs, Entity *entity, AnimationComponent *animation,
-                        DrawingComponent *draw, TextComponent *text, const void *image);
+void updateRenderSystem(ECS *ecs, Entity *entity);
 
 #endif // !SYSTEMS_H

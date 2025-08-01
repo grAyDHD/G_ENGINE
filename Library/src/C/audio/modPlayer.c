@@ -36,7 +36,7 @@ void modInit() {
   mixbuf.position = mixbuf.bufBase;
 
   modTiming.mixFreq = 16000;
-  modTiming.rcpMixFreq = (1 << 28) / modTiming.mixFreq;
+  modTiming.mixFreqPeriod = ((AMIGA_VAL << 9) / modTiming.mixFreq) << 3;
 
   // initialize channel structures
   for (int i = 0; i < MOD_MAX_CHANNELS; i++) {
@@ -66,21 +66,22 @@ void modUpdate() {
   s32 samplesLeft = BUFFER_SIZE;
 
   while (samplesLeft > 0) {
-    if (modTiming.samplesUntilMODTick == 0 &&
+    if (modTiming.samplesUntilMODTick < (1 << 12) &&
         modPlayer.state == MOD_STATE_PLAY) {
       modAdvance();
-      modTiming.samplesUntilMODTick = modTiming.samplesPerMODTick;
+      modTiming.samplesUntilMODTick += modTiming.samplesPerMODTick;
     }
 
-    if (modTiming.samplesUntilMODTick < samplesLeft &&
+    if ((modTiming.samplesUntilMODTick >> 12) < samplesLeft &&
         modPlayer.state == MOD_STATE_PLAY) {
-      modMix(modTiming.samplesUntilMODTick);
-      samplesLeft -= modTiming.samplesUntilMODTick;
+      modMix(modTiming.samplesUntilMODTick >> 12);
+      samplesLeft -= modTiming.samplesUntilMODTick >> 12;
 
-      modTiming.samplesUntilMODTick = 0;
+      modTiming.samplesUntilMODTick -= (modTiming.samplesUntilMODTick >> 12)
+                                       << 12;
     } else {
       modMix(samplesLeft);
-      modTiming.samplesUntilMODTick -= samplesLeft;
+      modTiming.samplesUntilMODTick -= samplesLeft << 12;
       samplesLeft = 0;
     }
   }
@@ -218,7 +219,7 @@ void modPlayNote(ModEffectUpdateData *data) {
   }
 
   sample = &modPlayer.sample[data->modCh->sample];
-  data->modCh->frequency = modFreqTable[sample->finetune * 60 + data->note];
+  data->modCh->period = modPeriodTable[sample->finetune * 60 + data->note];
 
   // set up mixer channel
   data->mixCh->data = sample->smpData;
@@ -238,12 +239,13 @@ void modPlayNote(ModEffectUpdateData *data) {
 } // modPlayNote
 
 void modSetTempo(u32 tempo) {
-  u32 modFreq;
+  // u32 modFreq;
 
-  modPlayer.tempo = tempo;
-  modFreq = (tempo * 2) / 5;
+  // modPlayer.tempo = tempo;
+  // modFreq = (tempo * 2) / 5;
+  modTiming.samplesPerMODTick = (modTiming.mixFreq * 5 << 12) / (tempo * 2);
 
-  modTiming.samplesUntilMODTick -= modTiming.samplesPerMODTick;
-  modTiming.samplesPerMODTick = modTiming.mixFreq / modFreq;
-  modTiming.samplesUntilMODTick += modTiming.samplesPerMODTick;
+  // modTiming.samplesUntilMODTick -= modTiming.samplesPerMODTick;
+  // modTiming.samplesPerMODTick = modTiming.mixFreq / modFreq;
+  // modTiming.samplesUntilMODTick += modTiming.samplesPerMODTick;
 } // modSetTempo

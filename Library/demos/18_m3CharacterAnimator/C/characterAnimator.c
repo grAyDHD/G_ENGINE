@@ -1,6 +1,4 @@
 #include "../includes/characterAnimator.h"
-//#include "assets/sprites/animated/Sonic.h"
-#include "Robo.h"
 #include "core/interrupts.h"
 #include "ecs/components.h"
 #include "ecs/ecs.h"
@@ -10,7 +8,6 @@ static ComponentStorage components;
 static ECS ecs;
 
 volatile fixed_s32 deltaTime;
-
 
 int main() {
   DSPC = MODE3 | BG2;
@@ -24,6 +21,8 @@ int main() {
 
   while (1) {
     VBLANK();
+
+    //    if (DSPS & 0x0001)
     clearSpriteFrames(&ecs, &components, BedroomBitmap);
     updateInputSystem(&ecs, ecs.entity, ecs.components->input, deltaTime);
     updateBehaviorSystem(&ecs, ecs.entity, ecs.components->ai);
@@ -35,8 +34,7 @@ int main() {
                           ecs.components->velocity, ecs.components->hitbox,
                           deltaTime);
     updateAnimationSystem(ecs.entity, ecs.components->animation);
-    updateRenderSystem(&ecs, ecs.entity, ecs.components->animation,
-                       ecs.components->draw);
+    updateRenderSystem(&ecs, ecs.entity);
     deltaTime = 0;
   }
 

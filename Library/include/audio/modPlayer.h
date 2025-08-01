@@ -59,9 +59,9 @@ typedef struct {
 } ModMixerChannel;
 
 typedef struct {
-  u32 frequency; // Current frequency of note being played, in Hz
-  u8 sample;     // Last sample used on this channel
-  u8 vol;        // Current volume
+  u32 period; // Current period of note being played
+  u8 sample;  // Last sample used on this channel
+  u8 vol;     // Current volume
 
   u8 effect; // Current effect (set to 0 on row tick if no effect/parameter)
   u8 param;  // Current parameter (set to 0 on row tick if no effect/parameter)
@@ -69,9 +69,10 @@ typedef struct {
 
 typedef struct {
   u16 mixFreq;
-  u16 rcpMixFreq;
-  s16 samplesUntilMODTick;
-  u16 samplesPerMODTick;
+  u32 mixFreqPeriod;
+
+  u32 samplesUntilMODTick;
+  u32 samplesPerMODTick;
 } ModTiming;
 
 typedef struct {

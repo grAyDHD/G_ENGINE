@@ -4,10 +4,10 @@
 #include "core/typedefs.h"
 #include "ecs/components.h"
 
-#include "graphics/draw.h"
 #include "ecs/entities.h"
-#include "math/math.h"
+#include "graphics/draw.h"
 #include "graphics/m3Text.h"
+#include "math/math.h"
 
 void updateInputSystem(ECS *ecs, Entity *entity, InputComponent *input,
                        fixed_s32 deltaTime) {
@@ -29,7 +29,7 @@ void updateBehaviorSystem(ECS *ecs, Entity *entity, AIComponent *ai) {
   }
 };
 
-#define FRICTION_COEFFICIENT 0x0000B000 
+#define FRICTION_COEFFICIENT 0x0000B000
 // (INT_TO_FIXED(63) >> 7)
 
 void updatePhysicsSystem(Entity *entity, VelocityComponent *velocity,
@@ -68,12 +68,13 @@ void updatePhysicsSystem(Entity *entity, VelocityComponent *velocity,
 void updateMovementSystem(Entity *entity, PositionComponent *position,
                           VelocityComponent *velocity, fixed_s32 deltaTime) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
-    if (!(entity[id].flag & ACTIVE)) continue;
+    if (!(entity[id].flag & ACTIVE))
+      continue;
     if (entity[id].flag & VELOCITY_COMPONENT) {
       if (velocity[id].dx != 0 || velocity[id].dy != 0) {
         position[id].prevX = position[id].x;
         position[id].prevY = position[id].y;
-        
+
         position[id].x += (MULT(velocity[id].dx, deltaTime));
         position[id].y += (MULT(velocity[id].dy, deltaTime));
         entity[id].flag |= DIRTY;
@@ -224,22 +225,20 @@ void updateCollisionSystem(Entity *entity, PositionComponent *position,
                            VelocityComponent *velocity, HitboxComponent *hitbox,
                            fixed_s32 deltaTime) {
   for (int idA = 0; idA < MAX_ENTITIES; idA++) {
-    if (!(entity[idA].flag & ACTIVE)) 
+    if (!(entity[idA].flag & ACTIVE))
       continue;
     if (!(entity[idA].flag & DETECTS_COLLISIONS))
       continue;
 
     // int hasCollision = 0; // track if collision this frame
     // Clear previous collision flags at start of frame
-    entity[idA].flag &=
-        ~(HORIZONTAL_COLLISION | VERTICAL_COLLISION);
-
+    entity[idA].flag &= ~(HORIZONTAL_COLLISION | VERTICAL_COLLISION);
 
     for (int idB = idA + 1; idB < MAX_ENTITIES; idB++) {
-      if (!(entity[idB].flag & ACTIVE)) 
+      if (!(entity[idB].flag & ACTIVE))
         continue;
       if (!(entity[idB].flag & TRIGGERS_COLLISIONS))
-        continue; 
+        continue;
 
       HitboxComponent overlap = getOverlap(&position[idA], &hitbox[idA],
                                            &position[idB], &hitbox[idB]);
@@ -266,13 +265,14 @@ void updateCollisionSystem(Entity *entity, PositionComponent *position,
         resolveDynamicCollisions(&entity[idA], &velocity[idA], &position[idA],
                                  &velocity[idB], &position[idB], overlap);
       }
-    } 
+    }
   }
 }
 
 void updateAnimationSystem(Entity *entity, AnimationComponent *animation) {
   for (int id = 0; id < MAX_ENTITIES; id++) {
-    if (!(entity[id].flag & ACTIVE)) continue;
+    if (!(entity[id].flag & ACTIVE))
+      continue;
     if (entity[id].flag & ANIMATION_COMPONENT) {
       animation[id].keyframe++;
       if (animation[id].keyframe >= animation[id].keyframeInterval) {
@@ -288,14 +288,21 @@ void updateAnimationSystem(Entity *entity, AnimationComponent *animation) {
 }
 
 // todo: optimize clearing of text, contemplate where this is handled
-void updateRenderSystem(ECS *ecs, Entity *entity, AnimationComponent *animation,
-                        DrawingComponent *draw, TextComponent *text, const void *image) {
+void updateRenderSystem(ECS *ecs, Entity *entity) {
+  AnimationComponent *animation = ecs->components->animation;
+  DrawingComponent *draw = ecs->components->draw;
+  TextComponent *text = ecs->components->text;
+
   for (int id = 0; id < MAX_ENTITIES; id++) {
-    if (!(entity[id].flag & DIRTY)) continue;
-    if (!(entity[id].flag & ACTIVE)) continue;
-    
+    if (!(entity[id].flag & DIRTY))
+      continue;
+    if (!(entity[id].flag & ACTIVE))
+      continue;
+
     if (entity[id].flag & SPRITE_FLAG) {
-      clearSpriteFrame(ecs->components->position[id].prevX, ecs->components->position[id].prevY, 32, image);
+      clearSpriteFrame(ecs->components->position[id].prevX,
+                       ecs->components->position[id].prevY, 32,
+                       ecs->components->sprite[id].spriteSheet);
 
       renderEntity(ecs, id);
     }
@@ -303,7 +310,8 @@ void updateRenderSystem(ECS *ecs, Entity *entity, AnimationComponent *animation,
       draw[id].drawingRoutine(ecs, id);
     }
     if (entity[id].flag & TEXT_COMPONENT) {
-      // todo: handle text clearing?  only necessary for changing text, like dialog. can be simple as clearing monocolor text box
+      // todo: handle text clearing?  only necessary for changing text, like
+      // dialog. can be simple as clearing monocolor text box
       renderEntityText(ecs, id);
     }
 

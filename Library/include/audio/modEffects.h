@@ -24,6 +24,6 @@ extern const ModEffectUpdateData modDefaultData[MOD_EFFECT_TIMING_COUNT];
 extern void modHandleUpdateFlags(ModEffectUpdateData *data);
 extern void modUpdateEffects();
 
-extern void MODFXSpeed(ModEffectUpdateData *data);
+// extern void MODFXSpeed(ModEffectUpdateData *data);
 
 #endif
