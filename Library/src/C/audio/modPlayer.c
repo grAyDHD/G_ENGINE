@@ -201,22 +201,8 @@ static void modProcessRow() {
       modEffect[MOD_EFFECT_TIMING_ROW][data.effect](&data);
     }
 
-    if ((data.note != MOD_NO_NOTE) && (data.updateFlags & MOD_PLAY_NOTE)) {
-      modPlayNote(&data); // update function or parameters
-    }
-
-    // Set the mixer volume like the block above that handles new samples used
-    // to do
-    if (data.updateFlags & MOD_SET_VOL) {
-      data.mixCh->vol = data.modCh->vol;
-    }
-
-    // Like MODPlayNote used to do
-    if (data.updateFlags & MOD_SET_FREQ) {
-      data.mixCh->inc = data.modCh->frequency * modTiming.rcpMixFreq >> 16;
-    }
+    modHandleUpdateFlags(&data);
   }
-
 } // MODProcessRow
 
 void modPlayNote(ModEffectUpdateData *data) {

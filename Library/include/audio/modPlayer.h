@@ -18,6 +18,8 @@
 #define MOD_NO_NOTE 63   // 5 octaves, notes 0-59, 63 fits in same bits
 #define MOD_NO_SAMPLE 31 // Valid samples 0-30, use 31 as blank
 
+#define AMIGA_VAL 3579545
+
 typedef enum {
   MOD_STATE_STOP,
   MOD_STATE_PLAY,
