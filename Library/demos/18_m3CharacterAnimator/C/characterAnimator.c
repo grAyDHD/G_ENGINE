@@ -16,6 +16,7 @@ int main() {
   initEntitySystem(&ecs, &components);
   createPlayer(&ecs, RoboBitmap);
   ecs.entity[0].flag |= PHYSICS_FLAG;
+  ecs.entity[0].flag |= DIRTY;
   createNPC(&ecs, RoboBitmap);
   createScreenBorders(&ecs);
 
@@ -23,7 +24,7 @@ int main() {
     VBLANK();
 
     //    if (DSPS & 0x0001)
-    clearSpriteFrames(&ecs, &components, BedroomBitmap);
+    //   clearSpriteFrames(&ecs, &components, BedroomBitmap);
     updateInputSystem(&ecs, ecs.entity, ecs.components->input, deltaTime);
     updateBehaviorSystem(&ecs, ecs.entity, ecs.components->ai);
     updatePhysicsSystem(ecs.entity, ecs.components->velocity,
@@ -34,7 +35,7 @@ int main() {
                           ecs.components->velocity, ecs.components->hitbox,
                           deltaTime);
     updateAnimationSystem(ecs.entity, ecs.components->animation);
-    updateRenderSystem(&ecs, ecs.entity);
+    updateRenderSystem(&ecs, ecs.entity, BedroomBitmap);
     deltaTime = 0;
   }
 

@@ -33,7 +33,10 @@ int createPlayer(ECS *ecs, const void *spriteSheet) {
 
   ecs->components->position[playerId] =
       // this should be provided as an argument
-      (PositionComponent){.x = INT_TO_FIXED(80), .y = INT_TO_FIXED(80)};
+      (PositionComponent){.x = INT_TO_FIXED(80),
+                          .y = INT_TO_FIXED(80),
+                          .prevX = INT_TO_FIXED(80),
+                          .prevY = INT_TO_FIXED(80)};
 
   ecs->components->hitbox[playerId] =
       (HitboxComponent){.width = 32, .height = 32};

@@ -288,10 +288,11 @@ void updateAnimationSystem(Entity *entity, AnimationComponent *animation) {
 }
 
 // todo: optimize clearing of text, contemplate where this is handled
-void updateRenderSystem(ECS *ecs, Entity *entity) {
+void updateRenderSystem(ECS *ecs, Entity *entity, const void *backgroundImage) {
   AnimationComponent *animation = ecs->components->animation;
   DrawingComponent *draw = ecs->components->draw;
   TextComponent *text = ecs->components->text;
+  SpriteComponent *sprite = ecs->components->sprite;
 
   for (int id = 0; id < MAX_ENTITIES; id++) {
     if (!(entity[id].flag & DIRTY))
@@ -302,7 +303,7 @@ void updateRenderSystem(ECS *ecs, Entity *entity) {
     if (entity[id].flag & SPRITE_FLAG) {
       clearSpriteFrame(ecs->components->position[id].prevX,
                        ecs->components->position[id].prevY, 32,
-                       ecs->components->sprite[id].spriteSheet);
+                       backgroundImage);
 
       renderEntity(ecs, id);
     }

@@ -32,6 +32,6 @@ void updateMovementSystem(Entity *entity, PositionComponent *position,
 
 void updateAnimationSystem(Entity *entity, AnimationComponent *animation);
 
-void updateRenderSystem(ECS *ecs, Entity *entity);
+void updateRenderSystem(ECS *ecs, Entity *entity, const void *backgroundImage);
 
 #endif // !SYSTEMS_H
