@@ -40,7 +40,7 @@ typedef struct __attribute__((packed)) {
 extern Mixbuffer mixbuf;
 extern volatile u32 reload;
 
-void dmaAudioIsr(void);
+void dmaAudioIsr(void) IN_IWRAM;
 void initializeFIFOInterrupts();
 // void initMixChannels();
 void initMonoFIFO();

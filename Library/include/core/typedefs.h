@@ -23,4 +23,10 @@ typedef struct {
   int y;
 } Coordinate;
 
+#define IN_EWRAM __attribute__((section(".ewram")))
+#define IN_IWRAM __attribute__((section(".iwram")))
+#define ALIGN(n) __attribute__((aligned((n))))
+extern u32 __FarFunction(u32 (*ptr)(), ...);
+extern void __FarProcedure(u32);
+
 #endif // TYPES_H

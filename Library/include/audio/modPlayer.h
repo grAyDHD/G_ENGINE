@@ -120,7 +120,7 @@ extern const SampleHeader dSfxTable[];
 // ----- Global functions -----
 
 extern void modInit();
-extern void modMix(u32 samplesToMix);
+extern void modMix(u32 samplesToMix) IN_IWRAM;
 extern void modUpdate();
 extern void modAdvance();
 
