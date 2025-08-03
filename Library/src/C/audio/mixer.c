@@ -127,9 +127,9 @@ void audioIsr(void) {
 */
 
 void initializeFIFOInterrupts() {
-  ISR = dmaAudioIsr;
+  //  ISR = dmaAudioIsr;
   irqEnable(IRQ_DMA1);
-  irqMaster(ON);
+  //  irqMaster(ON);
 }
 
 // only sets up direct sound A right now, begins reading from buffer
