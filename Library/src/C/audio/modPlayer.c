@@ -223,7 +223,7 @@ void modPlayNote(ModEffectUpdateData *data) {
 
   // set up mixer channel
   data->mixCh->data = sample->smpData;
-  data->mixCh->pos = 0;
+  data->mixCh->pos = data->sampleOffset << 20;
 
   // Let update flags take care of setting the inc
   // because it may also need to be set by effects without playing a note

@@ -103,7 +103,8 @@ typedef struct {
   u8 effect;
   u8 param;
 
-  u8 updateFlags; // ModUpdateFlags
+  u8 updateFlags;  // ModUpdateFlags
+  u8 sampleOffset; // offset added to sample if a note is played
 } ModEffectUpdateData;
 
 // ----- Global vars -----
