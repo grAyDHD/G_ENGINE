@@ -2,18 +2,27 @@
 #include "audio/modPlayer.h"
 
 void modFxArpeggio(ModEffectUpdateData *data) {}
+
 void modFxPortamentoUp(ModEffectUpdateData *data) {}
+
 void modFxPortamentoDown(ModEffectUpdateData *data) {}
+
 void modFxTonePortamento(ModEffectUpdateData *data) {}
+
 void modFxVibrato(ModEffectUpdateData *data) {}
+
 void modFxVolumeSlideTonePortamento(ModEffectUpdateData *data) {}
+
 void modFxVolumeSlideVibrato(ModEffectUpdateData *data) {}
+
 void modFxTremolo(ModEffectUpdateData *data) {}
+
 void modFxSetPanning(ModEffectUpdateData *data) {}
 
 void modFxSampleOffset(ModEffectUpdateData *data) {}
 
 void modFxVolumeSlide(ModEffectUpdateData *data) {}
+
 void modFxJumpToOrder(ModEffectUpdateData *data) {}
 
 void modFxSetVol(ModEffectUpdateData *data) {
