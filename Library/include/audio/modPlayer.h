@@ -26,7 +26,8 @@ typedef enum {
   MOD_STATE_PAUSE,
 } ModState;
 
-// ----- Stacic MOD Data Structures (ROM) ----- //
+// typedef void (*MOD_CALLBACK)(u32 param, );
+//  ----- Stacic MOD Data Structures (ROM) ----- //
 
 typedef struct {
   u16 length;
@@ -65,6 +66,8 @@ typedef struct {
 
   u8 effect; // Current effect (set to 0 on row tick if no effect/parameter)
   u8 param;  // Current parameter (set to 0 on row tick if no effect/parameter)
+
+  s8 volumeSlideSpeed;
 } ModChannel;
 
 typedef struct {
@@ -79,6 +82,8 @@ typedef struct {
   const SampleHeader *sample; // Pointer to table of samples in ROM
   const u8 **pattern;         // Pointer to table of pointers to patterns
   const u8 *order;            // Array of pattern numbers to play
+  MOD_CALLBACK callback;      // user function called by 0xE0 effects.
+
   const u8 *rowPtr; // Current position in current pattern, for quick access
 
   u8 state; // MOD_STATE enum (stopped/playing/paused)

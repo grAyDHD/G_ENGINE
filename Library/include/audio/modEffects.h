@@ -38,10 +38,13 @@ void modFxTremolo(ModEffectUpdateData *data);
 
 void modFxSetPanning(ModEffectUpdateData *data);
 void modFxSampleOffset(ModEffectUpdateData *data);
-void modFxVolumeSlide(ModEffectUpdateData *data);
+
+void modFxVolumeSlideRow(ModEffectUpdateData *data);
+void modFxVolumeSlideMid(ModEffectUpdateData *data);
+
 void modFxJumpToOrder(ModEffectUpdateData *data);
 
-void modFxSetVol(ModEffectUpdateData *data);
+void modFxSetVolume(ModEffectUpdateData *data);
 void modFxBreakToRow(ModEffectUpdateData *data);
 void modFxSpecial(ModEffectUpdateData *data);
 void modFxSetSpeed(ModEffectUpdateData *data);

@@ -19,13 +19,43 @@ void modFxTremolo(ModEffectUpdateData *data) {}
 
 void modFxSetPanning(ModEffectUpdateData *data) {}
 
-void modFxSampleOffset(ModEffectUpdateData *data) {}
+void modFxSampleOffset(ModEffectUpdateData *data) {
+  data->sampleOffset = data->param;
+}
 
-void modFxVolumeSlide(ModEffectUpdateData *data) {}
+static u32 modFxVolumeSlide(u32 volume, s32 slide) {
+  volume += slide;
+  if (volume > 64) {
+    if (slide > 0) {
+      volume = 64;
+    } else {
+      volume = 0;
+    }
+  }
+  return volume;
+}
+
+void modFxVolumeSlideRow(ModEffectUpdateData *data) {
+  if (data->param != 0) {
+    if ((data->param & 0x0F) == 0) { // crescendo
+      data->modCh->volumeSlideSpeed = data->param >> 4;
+    } else if (data->param & 0xF0) {
+      data->modCh->volumeSlideSpeed = -data->param;
+    } else {
+      data->modCh->effect = data->modCh->param = 0;
+    }
+  }
+}
+
+void modFxVolumeSlideMid(ModEffectUpdateData *data) {
+  data->modCh->vol =
+      modFxVolumeSlide(data->modCh->vol, data->modCh->volumeSlideSpeed);
+  data->updateFlags |= MOD_SET_VOL;
+}
 
 void modFxJumpToOrder(ModEffectUpdateData *data) {}
 
-void modFxSetVol(ModEffectUpdateData *data) {
+void modFxSetVolume(ModEffectUpdateData *data) {
   data->modCh->vol = data->param;
   if (data->modCh->vol > 64) {
     data->modCh->vol = 64;
@@ -33,7 +63,114 @@ void modFxSetVol(ModEffectUpdateData *data) {
 }
 
 void modFxBreakToRow(ModEffectUpdateData *data) {}
-void modFxSpecial(ModEffectUpdateData *data) {}
+
+void modFxSpecialRow(ModEffectUpdateData *data) {
+  u32 param = data->modCh->param & 0xF;
+
+  switch (data->modCh->param >> 4) {
+  case 0x0:
+    break;
+
+  case 0x1:
+    break;
+
+  case 0x2:
+    break;
+
+  case 0x3:
+    break;
+
+  case 0x4:
+    break;
+
+  case 0x5:
+    break;
+
+  case 0x6:
+    break;
+
+  case 0x7:
+    break;
+
+  case 0x8:
+    break;
+
+  case 0x9:
+    break;
+
+  case 0xA:
+    break;
+
+  case 0xB:
+    break;
+
+  case 0xC:
+    break;
+
+  case 0xD:
+    break;
+
+  case 0xE:
+    break;
+
+  case 0xF:
+    break;
+  }
+}
+
+void modFxSpecialMid(ModEffectUpdateData *data) {
+  u32 param = data->modCh->param & 0xF;
+
+  switch (data->modCh->param >> 4) {
+  case 0x0: // callback
+    break;
+
+  case 0x1:
+    break;
+
+  case 0x2:
+    break;
+
+  case 0x3:
+    break;
+
+  case 0x4:
+    break;
+
+  case 0x5:
+    break;
+
+  case 0x6:
+    break;
+
+  case 0x7:
+    break;
+
+  case 0x8:
+    break;
+
+  case 0x9:
+    break;
+
+  case 0xA:
+    break;
+
+  case 0xB:
+    break;
+
+  case 0xC:
+    break;
+
+  case 0xD:
+    break;
+
+  case 0xE:
+    break;
+
+  case 0xF:
+    break;
+  }
+}
 
 void modFxSetSpeed(ModEffectUpdateData *data) {
   if (data->param < 32) {
@@ -44,41 +181,41 @@ void modFxSetSpeed(ModEffectUpdateData *data) {
 const ModEffect modEffect[MOD_EFFECT_TIMING_COUNT][16] = {
     {
         // MOD_EFFECT_TABLE_ROW
-        NULL,        // 0x0: Arpeggio
-        NULL,        // 0x1: Porta up
-        NULL,        // 0x2: Porta down
-        NULL,        // 0x3: Tone porta
-        NULL,        // 0x4: Vibrato
-        NULL,        // 0x5: Volslide+Tone porta
-        NULL,        // 0x6: Volslide+Vibrato
-        NULL,        // 0x7: Tremolo
-        NULL,        // 0x8: Set panning
-        NULL,        // 0x9: Sample offset
-        NULL,        // 0xA: Volume slide
-        NULL,        // 0xB: Jump to order
-        modFxVolume, // 0xC: Set volume
-        NULL,        // 0xD: Break to row
-        NULL,        // 0xE: Special (more on this later)
-        modFxSpeed,  // 0xF: Speed/Tempo
+        NULL,                // 0x0: Arpeggio
+        NULL,                // 0x1: Porta up
+        NULL,                // 0x2: Porta down
+        NULL,                // 0x3: Tone porta
+        NULL,                // 0x4: Vibrato
+        NULL,                // 0x5: Volslide+Tone porta
+        NULL,                // 0x6: Volslide+Vibrato
+        NULL,                // 0x7: Tremolo
+        NULL,                // 0x8: Set panning
+        NULL,                // 0x9: Sample offset
+        modFxVolumeSlideRow, // 0xA: Volume slide
+        NULL,                // 0xB: Jump to order
+        modFxSetVolume,      // 0xC: Set volume
+        NULL,                // 0xD: Break to row
+        NULL,                // 0xE: Special (more on this later)
+        modFxSetSpeed,       // 0xF: Speed/Tempo
     },
     {
         // MOD_EFFECT_TABLE_MID
-        NULL,              // 0x0: Arpeggio
-        NULL,              // 0x1: Porta up
-        NULL,              // 0x2: Porta down
-        NULL,              // 0x3: Tone porta
-        NULL,              // 0x4: Vibrato
-        NULL,              // 0x5: Volslide+Tone porta
-        NULL,              // 0x6: Volslide+Vibrato
-        NULL,              // 0x7: Tremolo
-        NULL,              // 0x8: Set panning
-        modFxSampleOffset, // 0x9: Sample offset
-        NULL,              // 0xA: Volume slide
-        NULL,              // 0xB: Jump to order
-        NULL,              // 0xC: Set volume
-        NULL,              // 0xD: Break to row
-        NULL,              // 0xE: Special (more on this later)
-        NULL               // 0xF: Speed/Tempo
+        NULL,                // 0x0: Arpeggio
+        NULL,                // 0x1: Porta up
+        NULL,                // 0x2: Porta down
+        NULL,                // 0x3: Tone porta
+        NULL,                // 0x4: Vibrato
+        NULL,                // 0x5: Volslide+Tone porta
+        NULL,                // 0x6: Volslide+Vibrato
+        NULL,                // 0x7: Tremolo
+        NULL,                // 0x8: Set panning
+        modFxSampleOffset,   // 0x9: Sample offset
+        modFxVolumeSlideMid, // 0xA: Volume slide
+        NULL,                // 0xB: Jump to order
+        NULL,                // 0xC: Set volume
+        NULL,                // 0xD: Break to row
+        NULL,                // 0xE: Special (more on this later)
+        NULL                 // 0xF: Speed/Tempo
     },
 };
 
