@@ -219,7 +219,7 @@ void modPlayNote(ModEffectUpdateData *data) {
   }
 
   sample = &modPlayer.sample[data->modCh->sample];
-  data->modCh->period = modPeriodTable[sample->finetune * 60 + data->note];
+  data->modCh->period = modPeriodTable[data->modCh->finetune * 60 + data->note];
 
   // set up mixer channel
   data->mixCh->data = sample->smpData;

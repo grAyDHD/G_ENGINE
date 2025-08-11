@@ -1,4 +1,5 @@
 #include "audio/modEffects.h"
+#include "audio/modFreqTable.h"
 #include "audio/modPlayer.h"
 
 void modFxArpeggio(ModEffectUpdateData *data) {}
@@ -48,27 +49,41 @@ void modFxVolumeSlideRow(ModEffectUpdateData *data) {
 }
 
 void modFxVolumeSlideMid(ModEffectUpdateData *data) {
-  data->modCh->vol =
-      modFxVolumeSlide(data->modCh->vol, data->modCh->volumeSlideSpeed);
+  data->modCh->volume =
+      modFxVolumeSlide(data->modCh->volume, data->modCh->volumeSlideSpeed);
   data->updateFlags |= MOD_SET_VOL;
 }
 
 void modFxJumpToOrder(ModEffectUpdateData *data) {}
 
 void modFxSetVolume(ModEffectUpdateData *data) {
-  data->modCh->vol = data->param;
-  if (data->modCh->vol > 64) {
-    data->modCh->vol = 64;
+  data->modCh->volume = data->param;
+  if (data->modCh->volume > 64) {
+    data->modCh->volume = 64;
   }
 }
 
 void modFxBreakToRow(ModEffectUpdateData *data) {}
+/*
+ * callback format:
+ * bRowTick is actually a bool, transition to enum
+ * void function(u32 param, int bRowTick) {
+ *   if (bRowTick == 1) {
+ *     doThing(param);
+ *   }
+ * }
+ * */
 
 void modFxSpecialRow(ModEffectUpdateData *data) {
   u32 param = data->modCh->param & 0xF;
 
+  // half of modCh->param is actual parameter (high 4 bits)
+  // low 4 bits represent special effect called in switch
   switch (data->modCh->param >> 4) {
   case 0x0:
+    if (modPlayer.callback != NULL) {
+      modPlayer.callback(param, 1);
+    }
     break;
 
   case 0x1:
@@ -83,7 +98,13 @@ void modFxSpecialRow(ModEffectUpdateData *data) {
   case 0x4:
     break;
 
-  case 0x5:
+  case 0x5: // finetune
+    data->modCh->finetune = param;
+    if (data->modCh->note != MOD_NO_NOTE) {
+      data->modCh->period =
+          modPeriodTable[data->modCh->finetune * 60 + data->modCh->note];
+      data->updateFlags |= MOD_SET_FREQ;
+    }
     break;
 
   case 0x6:
@@ -123,6 +144,9 @@ void modFxSpecialMid(ModEffectUpdateData *data) {
 
   switch (data->modCh->param >> 4) {
   case 0x0: // callback
+    if (modPlayer.callback != NULL) {
+      modPlayer.callback(param, 0);
+    }
     break;
 
   case 0x1:

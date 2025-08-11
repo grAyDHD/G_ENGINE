@@ -52,17 +52,20 @@ typedef struct {
 
 typedef struct {
   const s8 *data;
-  u32 pos;
-  u32 inc;
-  u32 vol;
+  u32 position;
+  u32 increment;
+  u32 volume;
   u32 length;
   u32 loopLength;
 } ModMixerChannel;
 
 typedef struct {
-  u32 period; // Current period of note being played
-  u8 sample;  // Last sample used on this channel
-  u8 vol;     // Current volume
+  u32 period; // Current period of note being played  u16 or u32?
+
+  u8 note;
+  u8 sample; // Last sample used on this channel
+  u8 volume; // Current volume
+  u8 finetune;
 
   u8 effect; // Current effect (set to 0 on row tick if no effect/parameter)
   u8 param;  // Current parameter (set to 0 on row tick if no effect/parameter)
@@ -70,19 +73,21 @@ typedef struct {
   s8 volumeSlideSpeed;
 } ModChannel;
 
+typedef void (*ModCallback)(u32 param, int bRowTick);
+
 typedef struct {
   u16 mixFreq;
   u32 mixFreqPeriod;
 
-  u32 samplesUntilMODTick;
-  u32 samplesPerMODTick;
+  u32 samplesUntilModTick;
+  u32 samplesPerModTick;
 } ModTiming;
 
 typedef struct {
   const SampleHeader *sample; // Pointer to table of samples in ROM
   const u8 **pattern;         // Pointer to table of pointers to patterns
   const u8 *order;            // Array of pattern numbers to play
-  MOD_CALLBACK callback;      // user function called by 0xE0 effects.
+  ModCallback callback;       // user function called by 0xE0 effects.
 
   const u8 *rowPtr; // Current position in current pattern, for quick access
 

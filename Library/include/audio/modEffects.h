@@ -46,7 +46,11 @@ void modFxJumpToOrder(ModEffectUpdateData *data);
 
 void modFxSetVolume(ModEffectUpdateData *data);
 void modFxBreakToRow(ModEffectUpdateData *data);
+
 void modFxSpecial(ModEffectUpdateData *data);
+void modFxSpecialRow(ModEffectUpdateData *data);
+void modFxSpecialMid(ModEffectUpdateData *data);
+
 void modFxSetSpeed(ModEffectUpdateData *data);
 
 #endif
