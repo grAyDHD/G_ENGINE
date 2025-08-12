@@ -27,8 +27,8 @@ extern void modUpdateEffects();
 //--- Mod Effect Declarations ---//
 
 void modFxArpeggio(ModEffectUpdateData *data);
-void modFxPortamentoUp(ModEffectUpdateData *data);
-void modFxPortamentoDown(ModEffectUpdateData *data);
+// void modFxPortamentoUp(ModEffectUpdateData *data);
+// void modFxPortamentoDown(ModEffectUpdateData *data);
 void modFxTonePortamento(ModEffectUpdateData *data);
 
 void modFxVibrato(ModEffectUpdateData *data);
@@ -50,6 +50,9 @@ void modFxBreakToRow(ModEffectUpdateData *data);
 void modFxSpecial(ModEffectUpdateData *data);
 void modFxSpecialRow(ModEffectUpdateData *data);
 void modFxSpecialMid(ModEffectUpdateData *data);
+void modFxSetCallback(ModCallback callback);
+void modFxArpeggioRow(ModEffectUpdateData *data);
+void modFxArpeggioMid(ModEffectUpdateData *data);
 
 void modFxSetSpeed(ModEffectUpdateData *data);
 

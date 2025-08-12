@@ -41,15 +41,13 @@ void modInit() {
   // initialize channel structures
   for (int i = 0; i < MOD_MAX_CHANNELS; i++) {
     modMixerChannel[i].data = 0;
-    modMixerChannel[i].pos = 0;
-    modMixerChannel[i].inc = 0;
-    modMixerChannel[i].vol = 0;
+    modMixerChannel[i].position = 0;
+    modMixerChannel[i].increment = 0;
+    modMixerChannel[i].volume = 0;
     modMixerChannel[i].length = 0;
     modMixerChannel[i].loopLength = 0;
   }
 
-  // start up the timer we will be using
-  //{64612, 18157, 304}
   TIMER[0].value = 0xFBE8;
   TIMER[0].control = TMR_ENABLE;
 
@@ -66,22 +64,22 @@ void modUpdate() {
   s32 samplesLeft = BUFFER_SIZE;
 
   while (samplesLeft > 0) {
-    if (modTiming.samplesUntilMODTick < (1 << 12) &&
+    if (modTiming.samplesUntilModTick < (1 << 12) &&
         modPlayer.state == MOD_STATE_PLAY) {
       modAdvance();
-      modTiming.samplesUntilMODTick += modTiming.samplesPerMODTick;
+      modTiming.samplesUntilModTick += modTiming.samplesPerModTick;
     }
 
-    if ((modTiming.samplesUntilMODTick >> 12) < samplesLeft &&
+    if ((modTiming.samplesUntilModTick >> 12) < samplesLeft &&
         modPlayer.state == MOD_STATE_PLAY) {
-      modMix(modTiming.samplesUntilMODTick >> 12);
-      samplesLeft -= modTiming.samplesUntilMODTick >> 12;
+      modMix(modTiming.samplesUntilModTick >> 12);
+      samplesLeft -= modTiming.samplesUntilModTick >> 12;
 
-      modTiming.samplesUntilMODTick -= (modTiming.samplesUntilMODTick >> 12)
+      modTiming.samplesUntilModTick -= (modTiming.samplesUntilModTick >> 12)
                                        << 12;
     } else {
       modMix(samplesLeft);
-      modTiming.samplesUntilMODTick -= samplesLeft << 12;
+      modTiming.samplesUntilModTick -= samplesLeft << 12;
       samplesLeft = 0;
     }
   }
@@ -104,16 +102,16 @@ void modMix(u32 samplesToMix) {
 
     if (chnPtr->data != 0) { // check if channel is active
       for (i = 0; i < samplesToMix; i++) {
-        tempBuffer[i] += chnPtr->data[chnPtr->pos >> 12] * chnPtr->vol;
-        chnPtr->pos += chnPtr->inc;
+        tempBuffer[i] += chnPtr->data[chnPtr->position >> 12] * chnPtr->volume;
+        chnPtr->position += chnPtr->increment;
 
-        if (chnPtr->pos >= chnPtr->length) {
+        if (chnPtr->position >= chnPtr->length) {
           if (chnPtr->loopLength == 0) { // if not looping, disable channel
             chnPtr->data = 0;
             i = samplesToMix;
           } else {
-            while (chnPtr->pos >= chnPtr->length) {
-              chnPtr->pos -= chnPtr->loopLength;
+            while (chnPtr->position >= chnPtr->length) {
+              chnPtr->position -= chnPtr->loopLength;
             }
           }
         }
@@ -143,7 +141,7 @@ void playMod(u32 modIdx) {
 
   // Set to default
   modSetTempo(MOD_DEFAULT_TEMPO);
-  modTiming.samplesUntilMODTick = 0;
+  modTiming.samplesUntilModTick = 0;
 
 } // SndPlayMOD
 
@@ -185,12 +183,13 @@ static void modProcessRow() {
     data.param = *modPlayer.rowPtr++;
 
     // Set these for the mid-ticks
+    data.modCh->note = data.note;
     data.modCh->effect = data.effect;
     data.modCh->param = data.param;
 
     if (data.sample != MOD_NO_SAMPLE) { // Never set local to memory anymore
       data.modCh->sample = data.sample;
-      data.modCh->vol = modPlayer.sample[data.sample].vol;
+      data.modCh->volume = modPlayer.sample[data.sample].vol;
 
       // Don't set mixer channel volume until after effect processing
       // vars.sndChn->vol          = vars.modChn->vol;
@@ -223,7 +222,7 @@ void modPlayNote(ModEffectUpdateData *data) {
 
   // set up mixer channel
   data->mixCh->data = sample->smpData;
-  data->mixCh->pos = data->sampleOffset << 20;
+  data->mixCh->position = data->sampleOffset << 20;
 
   // Let update flags take care of setting the inc
   // because it may also need to be set by effects without playing a note
@@ -243,7 +242,7 @@ void modSetTempo(u32 tempo) {
 
   // modPlayer.tempo = tempo;
   // modFreq = (tempo * 2) / 5;
-  modTiming.samplesPerMODTick = (modTiming.mixFreq * 5 << 12) / (tempo * 2);
+  modTiming.samplesPerModTick = (modTiming.mixFreq * 5 << 12) / (tempo * 2);
 
   // modTiming.samplesUntilMODTick -= modTiming.samplesPerMODTick;
   // modTiming.samplesPerMODTick = modTiming.mixFreq / modFreq;

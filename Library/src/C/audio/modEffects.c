@@ -2,17 +2,115 @@
 #include "audio/modFreqTable.h"
 #include "audio/modPlayer.h"
 
-void modFxArpeggio(ModEffectUpdateData *data) {}
+void modFxArpeggioRow(ModEffectUpdateData *data) {
+  data->modCh->arpeggioTick = 0;
+  if (data->modCh->note == MOD_NO_NOTE) {
+    data->modCh->effect = data->modCh->param = 0;
+  }
+}
 
-void modFxPortamentoUp(ModEffectUpdateData *data) {}
+void modFxArpeggioMid(ModEffectUpdateData *data) {
+  u32 arpNote;
 
-void modFxPortamentoDown(ModEffectUpdateData *data) {}
+  if (++data->modCh->arpeggioTick > 2) {
+    data->modCh->arpeggioTick = 0;
+  }
 
-void modFxTonePortamento(ModEffectUpdateData *data) {}
+  switch (data->modCh->arpeggioTick) {
+  case 0:
+    arpNote = data->modCh->note;
+    break;
+  case 1:
+    arpNote = data->modCh->note + (data->modCh->param >> 4);
+    break;
+  case 2:
+    arpNote = data->modCh->note + (data->modCh->param & 0xF);
+    break;
+  }
+
+  if (arpNote > MOD_HIGHEST_NOTE) {
+    arpNote = MOD_HIGHEST_NOTE;
+  }
+
+  data->modCh->period = modPeriodTable[data->modCh->finetune * 60 + arpNote];
+  data->updateFlags |= MOD_SET_FREQ;
+} // modFxArpeggioMid
+
+static s32 modPitchSlide(s32 period, s32 slide) {
+  period += slide;
+  if (period > MOD_PERIOD_MAX) {
+    period = MOD_PERIOD_MAX;
+  } else if (period < MOD_PERIOD_MIN) {
+    period = MOD_PERIOD_MIN;
+  }
+
+  return period;
+}
+
+static void modFxPortamentoRow(ModEffectUpdateData *data) {
+  if (data->param != 0) {
+    data->modCh->portaSpeed = data->param;
+  }
+}
+
+static void modFxPortamentoUp(ModEffectUpdateData *data) {
+  data->modCh->period =
+      modPitchSlide(data->modCh->period,
+                    -data->modCh->portaSpeed); // negative = higher pitch
+  data->updateFlags |= MOD_SET_FREQ;
+}
+
+static void modFxPortamentoDown(ModEffectUpdateData *data) {
+  data->modCh->period =
+      modPitchSlide(data->modCh->period,
+                    data->modCh->portaSpeed); // positive = lower pitch
+  data->updateFlags |= MOD_SET_FREQ;
+}
+
+void modFxTonePortamentoRow(ModEffectUpdateData *data) {
+  if (data->note != MOD_NO_NOTE) {
+    data->modCh->tonePortaTarget = data->note;
+  }
+
+  if (data->param != 0) {
+    data->modCh->tonePortaSpeed = data->param;
+  }
+
+  data->updateFlags &= MOD_PLAY_NOTE;
+}
+
+void modFxTonePortamentoMid(ModEffectUpdateData *data) {
+  u16 targetPeriod =
+      modPeriodTable[data->modCh->finetune * 60 + data->modCh->tonePortaTarget];
+
+  if (data->modCh->period < targetPeriod) {
+    data->modCh->period =
+        modPitchSlide(data->modCh->period, data->modCh->tonePortaSpeed);
+    if (data->modCh->period > targetPeriod) {
+      data->modCh->period = targetPeriod;
+    }
+  } else if (data->modCh->period > targetPeriod) {
+    data->modCh->period =
+        modPitchSlide(data->modCh->period, -data->modCh->tonePortaSpeed);
+    if (data->modCh->period < targetPeriod) {
+      data->modCh->period = targetPeriod;
+    }
+  }
+}
 
 void modFxVibrato(ModEffectUpdateData *data) {}
 
-void modFxVolumeSlideTonePortamento(ModEffectUpdateData *data) {}
+void modFxVolumeSlideTonePortaRow(ModEffectUpdateData *data) {
+  modFxVolumeSlideRow(data);
+  data->param = 0;
+
+  modFxTonePortamentoRow(data);
+}
+
+void modFxVolumeSlideTonePortaMid(ModEffectUpdateData *data) {
+  modFxVolumeSlideMid(data);
+  modFxTonePortamentoMid(data);
+}
 
 void modFxVolumeSlideVibrato(ModEffectUpdateData *data) {}
 
@@ -196,18 +294,91 @@ void modFxSpecialMid(ModEffectUpdateData *data) {
   }
 }
 
+void modFxSetCallback(ModCallback callback) { modPlayer.callback = callback; }
+
 void modFxSetSpeed(ModEffectUpdateData *data) {
   if (data->param < 32) {
     modPlayer.speed = data->param;
   }
 }
+/*
+
+// Save ourselves the trouble of initializing each member in code
+static const MOD_UPDATE_VARS modDefaultVars[MOD_EFFECT_TABLE_NUM] = {
+    {
+        // MOD_EFFECT_TABLE_ROW
+        NULL,                  // modChn
+        NULL,                  // sndChn
+        MOD_NO_NOTE,           // note
+        MOD_NO_SAMPLE,         // sample
+        0,                     // effect
+        0,                     // param
+        MOD_UPD_FLG_PLAY_NOTE, // updateFlags
+        0,                     // fineSlide
+        0,                     // smpOffset
+    },
+    {
+        // MOD_EFFECT_TABLE_MID
+        NULL,          // modChn
+        NULL,          // sndChn
+        MOD_NO_NOTE,   // note
+        MOD_NO_SAMPLE, // sample
+        0,             // effect
+        0,             // param
+        0,             // updateFlags
+        0,             // fineSlide
+        0,             // smpOffset
+    }};
+
+static const EFFECT_FUNC_PTR modEffectTable[MOD_EFFECT_TABLE_NUM][16] = {
+    {
+        // Row-tick updates
+        MODFXArpeggioRow,    // 0x0: Arpeggio
+        MODFXPortaRow,       // 0x1: Porta up
+        MODFXPortaRow,       // 0x2: Porta down
+        MODFXTonePortaRow,   // 0x3: Tone porta
+        MODFXVibratoRow,     // 0x4: Vibrato
+        MODFXVSldTPortaRow,  // 0x5: Volslide+Tone porta
+        MODFXVSldVibratoRow, // 0x6: Volslide+Vibrato
+        MODFXTremoloRow,     // 0x7: Tremolo
+        NULL,                // 0x8: Set panning (unsupported)
+        MODFXSampleOffset,   // 0x9: Sample offset
+        MODFXVolslideRow,    // 0xA: Volume slide
+        MODFXJumpToOrder,    // 0xB: Jump to order
+        MODFXSetVol,         // 0xC: Set volume
+        MODFXBreakToRow,     // 0xD: Break to row
+        MODFXSpecialRow,     // 0xE: Special
+        MODFXSpeed           // 0xF: Speed/Tempo
+    },
+    {
+        // Non row-tick updates
+        MODFXArpeggioMid,    // 0x0: Arpeggio
+        MODFXPortaUpMid,     // 0x1: Porta up
+        MODFXPortaDownMid,   // 0x2: Porta down
+        MODFXTonePortaMid,   // 0x3: Tone porta
+        MODFXVibratoMid,     // 0x4: Vibrato
+        MODFXVSldTPortaMid,  // 0x5: VolSlide+Tone porta
+        MODFXVSldVibratoMid, // 0x6: VolSlide+Vibrato
+        MODFXTremoloMid,     // 0x7: Tremolo
+        NULL,                // 0x8: Set panning
+        NULL,                // 0x9: Sample offset
+        MODFXVolslideMid,    // 0xA: Volume slide
+        NULL,                // 0xB: Jump to order
+        NULL,                // 0xC: Set volume
+        NULL,                // 0xD: Break to row
+        MODFXSpecialMid,     // 0xE: Special
+        NULL                 // 0xF: Speed/Tempo
+    }};
+
+
+ */
 
 const ModEffect modEffect[MOD_EFFECT_TIMING_COUNT][16] = {
     {
         // MOD_EFFECT_TABLE_ROW
-        NULL,                // 0x0: Arpeggio
-        NULL,                // 0x1: Porta up
-        NULL,                // 0x2: Porta down
+        modFxArpeggioRow,    // 0x0: Arpeggio
+        modFxPortamentoRow,  // 0x1: Porta up
+        modFxPortamentoRow,  // 0x2: Porta down
         NULL,                // 0x3: Tone porta
         NULL,                // 0x4: Vibrato
         NULL,                // 0x5: Volslide+Tone porta
@@ -224,9 +395,9 @@ const ModEffect modEffect[MOD_EFFECT_TIMING_COUNT][16] = {
     },
     {
         // MOD_EFFECT_TABLE_MID
-        NULL,                // 0x0: Arpeggio
-        NULL,                // 0x1: Porta up
-        NULL,                // 0x2: Porta down
+        modFxArpeggioMid,    // 0x0: Arpeggio
+        modFxPortamentoUp,   // 0x1: Porta up
+        modFxPortamentoDown, // 0x2: Porta down
         NULL,                // 0x3: Tone porta
         NULL,                // 0x4: Vibrato
         NULL,                // 0x5: Volslide+Tone porta
@@ -266,11 +437,11 @@ void modHandleUpdateFlags(ModEffectUpdateData *data) {
   }
 
   if (data->updateFlags & MOD_SET_VOL) {
-    data->mixCh->vol = data->modCh->vol;
+    data->mixCh->volume = data->modCh->volume;
   }
 
   if (data->updateFlags & MOD_SET_FREQ) {
-    data->mixCh->inc = modTiming.mixFreqPeriod / data->modCh->period;
+    data->mixCh->increment = modTiming.mixFreqPeriod / data->modCh->period;
   }
 
 } // modHandleUpdateFlags

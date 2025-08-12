@@ -18,6 +18,11 @@
 #define MOD_NO_NOTE 63   // 5 octaves, notes 0-59, 63 fits in same bits
 #define MOD_NO_SAMPLE 31 // Valid samples 0-30, use 31 as blank
 
+#define MOD_HIGHEST_NOTE 59 // Highest valid note
+
+#define MOD_PERIOD_MIN 53   // Highest pitch
+#define MOD_PERIOD_MAX 1814 // Lowest pitch
+
 #define AMIGA_VAL 3579545
 
 typedef enum {
@@ -70,7 +75,13 @@ typedef struct {
   u8 effect; // Current effect (set to 0 on row tick if no effect/parameter)
   u8 param;  // Current parameter (set to 0 on row tick if no effect/parameter)
 
+  u8 arpeggioTick;
+
   s8 volumeSlideSpeed;
+  u8 portaSpeed;
+
+  u8 tonePortaTarget; // Target note to slide towards
+  u8 tonePortaSpeed;
 } ModChannel;
 
 typedef void (*ModCallback)(u32 param, int bRowTick);
